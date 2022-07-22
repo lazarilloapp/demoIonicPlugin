@@ -1,5 +1,5 @@
 import './ExploreContainer.css';
-import { LazarilloSDK } from "@lzdevelopers/lz-ionic-plugin";
+import { LazarilloSDK, OpenMapOptions } from "@lzdevelopers/lz-ionic-plugin";
 import { IonButton } from '@ionic/react';
 
 interface ContainerProps { }
@@ -9,6 +9,15 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   if (apiKey === "") {
     throw new Error("PLEASE add valid apiKey");
   }
+
+  const mapOptions : OpenMapOptions = {
+    latitude: 0,
+    longitude: 0,
+    id: "my-map",
+    element: null,
+    parentPlaceId: "-N19VjzEVIj2RDKu7i4r",
+    routingOptions: null
+  }
   
   return (
     <div className="container">
@@ -16,7 +25,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
       <IonButton expand="full" onClick={() => {      
           LazarilloSDK.initialize(apiKey);
           LazarilloSDK.mapSupport(true);
-          LazarilloSDK.openMap();
+          LazarilloSDK.openMap(mapOptions);
        }}>
           Open the map
         </IonButton>
