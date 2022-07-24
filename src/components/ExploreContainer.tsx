@@ -21,13 +21,20 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   
   return (
     <div className="container">
-      <strong>Ready to create an app?</strong>
+      <strong>Ready to tes the plugin.</strong>
       <IonButton expand="full" onClick={() => {      
           LazarilloSDK.initialize(apiKey);
           LazarilloSDK.mapSupport(true);
           LazarilloSDK.openMap(mapOptions);
        }}>
           Open the map
+        </IonButton>
+        <IonButton expand="full" onClick={() => {      
+          LazarilloSDK.initialize(apiKey);
+          LazarilloSDK.mapSupport(true);
+          LazarilloSDK.openCustomMap(mapOptions);
+       }}>
+          Open custom map
         </IonButton>
     </div>
   );
