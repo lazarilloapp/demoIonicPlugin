@@ -6,10 +6,6 @@ interface ContainerProps { }
 
 const ExploreContainer: React.FC<ContainerProps> = () => {
   const apiKey: string = "";
-  if (apiKey === "") {
-    throw new Error("PLEASE add valid apiKey");
-  }
-
   const mapOptions : OpenMapOptions = {
     latitude: 0,
     longitude: 0,
