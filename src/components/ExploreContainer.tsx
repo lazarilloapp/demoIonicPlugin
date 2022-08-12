@@ -1,10 +1,22 @@
 import './ExploreContainer.css';
 import { LazarilloSDK, OpenMapOptions } from "@lzdevelopers/lz-ionic-plugin";
-import { IonButton } from '@ionic/react';
+import { IonButton, IonToast } from '@ionic/react';
+import { useState } from 'react';
 
 interface ContainerProps { }
 
+
+
 const ExploreContainer: React.FC<ContainerProps> = () => {
+
+  const [showToast1, setShowToast1] = useState(false);
+
+
+
+        // Add listener for the map when it is loaded
+    LazarilloSDK.addListener("mapLoaded", () => { setShowToast1(true) })
+
+
   const apiKey: string = "";
   const mapOptions : OpenMapOptions = {
     latitude: 0,
@@ -32,6 +44,13 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
        }}>
           Open custom map
         </IonButton>
+
+        <IonToast
+        isOpen={showToast1}
+        onDidDismiss={() => setShowToast1(false)}
+        message="Your settings have been saved."
+        duration={200}
+      />
     </div>
   );
 };
