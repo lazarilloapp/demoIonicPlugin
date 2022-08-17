@@ -1,3 +1,8 @@
+
+# Requerimientos
+- Ionic CLI
+
+
 # Instalación
 Para la instalación antes de ejecutar npm i, es necesario configurar el token de npm para tener acceso al repositorio privado.
 
@@ -14,8 +19,12 @@ Reemplazar el token en el archivo `.npmrc`.
 > Importante: Tener cuidado de no hacer commit con el token!
 
 # Ejecución
-Antes de ejecutar el proyecto es necesario agregar la api key en el siguiente archivo `demoLZSDK/src/components/ExploreContainer.tsx`
-
+```
+cd demoIonicPlugin
+npm install
+ionic build
+ionic capacitor run <platform> (android, ios)
+```
 
 # Para usar sdk en otros proyecto
 
@@ -39,3 +48,5 @@ allprojects {
 ## DOC SDK
 Puedes leer la documentación de los métodos disponibles en:
 `node_modules/@lzdevelopers/lz-ionic-plugin/README.md`
+
+
