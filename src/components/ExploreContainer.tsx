@@ -29,7 +29,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   
   return (
     <div className="container">
-      <strong>Ready to tes the plugin.</strong>
+      <strong>Ready to test the plugin.</strong>
       <IonButton expand="full" onClick={() => {      
           LazarilloSDK.initialize(apiKey);
           LazarilloSDK.mapSupport(true);
