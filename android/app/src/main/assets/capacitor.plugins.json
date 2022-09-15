@@ -4,6 +4,10 @@
 		"classpath": "com.capacitorjs.plugins.app.AppPlugin"
 	},
 	{
+		"pkg": "@capacitor/geolocation",
+		"classpath": "com.capacitorjs.plugins.geolocation.GeolocationPlugin"
+	},
+	{
 		"pkg": "@capacitor/haptics",
 		"classpath": "com.capacitorjs.plugins.haptics.HapticsPlugin"
 	},
@@ -16,7 +20,11 @@
 		"classpath": "com.capacitorjs.plugins.statusbar.StatusBarPlugin"
 	},
 	{
-		"pkg": "@lzdevelopers/lz-ionic-plugin",
+		"pkg": "@lzdevelopers/lazarillo-maps",
+		"classpath": "com.lazarillo.sdk.CapacitorLazarilloMapsPlugin"
+	},
+	{
+		"pkg": "@lzdevelopers/lazarillo-maps",
 		"classpath": "com.lazarillo.sdk.LazarilloSDKPlugin"
 	}
 ]
