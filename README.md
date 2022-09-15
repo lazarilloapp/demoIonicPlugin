@@ -1,3 +1,7 @@
+# Requerimientos
+- Ionic CLI
+
+
 # Instalación
 Para la instalación antes de ejecutar npm i, es necesario configurar el token de npm para tener acceso al repositorio privado.
 
@@ -38,4 +42,4 @@ allprojects {
 
 ## DOC SDK
 Puedes leer la documentación de los métodos disponibles en:
-`node_modules/@lzdevelopers/lz-ionic-plugin/README.md`
+`node_modules/@lzdevelopers/lazarillo-maps/README.md`
