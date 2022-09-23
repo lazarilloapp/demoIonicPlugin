@@ -76,7 +76,6 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
               <IonButton onClick={addRoute}>Add route</IonButton>
             </IonRow>
             <capacitor-lazarillo-map ref={mapRef}></capacitor-lazarillo-map>
-            <IonTitle>See places of interest:</IonTitle>
           </IonCol>
         </IonRow>
       </IonGrid>
