@@ -1,9 +1,11 @@
-# Requerimientos
+# Demo app for Lazaarillo maps on a Capacitor plugin
+
+## Requerimientos
 - Ionic CLI
 
 
-# Instalación
-Para la instalación antes de ejecutar npm i, es necesario configurar el token de npm para tener acceso al repositorio privado.
+## Instalación
+Para la instalación antes de ejecutar `npm i --legacy-peer-deps`, es necesario configurar el token de npm para tener acceso al repositorio privado.
 
 ## Opción 1
 En la consola ejecutar el siguiente comando reemplazando `<token>` por el token proporcionado por Lazarillo.
@@ -17,29 +19,10 @@ Reemplazar el token en el archivo `.npmrc`.
 
 > Importante: Tener cuidado de no hacer commit con el token!
 
-# Ejecución
-Antes de ejecutar el proyecto es necesario agregar la api key en el siguiente archivo `demoLZSDK/src/components/ExploreContainer.tsx`
-
-
-# Para usar sdk en otros proyecto
-
-Tener en cuenta las siguientes consideraciones:
-
-## Android
-En el `build.gradle`es necesario tener agregados los siguientes repositorios:
-
-```
-allprojects {
-    repositories {
-        mavenCentral()
-        jcenter()
-        maven { url "https://jitpack.io" }
-        google()
-    }
-}
-```
+## Ejecución
+Be sure to add the env variable REACT_APP_YOUR_API_KEY_HERE with the value of your api key
 
 
 ## DOC SDK
-Puedes leer la documentación de los métodos disponibles en:
-`node_modules/@lzdevelopers/lazarillo-maps/README.md`
+Read the avaialble documentation on:
+https://lazarilloapp.github.io/lz-sdk-plugin/

@@ -21,10 +21,6 @@
 	},
 	{
 		"pkg": "@lzdevelopers/lazarillo-maps",
-		"classpath": "com.lazarillo.sdk.CapacitorLazarilloMapsPlugin"
-	},
-	{
-		"pkg": "@lzdevelopers/lazarillo-maps",
-		"classpath": "com.lazarillo.sdk.LazarilloSDKPlugin"
+		"classpath": "com.lazarillo.sdk.plugin.CapacitorLazarilloMapsPlugin"
 	}
 ]
