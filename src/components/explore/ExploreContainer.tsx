@@ -31,7 +31,9 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
   const [showToast1, setShowToast1] = useState(false);
 
-  const apiKey = "AiNFZyJdbr5qa2KHmj7e"
+  const apiKey = process.env.REACT_APP_YOUR_API_KEY_HERE
+    ? process.env.REACT_APP_YOUR_API_KEY_HERE
+    : '';
 
   async function createMap() {
     if (!mapRef.current) return;
