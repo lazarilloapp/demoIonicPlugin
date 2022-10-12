@@ -185,13 +185,26 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
       <IonGrid>
         <IonRow>
           <IonCol>
-            <IonRow>
-              <IonButton onClick={createMap}>
-                <IonIcon icon={mapOutline}></IonIcon>
-              </IonButton>
-            </IonRow>
+            <IonButton onClick={createMap}>
+              <IonIcon icon={mapOutline}></IonIcon>
+            </IonButton>
+          </IonCol>
+        </IonRow>
+
+        <IonRow>
+          <IonCol>
             <capacitor-lazarillo-map ref={mapRef}></capacitor-lazarillo-map>
+          </IonCol>
+        </IonRow>
+
+        <IonRow>
+          <IonCol>
             <IonTitle>See places of interest:</IonTitle>
+          </IonCol>
+        </IonRow>
+
+        <IonRow>
+          <IonCol>
             <IonList>
               {places.map((place, i) => (
                 <IonItem key={i} onClick={() => startRoute(i)}>
@@ -202,7 +215,11 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
                 </IonItem>
               ))}
             </IonList>
+          </IonCol>
+        </IonRow>
 
+        <IonRow>
+          <IonCol>
             <IonToast
               isOpen={showToast1}
               onDidDismiss={() => setShowToast1(false)}
