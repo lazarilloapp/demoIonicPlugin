@@ -22,6 +22,7 @@ import {
 } from '@ionic/react';
 import { map, mapOutline } from 'ionicons/icons';
 import { Place } from '../places/Place';
+import { RouteReadyCallbackData } from '@lzdevelopers/lazarillo-maps/dist/typings/definitions';
 
 interface ContainerProps {}
 
@@ -56,6 +57,10 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     });
   }
 
+  /**
+   * Not used
+   * @returns 
+   */
   async function addRoute() {
     if (!newMap) return;
 
@@ -82,6 +87,9 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
       finalFloor: '-N1OJ6FIVBV6dpjCXEFM',
       place: '-N19VjzEVIj2RDKu7i4r',
       preferAccessibleRoute: true,
+    }, async (data: RouteReadyCallbackData) => {
+      console.log('Route added', data)
+      presentToast('middle')
     });
   }
 
@@ -164,18 +172,18 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
         finalFloor: '-N1OJ6FIVBV6dpjCXEFM',
         place: '-N19VjzEVIj2RDKu7i4r',
         preferAccessibleRoute: true,
-      },
-      async () => {
-        console.log('Map loaded');
+      },async (data: RouteReadyCallbackData) => {
+        console.log('Route added', data)
+        presentToast('top', "Route loaded")
       },
     );
   }
 
   const [present] = useIonToast();
 
-  const presentToast = (position: 'top' | 'middle' | 'bottom') => {
+  const presentToast = (position: 'top' | 'middle' | 'bottom', message='Event received') => {
     present({
-      message: 'Hello World!',
+      message: message,
       duration: 1500,
       position: position
     });
