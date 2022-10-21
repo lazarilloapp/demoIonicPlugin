@@ -20,9 +20,10 @@ import {
   IonToast,
   useIonToast,
 } from '@ionic/react';
-import { map, mapOutline } from 'ionicons/icons';
+import { map, mapOutline, playSkipForwardOutline, playBackOutline } from 'ionicons/icons';
 import { Place } from '../places/Place';
 import { RouteReadyCallbackData } from '@lzdevelopers/lazarillo-maps/dist/typings/definitions';
+import { InnerFloor } from '../places/InnerFloor';
 
 interface ContainerProps {}
 
@@ -39,135 +40,121 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   async function createMap() {
     if (!mapRef.current) return;
 
-    newMap = await LazarilloMap.create({
-      id: 'my-cool-map',
-      element: mapRef.current,
-      apiKey: apiKey,
-      config: {
-        center: {
-          lat: -33.41758007741259,
-          lng: -70.60615300514021,
+    newMap = await LazarilloMap.create(
+      {
+        id: 'my-cool-map',
+        element: mapRef.current,
+        apiKey: apiKey,
+        config: {
+          center: {
+            lat: -33.41758007741259,
+            lng: -70.60615300514021,
+          },
+          zoom: 8,
+          parentPlaceId: '-N19VjzEVIj2RDKu7i4r',
         },
-        zoom: 8,
-        parentPlaceId: '-N19VjzEVIj2RDKu7i4r',
       },
-    },async () => {
-      console.log('Map loaded');
-      presentToast('top')
-    });
+      async () => {
+        console.log('Map loaded');
+        presentToast('top');
+      },
+    );
   }
 
   // Floor list
-  const innerFloors = {
-    "-N1OJ6FIVBV6dpjCXEFM": {
-        "floor": "Planta baja",
-        "index": 0,
-        "key": "-N1OJ6FIVBV6dpjCXEFM",
-        "level": -1,
-        "name": {
-            "default": "Planta baja",
-            "es": "Planta baja"
-        },
-        "title": "Planta baja",
-        "vectorTile": true
+  const innerFloors: InnerFloor[] = [
+    {
+      index: 0,
+      key: '-N1OJ6FIVBV6dpjCXEFM',
+      level: -1,
+      name: {
+        default: 'Planta baja',
+        es: 'Planta baja',
+      },
+      vectorTile: true,
     },
-    "-NCtxDrJbDWE3gMkZ_45": {
-        "floor": "Primer piso",
-        "index": 1,
-        "key": "-NCtxDrJbDWE3gMkZ_45",
-        "level": 1,
-        "name": {
-            "default": "Primer piso",
-            "es": "Primer piso"
-        },
-        "title": "Primer piso",
-        "vectorTile": true
+    {
+      index: 1,
+      key: '-NCtxDrJbDWE3gMkZ_45',
+      level: 1,
+      name: {
+        default: 'Primer piso',
+        es: 'Primer piso',
+      },
+      vectorTile: true,
     },
-    "-NCtxOT4E4n3XlW_-hzL": {
-        "floor": "Segundo piso",
-        "index": 2,
-        "key": "-NCtxOT4E4n3XlW_-hzL",
-        "level": 2,
-        "name": {
-            "default": "Segundo piso",
-            "es": "Segundo piso"
-        },
-        "title": "Segundo piso",
-        "vectorTile": true
+    {
+      index: 2,
+      key: '-NCtxOT4E4n3XlW_-hzL',
+      level: 2,
+      name: {
+        default: 'Segundo piso',
+        es: 'Segundo piso',
+      },
+      vectorTile: true,
     },
-    "-NCtxUY6bYLXOEndcqMl": {
-        "floor": "Tercer piso",
-        "index": 3,
-        "key": "-NCtxUY6bYLXOEndcqMl",
-        "level": 3,
-        "name": {
-            "default": "Tercer piso",
-            "es": "Tercer piso"
-        },
-        "title": "Tercer piso",
-        "vectorTile": true
+    {
+      index: 3,
+      key: '-NCtxUY6bYLXOEndcqMl',
+      level: 3,
+      name: {
+        default: 'Tercer piso',
+        es: 'Tercer piso',
+      },
+      vectorTile: true,
     },
-    "-NCtxd01xaDOjDQSOPCT": {
-        "floor": "Cuarto piso",
-        "index": 4,
-        "key": "-NCtxd01xaDOjDQSOPCT",
-        "level": 4,
-        "name": {
-            "default": "Cuarto piso",
-            "es": "Cuarto piso"
-        },
-        "title": "Cuarto piso",
-        "vectorTile": true
+    {
+      index: 4,
+      key: '-NCtxd01xaDOjDQSOPCT',
+      level: 4,
+      name: {
+        default: 'Cuarto piso',
+        es: 'Cuarto piso',
+      },
+      vectorTile: true,
     },
-    "-NCtxg_OxCuCfGVevdck": {
-        "floor": "Quinto piso",
-        "index": 5,
-        "key": "-NCtxg_OxCuCfGVevdck",
-        "level": 5,
-        "name": {
-            "default": "Quinto piso",
-            "es": "Quinto piso"
-        },
-        "title": "Quinto piso",
-        "vectorTile": true
+    {
+      index: 5,
+      key: '-NCtxg_OxCuCfGVevdck',
+      level: 5,
+      name: {
+        default: 'Quinto piso',
+        es: 'Quinto piso',
+      },
+      vectorTile: true,
     },
-    "-NCtxjm9HZsty9D0i-or": {
-        "floor": "Sexto piso",
-        "index": 6,
-        "key": "-NCtxjm9HZsty9D0i-or",
-        "level": 6,
-        "name": {
-            "default": "Sexto piso",
-            "es": "Sexto piso"
-        },
-        "title": "Sexto piso",
-        "vectorTile": true
+    {
+      index: 6,
+      key: '-NCtxjm9HZsty9D0i-or',
+      level: 6,
+      name: {
+        default: 'Sexto piso',
+        es: 'Sexto piso',
+      },
+      vectorTile: true,
     },
-    "-ND-DoTPPnqUT_dWjW3e": {
-        "floor": "Piso 61",
-        "index": 7,
-        "key": "-ND-DoTPPnqUT_dWjW3e",
-        "level": 7,
-        "name": {
-            "default": "Piso 61",
-            "es": "Piso 61"
-        },
-        "title": "Piso 61",
-        "vectorTile": true
+    {
+      index: 7,
+      key: '-ND-DoTPPnqUT_dWjW3e',
+      level: 7,
+      name: {
+        default: 'Piso 61',
+        es: 'Piso 61',
+      },
+
+      vectorTile: true,
     },
-    "-ND-DotO0jGRTA5-D-Jv": {
-        "floor": "Piso 62",
-        "index": 8,
-        "key": "-ND-DotO0jGRTA5-D-Jv",
-        "level": 8,
-        "name": {
-            "default": "Piso 62",
-            "es": "Piso 62"
-        },
-        "title": "Piso 62",
-        "vectorTile": true
-    }
-}
+    {
+      index: 8,
+      key: '-ND-DotO0jGRTA5-D-Jv',
+      level: 8,
+      name: {
+        default: 'Piso 62',
+        es: 'Piso 62',
+      },
+      vectorTile: true,
+    },
+  ];
 
   // Place list
   const places: Place[] = [
@@ -209,7 +196,6 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     },
   ];
 
-
   async function startRoute(targetPlaceKey: number) {
     const targetPlace = places[targetPlaceKey];
 
@@ -239,23 +225,55 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
         finalFloor: '-N1OJ6FIVBV6dpjCXEFM',
         place: '-N19VjzEVIj2RDKu7i4r',
         preferAccessibleRoute: true,
-      },async (data: RouteReadyCallbackData) => {
-        console.log('Route added', data)
-        presentToast('top', "Route loaded")
+      },
+      async (data: RouteReadyCallbackData) => {
+        console.log('Route added', data);
+        presentToast('top', 'Route loaded');
       },
     );
   }
 
   const [present] = useIonToast();
 
-  const presentToast = (position: 'top' | 'middle' | 'bottom', message='Event received') => {
+  const presentToast = (
+    position: 'top' | 'middle' | 'bottom',
+    message = 'Event received',
+  ) => {
     present({
       message: message,
       duration: 1500,
-      position: position
+      position: position,
     });
   };
 
+  let currentFloorIndex = 0
+
+
+  async function changeNextFloor() {
+
+    currentFloorIndex += 1
+
+    const nextFloorId = innerFloors[currentFloorIndex].key;
+
+    newMap.setFloor({
+      mapId: 'my-cool-map',
+      floorId : nextFloorId
+    })
+
+  }
+
+  async function changePrevFloor() {
+
+    currentFloorIndex -= 1
+
+    const prevFloorId = innerFloors[currentFloorIndex].key;
+
+    newMap.setFloor({
+      mapId: 'my-cool-map',
+      floorId : prevFloorId
+    })
+
+  }
 
   return (
     <IonContent>
@@ -265,7 +283,14 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
             <IonButton onClick={createMap}>
               <IonIcon icon={mapOutline}></IonIcon>
             </IonButton>
+            <IonButton onClick={changePrevFloor}>
+              <IonIcon icon={playBackOutline}></IonIcon>
+            </IonButton>
+            <IonButton onClick={changeNextFloor}>
+              <IonIcon icon={playSkipForwardOutline}></IonIcon>
+            </IonButton>
           </IonCol>
+
         </IonRow>
 
         <IonRow>
