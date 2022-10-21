@@ -57,42 +57,6 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     });
   }
 
-  /**
-   * Not used
-   * @returns 
-   */
-  async function addRoute() {
-    if (!newMap) return;
-
-    let initialPos = {
-      building: '-N19VjzEVIj2RDKu7i4r',
-      floor: '-N1OJ6FIVBV6dpjCXEFM',
-      polygons: undefined,
-      latitude: -33.41758007741259,
-      longitude: -70.60615300514021,
-    };
-    let finalPos = {
-      building: '-N19VjzEVIj2RDKu7i4r',
-      floor: '-N1OJ6FIVBV6dpjCXEFM',
-      polygons: undefined,
-      latitude: -33.417596318453455,
-      longitude: -70.60672561495679,
-    };
-
-    newMap.addRoute({
-      mapId: 'my-cool-map',
-      initialPos: initialPos,
-      finalPos: finalPos,
-      initialFloor: '-N1OJ6FIVBV6dpjCXEFM',
-      finalFloor: '-N1OJ6FIVBV6dpjCXEFM',
-      place: '-N19VjzEVIj2RDKu7i4r',
-      preferAccessibleRoute: true,
-    }, async (data: RouteReadyCallbackData) => {
-      console.log('Route added', data)
-      presentToast('middle')
-    });
-  }
-
   // Place list
   const places: Place[] = [
     {
@@ -133,15 +97,6 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     },
   ];
 
-  const placesComponent = places.map(place => {
-    <IonSlide>
-      <IonRow>
-        <IonText>{place._name}</IonText>
-        <IonImg src={'https://random.imagecdn.app/150/150'} />
-      </IonRow>
-      ;
-    </IonSlide>;
-  });
 
   async function startRoute(targetPlaceKey: number) {
     const targetPlace = places[targetPlaceKey];
