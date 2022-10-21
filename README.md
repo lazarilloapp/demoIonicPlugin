@@ -1,4 +1,4 @@
-# Demo app for Lazaarillo maps on a Capacitor plugin
+# Demo app for Lazarillo maps on a Capacitor plugin
 
 ## Requerimientos
 - Ionic CLI

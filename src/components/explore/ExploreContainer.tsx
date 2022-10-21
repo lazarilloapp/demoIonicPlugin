@@ -20,9 +20,10 @@ import {
   IonToast,
   useIonToast,
 } from '@ionic/react';
-import { map, mapOutline } from 'ionicons/icons';
+import { map, mapOutline, playSkipForwardOutline, playBackOutline } from 'ionicons/icons';
 import { Place } from '../places/Place';
 import { RouteReadyCallbackData } from '@lzdevelopers/lazarillo-maps/dist/typings/definitions';
+import { InnerFloor } from '../places/InnerFloor';
 
 interface ContainerProps {}
 
@@ -39,59 +40,121 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   async function createMap() {
     if (!mapRef.current) return;
 
-    newMap = await LazarilloMap.create({
-      id: 'my-cool-map',
-      element: mapRef.current,
-      apiKey: apiKey,
-      config: {
-        center: {
-          lat: -33.41758007741259,
-          lng: -70.60615300514021,
+    newMap = await LazarilloMap.create(
+      {
+        id: 'my-cool-map',
+        element: mapRef.current,
+        apiKey: apiKey,
+        config: {
+          center: {
+            lat: -33.41758007741259,
+            lng: -70.60615300514021,
+          },
+          zoom: 8,
+          parentPlaceId: '-N19VjzEVIj2RDKu7i4r',
         },
-        zoom: 8,
-        parentPlaceId: '-N19VjzEVIj2RDKu7i4r',
       },
-    },async () => {
-      console.log('Map loaded');
-      presentToast('top')
-    });
+      async () => {
+        console.log('Map loaded');
+        presentToast('top');
+      },
+    );
   }
 
-  /**
-   * Not used
-   * @returns 
-   */
-  async function addRoute() {
-    if (!newMap) return;
+  // Floor list
+  const innerFloors: InnerFloor[] = [
+    {
+      index: 0,
+      key: '-N1OJ6FIVBV6dpjCXEFM',
+      level: -1,
+      name: {
+        default: 'Planta baja',
+        es: 'Planta baja',
+      },
+      vectorTile: true,
+    },
+    {
+      index: 1,
+      key: '-NCtxDrJbDWE3gMkZ_45',
+      level: 1,
+      name: {
+        default: 'Primer piso',
+        es: 'Primer piso',
+      },
+      vectorTile: true,
+    },
+    {
+      index: 2,
+      key: '-NCtxOT4E4n3XlW_-hzL',
+      level: 2,
+      name: {
+        default: 'Segundo piso',
+        es: 'Segundo piso',
+      },
+      vectorTile: true,
+    },
+    {
+      index: 3,
+      key: '-NCtxUY6bYLXOEndcqMl',
+      level: 3,
+      name: {
+        default: 'Tercer piso',
+        es: 'Tercer piso',
+      },
+      vectorTile: true,
+    },
+    {
+      index: 4,
+      key: '-NCtxd01xaDOjDQSOPCT',
+      level: 4,
+      name: {
+        default: 'Cuarto piso',
+        es: 'Cuarto piso',
+      },
+      vectorTile: true,
+    },
+    {
+      index: 5,
+      key: '-NCtxg_OxCuCfGVevdck',
+      level: 5,
+      name: {
+        default: 'Quinto piso',
+        es: 'Quinto piso',
+      },
+      vectorTile: true,
+    },
+    {
+      index: 6,
+      key: '-NCtxjm9HZsty9D0i-or',
+      level: 6,
+      name: {
+        default: 'Sexto piso',
+        es: 'Sexto piso',
+      },
+      vectorTile: true,
+    },
+    {
+      index: 7,
+      key: '-ND-DoTPPnqUT_dWjW3e',
+      level: 7,
+      name: {
+        default: 'Piso 61',
+        es: 'Piso 61',
+      },
 
-    let initialPos = {
-      building: '-N19VjzEVIj2RDKu7i4r',
-      floor: '-N1OJ6FIVBV6dpjCXEFM',
-      polygons: undefined,
-      latitude: -33.41758007741259,
-      longitude: -70.60615300514021,
-    };
-    let finalPos = {
-      building: '-N19VjzEVIj2RDKu7i4r',
-      floor: '-N1OJ6FIVBV6dpjCXEFM',
-      polygons: undefined,
-      latitude: -33.417596318453455,
-      longitude: -70.60672561495679,
-    };
-
-    newMap.addRoute({
-      mapId: 'my-cool-map',
-      initialPos: initialPos,
-      finalPos: finalPos,
-      initialFloor: '-N1OJ6FIVBV6dpjCXEFM',
-      finalFloor: '-N1OJ6FIVBV6dpjCXEFM',
-      place: '-N19VjzEVIj2RDKu7i4r',
-      preferAccessibleRoute: true,
-    }, async (data: RouteReadyCallbackData) => {
-      console.log('Route added', data)
-      presentToast('middle')
-    });
-  }
+      vectorTile: true,
+    },
+    {
+      index: 8,
+      key: '-ND-DotO0jGRTA5-D-Jv',
+      level: 8,
+      name: {
+        default: 'Piso 62',
+        es: 'Piso 62',
+      },
+      vectorTile: true,
+    },
+  ];
 
   // Place list
   const places: Place[] = [
@@ -133,16 +196,6 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     },
   ];
 
-  const placesComponent = places.map(place => {
-    <IonSlide>
-      <IonRow>
-        <IonText>{place._name}</IonText>
-        <IonImg src={'https://random.imagecdn.app/150/150'} />
-      </IonRow>
-      ;
-    </IonSlide>;
-  });
-
   async function startRoute(targetPlaceKey: number) {
     const targetPlace = places[targetPlaceKey];
 
@@ -172,23 +225,55 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
         finalFloor: '-N1OJ6FIVBV6dpjCXEFM',
         place: '-N19VjzEVIj2RDKu7i4r',
         preferAccessibleRoute: true,
-      },async (data: RouteReadyCallbackData) => {
-        console.log('Route added', data)
-        presentToast('top', "Route loaded")
+      },
+      async (data: RouteReadyCallbackData) => {
+        console.log('Route added', data);
+        presentToast('top', 'Route loaded');
       },
     );
   }
 
   const [present] = useIonToast();
 
-  const presentToast = (position: 'top' | 'middle' | 'bottom', message='Event received') => {
+  const presentToast = (
+    position: 'top' | 'middle' | 'bottom',
+    message = 'Event received',
+  ) => {
     present({
       message: message,
       duration: 1500,
-      position: position
+      position: position,
     });
   };
 
+  let currentFloorIndex = 0
+
+
+  async function changeNextFloor() {
+
+    currentFloorIndex += 1
+
+    const nextFloorId = innerFloors[currentFloorIndex].key;
+
+    newMap.setFloor({
+      mapId: 'my-cool-map',
+      floorId : nextFloorId
+    })
+
+  }
+
+  async function changePrevFloor() {
+
+    currentFloorIndex -= 1
+
+    const prevFloorId = innerFloors[currentFloorIndex].key;
+
+    newMap.setFloor({
+      mapId: 'my-cool-map',
+      floorId : prevFloorId
+    })
+
+  }
 
   return (
     <IonContent>
@@ -198,7 +283,14 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
             <IonButton onClick={createMap}>
               <IonIcon icon={mapOutline}></IonIcon>
             </IonButton>
+            <IonButton onClick={changePrevFloor}>
+              <IonIcon icon={playBackOutline}></IonIcon>
+            </IonButton>
+            <IonButton onClick={changeNextFloor}>
+              <IonIcon icon={playSkipForwardOutline}></IonIcon>
+            </IonButton>
           </IonCol>
+
         </IonRow>
 
         <IonRow>
