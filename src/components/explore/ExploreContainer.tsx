@@ -57,6 +57,118 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     });
   }
 
+  // Floor list
+  const innerFloors = {
+    "-N1OJ6FIVBV6dpjCXEFM": {
+        "floor": "Planta baja",
+        "index": 0,
+        "key": "-N1OJ6FIVBV6dpjCXEFM",
+        "level": -1,
+        "name": {
+            "default": "Planta baja",
+            "es": "Planta baja"
+        },
+        "title": "Planta baja",
+        "vectorTile": true
+    },
+    "-NCtxDrJbDWE3gMkZ_45": {
+        "floor": "Primer piso",
+        "index": 1,
+        "key": "-NCtxDrJbDWE3gMkZ_45",
+        "level": 1,
+        "name": {
+            "default": "Primer piso",
+            "es": "Primer piso"
+        },
+        "title": "Primer piso",
+        "vectorTile": true
+    },
+    "-NCtxOT4E4n3XlW_-hzL": {
+        "floor": "Segundo piso",
+        "index": 2,
+        "key": "-NCtxOT4E4n3XlW_-hzL",
+        "level": 2,
+        "name": {
+            "default": "Segundo piso",
+            "es": "Segundo piso"
+        },
+        "title": "Segundo piso",
+        "vectorTile": true
+    },
+    "-NCtxUY6bYLXOEndcqMl": {
+        "floor": "Tercer piso",
+        "index": 3,
+        "key": "-NCtxUY6bYLXOEndcqMl",
+        "level": 3,
+        "name": {
+            "default": "Tercer piso",
+            "es": "Tercer piso"
+        },
+        "title": "Tercer piso",
+        "vectorTile": true
+    },
+    "-NCtxd01xaDOjDQSOPCT": {
+        "floor": "Cuarto piso",
+        "index": 4,
+        "key": "-NCtxd01xaDOjDQSOPCT",
+        "level": 4,
+        "name": {
+            "default": "Cuarto piso",
+            "es": "Cuarto piso"
+        },
+        "title": "Cuarto piso",
+        "vectorTile": true
+    },
+    "-NCtxg_OxCuCfGVevdck": {
+        "floor": "Quinto piso",
+        "index": 5,
+        "key": "-NCtxg_OxCuCfGVevdck",
+        "level": 5,
+        "name": {
+            "default": "Quinto piso",
+            "es": "Quinto piso"
+        },
+        "title": "Quinto piso",
+        "vectorTile": true
+    },
+    "-NCtxjm9HZsty9D0i-or": {
+        "floor": "Sexto piso",
+        "index": 6,
+        "key": "-NCtxjm9HZsty9D0i-or",
+        "level": 6,
+        "name": {
+            "default": "Sexto piso",
+            "es": "Sexto piso"
+        },
+        "title": "Sexto piso",
+        "vectorTile": true
+    },
+    "-ND-DoTPPnqUT_dWjW3e": {
+        "floor": "Piso 61",
+        "index": 7,
+        "key": "-ND-DoTPPnqUT_dWjW3e",
+        "level": 7,
+        "name": {
+            "default": "Piso 61",
+            "es": "Piso 61"
+        },
+        "title": "Piso 61",
+        "vectorTile": true
+    },
+    "-ND-DotO0jGRTA5-D-Jv": {
+        "floor": "Piso 62",
+        "index": 8,
+        "key": "-ND-DotO0jGRTA5-D-Jv",
+        "level": 8,
+        "name": {
+            "default": "Piso 62",
+            "es": "Piso 62"
+        },
+        "title": "Piso 62",
+        "vectorTile": true
+    }
+}
+
   // Place list
   const places: Place[] = [
     {
