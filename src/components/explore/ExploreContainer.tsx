@@ -225,6 +225,9 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
         finalFloor: '-N1OJ6FIVBV6dpjCXEFM',
         place: '-N19VjzEVIj2RDKu7i4r',
         preferAccessibleRoute: true,
+        nextStepsRouteColor:'#ff33b5',
+        prevStepsRouteColor:'#aaaaaa',
+        polylineWidth: 10,
       },
       async (data: RouteReadyCallbackData) => {
         console.log('Route added', data);
