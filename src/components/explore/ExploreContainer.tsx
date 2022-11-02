@@ -20,7 +20,7 @@ import {
   IonToast,
   useIonToast,
 } from '@ionic/react';
-import { map, mapOutline, playSkipForwardOutline, playBackOutline, pinOutline } from 'ionicons/icons';
+import { map, mapOutline, playSkipForwardOutline, playBackOutline } from 'ionicons/icons';
 import { Place } from '../places/Place';
 import { RouteReadyCallbackData } from '@lzdevelopers/lazarillo-maps/dist/typings/definitions';
 import { InnerFloor } from '../places/InnerFloor';
@@ -278,107 +278,6 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
   }
 
-
-  async function addIndoorMarker(){
-
-    newMap.addMarker(
-      {
-        /**
-         * Marker position
-         */
-        coordinate: {
-          lat: -33.41785379621859,
-          lng: -70.60568241131433,
-        },
-        /**
-         * Sets the opacity of the marker, between 0 (completely transparent) and 1 inclusive.
-         *
-         * @default 1
-         */
-        opacity: 0.75,
-        /**
-         * Title, a short description of the overlay.
-         */
-        title: "My marker",
-        /**
-         * Snippet text, shown beneath the title in the info window when selected.
-         */
-        snippet: "Snippet example",
-        /**
-         * Controls whether this marker should be flat against the Earth's surface or a billboard facing the camera.
-         *
-         * @default false
-         */
-        isFlat: false,
-        /**
-         * Marker icon to render.
-         */
-        // iconUrl: string,
-        /**
-         * Controls whether this marker can be dragged interactively
-         *
-         * @default false
-         */
-        // draggable?: boolean
-        /**
-         * If floor id is passed, the marker will only show itself when the floor is visible. 
-         * Keep this field empty if the marker is outdoor
-         */
-         floorId: '-N1OJ6FIVBV6dpjCXEFM'
-    }
-
-    )
-
-  }
-
-  async function addOutdoorMarker(){
-
-    newMap.addMarker(
-      {
-        /**
-         * Marker position
-         */
-        coordinate: {
-          lat: -33.41785379621859,
-          lng: -70.60568241131433,
-        },
-        /**
-         * Sets the opacity of the marker, between 0 (completely transparent) and 1 inclusive.
-         *
-         * @default 1
-         */
-        opacity: 0.75,
-        /**
-         * Title, a short description of the overlay.
-         */
-        title: "My marker",
-        /**
-         * Snippet text, shown beneath the title in the info window when selected.
-         */
-        snippet: "Snippet example",
-        /**
-         * Controls whether this marker should be flat against the Earth's surface or a billboard facing the camera.
-         *
-         * @default false
-         */
-        isFlat: false,
-        /**
-         * Marker icon to render.
-         */
-        // iconUrl: string,
-        /**
-         * Controls whether this marker can be dragged interactively
-         *
-         * @default false
-         */
-        // draggable?: boolean
-
-    }
-
-    )
-
-  }
-
   return (
     <IonContent>
       <IonGrid>
@@ -393,14 +292,6 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
             <IonButton onClick={changeNextFloor}>
               <IonIcon icon={playSkipForwardOutline}></IonIcon>
             </IonButton>
-            <IonButton onClick={addIndoorMarker}>
-              <IonIcon icon={pinOutline}></IonIcon>
-            </IonButton>
-            <IonButton onClick={addOutdoorMarker}>
-              <IonIcon icon={pinOutline}></IonIcon>
-            </IonButton>
-
-
           </IonCol>
 
         </IonRow>
