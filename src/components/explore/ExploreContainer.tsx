@@ -20,7 +20,7 @@ import {
   IonToast,
   useIonToast,
 } from '@ionic/react';
-import { map, mapOutline, playSkipForwardOutline, playBackOutline } from 'ionicons/icons';
+import { map, mapOutline, playSkipForwardOutline, playBackOutline, location } from 'ionicons/icons';
 import { Place } from '../places/Place';
 import { RouteReadyCallbackData } from '@lzdevelopers/lazarillo-maps/dist/typings/definitions';
 import { InnerFloor } from '../places/InnerFloor';
@@ -44,7 +44,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
       {
         id: 'my-cool-map',
         element: mapRef.current,
-        apiKey: apiKey,
+        apiKey: 'AiNFZyJdbr5qa2KHmj7e',
         config: {
           center: {
             lat: -33.41758007741259,
@@ -278,6 +278,18 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
   }
 
+  async function addMarker() {
+    newMap.addMarker({
+      coordinate: {
+          lat: -33.416957685223366,
+          lng: -70.60679219611815,
+      },
+      title: "Hello world",
+      snippet: "Hola Mundo",
+      floorId: "-N1OJ6FIVBV6dpjCXEFM"
+    });
+  }
+
   return (
     <IonContent>
       <IonGrid>
@@ -291,6 +303,9 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
             </IonButton>
             <IonButton onClick={changeNextFloor}>
               <IonIcon icon={playSkipForwardOutline}></IonIcon>
+            </IonButton>
+            <IonButton onClick={addMarker}>
+              <IonIcon icon={location}></IonIcon>
             </IonButton>
           </IonCol>
 
