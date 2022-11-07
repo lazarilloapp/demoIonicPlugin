@@ -44,7 +44,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
       {
         id: 'my-cool-map',
         element: mapRef.current,
-        apiKey: 'AiNFZyJdbr5qa2KHmj7e',
+        apiKey: apiKey,
         config: {
           center: {
             lat: -33.41758007741259,
