@@ -284,11 +284,20 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
           lat: -33.416957685223366,
           lng: -70.60679219611815,
       },
-      title: "Hello world",
-      snippet: "Hola Mundo",
       floorId: "-N1OJ6FIVBV6dpjCXEFM"
     });
   }
+
+
+  async function addOutdoorMarker() {
+    newMap.addMarker({
+      coordinate: {
+        lat: -33.417556917537524,
+        lng: -70.60716507932558,
+      }
+    });
+  }
+
 
   return (
     <IonContent>
@@ -304,12 +313,23 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
             <IonButton onClick={changeNextFloor}>
               <IonIcon icon={playSkipForwardOutline}></IonIcon>
             </IonButton>
-            <IonButton onClick={addMarker}>
-              <IonIcon icon={location}></IonIcon>
-            </IonButton>
+       
           </IonCol>
 
         </IonRow>
+
+        <IonRow>
+          <IonCol>
+          <IonButton onClick={addMarker}>
+              <IonIcon icon={location}></IonIcon>
+              <IonText> Indoor</IonText>
+            </IonButton>
+            <IonButton onClick={addOutdoorMarker}>
+              <IonIcon icon={location}></IonIcon>
+              <IonText> Outdoor</IonText>
+            </IonButton>
+          </IonCol>
+          </IonRow>
 
         <IonRow>
           <IonCol>
