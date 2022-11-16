@@ -20,7 +20,7 @@ import {
   IonToast,
   useIonToast,
 } from '@ionic/react';
-import { map, mapOutline, playSkipForwardOutline, playBackOutline, location } from 'ionicons/icons';
+import { map, mapOutline, playSkipForwardOutline, playBackOutline, location, trashBinOutline } from 'ionicons/icons';
 import { Place } from '../places/Place';
 import { RouteReadyCallbackData } from '@lzdevelopers/lazarillo-maps/dist/typings/definitions';
 import { InnerFloor } from '../places/InnerFloor';
@@ -298,6 +298,11 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     });
   }
 
+  async function destroyMap(){
+    newMap.destroy()
+
+  }
+
 
   return (
     <IonContent>
@@ -313,7 +318,9 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
             <IonButton onClick={changeNextFloor}>
               <IonIcon icon={playSkipForwardOutline}></IonIcon>
             </IonButton>
-       
+            <IonButton onClick={destroyMap}>
+              <IonIcon icon={trashBinOutline}></IonIcon>
+            </IonButton>
           </IonCol>
 
         </IonRow>
