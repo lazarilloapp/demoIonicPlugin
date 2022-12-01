@@ -281,10 +281,10 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   async function addMarker() {
     newMap.addMarker({
       coordinate: {
-          lat: -33.416957685223366,
-          lng: -70.60679219611815,
+        lat: -33.417556917537524,
+        lng: -70.60716507932558,
       },
-      floorId: "-N1OJ6FIVBV6dpjCXEFM"
+      floorId: "outlined_person"
     });
   }
 
@@ -294,7 +294,8 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
       coordinate: {
         lat: -33.417556917537524,
         lng: -70.60716507932558,
-      }
+      },
+      icon: "outlined_pin"
     });
   }
 
@@ -362,9 +363,6 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
             </IonButton>
             <IonButton onClick={destroyMap}>
               <IonIcon icon={trashBinOutline}></IonIcon>
-            </IonButton>
-            <IonButton onClick={getRouteAndAddRoute}>
-              <IonIcon icon={addCircleOutline}></IonIcon>
             </IonButton>
           </IonCol>
 
