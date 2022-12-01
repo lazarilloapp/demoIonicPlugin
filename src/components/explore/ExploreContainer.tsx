@@ -1,5 +1,5 @@
 import './ExploreContainer.css';
-import { LazarilloMap } from '@lzdevelopers/lazarillo-maps';
+import { LazarilloMap, LazarilloUtils } from '@lzdevelopers/lazarillo-maps';
 import { useRef, useState } from 'react';
 import {
   IonButton,
@@ -20,7 +20,7 @@ import {
   IonToast,
   useIonToast,
 } from '@ionic/react';
-import { map, mapOutline, playSkipForwardOutline, playBackOutline, location, trashBinOutline } from 'ionicons/icons';
+import { map, mapOutline, playSkipForwardOutline, playBackOutline, location, trashBinOutline, addCircleOutline } from 'ionicons/icons';
 import { Place } from '../places/Place';
 import { RouteReadyCallbackData } from '@lzdevelopers/lazarillo-maps/dist/typings/definitions';
 import { InnerFloor } from '../places/InnerFloor';
@@ -50,7 +50,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
             lat: -33.41758007741259,
             lng: -70.60615300514021,
           },
-          zoom: 8,
+          zoom: 17,
           parentPlaceId: '-N19VjzEVIj2RDKu7i4r',
         },
       },
@@ -281,10 +281,10 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   async function addMarker() {
     newMap.addMarker({
       coordinate: {
-          lat: -33.416957685223366,
-          lng: -70.60679219611815,
+        lat: -33.417556917537524,
+        lng: -70.60716507932558,
       },
-      floorId: "-N1OJ6FIVBV6dpjCXEFM"
+      floorId: "outlined_person"
     });
   }
 
@@ -294,12 +294,55 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
       coordinate: {
         lat: -33.417556917537524,
         lng: -70.60716507932558,
-      }
+      },
+      icon: "outlined_pin"
     });
   }
 
   async function destroyMap(){
     newMap.destroy()
+
+  }
+
+
+  async function getRouteAndAddRoute(){
+    
+    LazarilloUtils.fetchRoute(
+        apiKey, // api key
+        'WALKING', // travelMode
+        places[0].latitude, // fromLat
+        places[0].longitude, // fromLng
+        places[1].latitude, // toLat
+        places[1].longitude, // toLng
+        1, // withMobility
+        'RELATIVE', // announceFormat
+        undefined, // userBearing
+        '-N1OJ6FIVBV6dpjCXEFM', // fromFloor
+        '-N19VjzEVIj2RDKu7i4r', // fromBuilding|
+        '-N1OJ6FIVBV6dpjCXEFM', // toFloor
+        '-N19VjzEVIj2RDKu7i4r', // toBuilding
+        'es',
+        'METRIC'
+    ) 
+    .then((response) => {
+      
+      console.log(response.url)
+      console.log(JSON.stringify(response.body).toString())
+     return response.json()
+    
+    })
+    .then((data) => {
+      console.log("Got route: ",data)
+      newMap.drawRoute(
+        {
+          mapId: 'my-cool-map',
+          route: data
+        }
+      )
+    })
+    .catch(console.error);
+
+   
 
   }
 
