@@ -20,7 +20,7 @@ import {
   IonToast,
   useIonToast,
 } from '@ionic/react';
-import { map, mapOutline, playSkipForwardOutline, playBackOutline, location, trashBinOutline, addCircleOutline } from 'ionicons/icons';
+import { map, mapOutline, playSkipForwardOutline, playBackOutline, location, trashBinOutline, addCircleOutline, cameraOutline } from 'ionicons/icons';
 import { Place } from '../places/Place';
 import { RouteReadyCallbackData } from '@lzdevelopers/lazarillo-maps/dist/typings/definitions';
 import { InnerFloor } from '../places/InnerFloor';
@@ -346,6 +346,43 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
   }
 
+  async function setCamera() {
+    newMap.setCamera({
+
+     coordinate: {
+
+        lat: -33.417556917537524,
+        lng: -70.60716507932558,
+     },
+     zoom: 21,
+     /**
+      * Bearing of the camera, in degrees clockwise from true north.
+      *
+      * @default 0
+      */
+     bearing: 90,
+     /**
+      * The angle, in degrees, of the camera from the nadir (directly facing the Earth).
+      *
+      * The only allowed values are 0 and 45.
+      *
+      * @default 0
+      */
+     angle: 45,
+     /**
+      * Animate the transition to the new Camera properties.
+      *
+      * @default false
+      */
+     animate: true,
+     /**
+      *
+      */
+     animationDuration: 8000,
+    });
+    
+  }
+
 
   return (
     <IonContent>
@@ -363,6 +400,9 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
             </IonButton>
             <IonButton onClick={destroyMap}>
               <IonIcon icon={trashBinOutline}></IonIcon>
+            </IonButton>
+            <IonButton onClick={setCamera}>
+              <IonIcon icon={cameraOutline}></IonIcon>
             </IonButton>
           </IonCol>
 
