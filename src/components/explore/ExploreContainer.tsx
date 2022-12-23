@@ -20,7 +20,7 @@ import {
   IonToast,
   useIonToast,
 } from '@ionic/react';
-import { map, mapOutline, playSkipForwardOutline, playBackOutline, location, trashBinOutline, addCircleOutline, cameraOutline } from 'ionicons/icons';
+import { map, mapOutline, playSkipForwardOutline, playBackOutline, location, trashBinOutline, addCircleOutline, cameraOutline, locateOutline } from 'ionicons/icons';
 import { Place } from '../places/Place';
 import { RouteReadyCallbackData } from '@lzdevelopers/lazarillo-maps/dist/typings/definitions';
 import { InnerFloor } from '../places/InnerFloor';
@@ -383,6 +383,12 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     
   }
 
+  let locationEnable = false
+
+  async function enableCurrentLocation() {
+    locationEnable = !locationEnable
+    newMap.enableCurrentLocation(locationEnable)
+  }
 
   return (
     <IonContent>
@@ -403,6 +409,9 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
             </IonButton>
             <IonButton onClick={setCamera}>
               <IonIcon icon={cameraOutline}></IonIcon>
+            </IonButton>
+            <IonButton onClick={enableCurrentLocation}>
+            <IonIcon icon={locateOutline}></IonIcon>
             </IonButton>
           </IonCol>
 
