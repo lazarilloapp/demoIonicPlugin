@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="io.ionic.starter">
+    package="io.ionic.starter"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <application
         android:allowBackup="true"
@@ -35,13 +36,28 @@
                 android:resource="@xml/file_paths"></meta-data>
         </provider>
 
-        <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyBfqYhcwkVU38X3VV4Tk0Pm0omEJFItqyU" />
+        <meta-data android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBfqYhcwkVU38X3VV4Tk0Pm0omEJFItqyU" />
     </application>
 
-    <!-- Permissions -->
+    <!-- Permissions for location -->
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <!-- Permissions for bluetooth -->
+
+    <!-- Request legacy Bluetooth permissions on older devices. -->
+    <uses-permission android:name="android.permission.BLUETOOTH"
+    android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"
+    android:maxSdkVersion="30" />
+
+    <!-- Needed to compute the location. -->
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+
+
 
 </manifest>
