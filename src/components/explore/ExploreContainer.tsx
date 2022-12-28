@@ -37,8 +37,17 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     ? process.env.REACT_APP_YOUR_API_KEY_HERE
     : '';
 
+  async function initPlugin(){
+    await LazarilloMap.initializeLazarilloPlugin({
+      apiKey: apiKey,
+    })
+  }
+
   async function createMap() {
     if (!mapRef.current) return;
+
+
+
 
     newMap = await LazarilloMap.create(
       {
@@ -324,14 +333,14 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
         'es',
         'METRIC'
     ) 
-    .then((response) => {
+    .then((response: { url: any; body: any; json: () => any; }) => {
       
       console.log(response.url)
       console.log(JSON.stringify(response.body).toString())
      return response.json()
     
     })
-    .then((data) => {
+    .then((data: any) => {
       console.log("Got route: ",data)
       newMap.drawRoute(
         {
@@ -391,8 +400,9 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   }
 
 
-  // Get current location
+  // Get current location one time
   async function getCurrentPosition() {
+    initPlugin()
     LazarilloMap.getCurrentPosition().then((location : any ) => {
       console.log("Hello location ", JSON.stringify(location).toString())
     }
@@ -400,6 +410,17 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
 
   }
+
+  // Active current location
+  async function watchPosition() {
+    initPlugin()
+   await LazarilloMap.watchPosition(undefined, (location : any ) => {
+      console.log("Hello location ", JSON.stringify(location).toString())
+    }
+   )
+
+  }
+
 
   return (
     <IonContent>
