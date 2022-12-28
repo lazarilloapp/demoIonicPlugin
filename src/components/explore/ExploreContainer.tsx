@@ -394,7 +394,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   // Get current location
   async function getCurrentPosition() {
     newMap.getCurrentPosition().then((location : any ) => {
-      console.log("Hello location ",location)
+      console.log("Hello location ", JSON.stringify(location).toString())
     }
     )
 
