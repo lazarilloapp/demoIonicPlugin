@@ -22,7 +22,7 @@ import {
 } from '@ionic/react';
 import { map, mapOutline, playSkipForwardOutline, playBackOutline, location, trashBinOutline, addCircleOutline, cameraOutline, locateOutline } from 'ionicons/icons';
 import { Place } from '../places/Place';
-import { RouteReadyCallbackData } from '@lzdevelopers/lazarillo-maps/dist/typings/definitions';
+import { LzLocation, RouteReadyCallbackData } from '@lzdevelopers/lazarillo-maps/dist/typings/definitions';
 import { InnerFloor } from '../places/InnerFloor';
 
 interface ContainerProps {}
@@ -390,6 +390,17 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     newMap.enableCurrentLocation(locationEnable)
   }
 
+
+  // Get current location
+  async function getCurrentPosition() {
+    newMap.getCurrentPosition().then((location : any ) => {
+      console.log("Hello location ",location)
+    }
+    )
+
+
+  }
+
   return (
     <IonContent>
       <IonGrid>
@@ -410,7 +421,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
             <IonButton onClick={setCamera}>
               <IonIcon icon={cameraOutline}></IonIcon>
             </IonButton>
-            <IonButton onClick={enableCurrentLocation}>
+            <IonButton onClick={getCurrentPosition}>
             <IonIcon icon={locateOutline}></IonIcon>
             </IonButton>
           </IonCol>
