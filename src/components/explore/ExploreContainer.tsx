@@ -239,8 +239,15 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
         polylineWidth: 10,
       },
       async (data: RouteReadyCallbackData) => {
-        console.log('Route added', data);
+        console.log('Route added', data.routeId);
         presentToast('top', 'Route loaded');
+
+        // Start the roputing process
+        newMap.startRouting({
+          routeId: data.routeId
+        })
+
+
       },
     );
   }
