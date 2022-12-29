@@ -247,6 +247,9 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
           routeId: data.routeId
         })
 
+        // Also add a watcher to the rouitng status
+        watchPositionWithoutInit()
+
 
       },
     );
@@ -421,6 +424,14 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   // Active current location
   async function watchPosition() {
     initPlugin()
+   await LazarilloMap.watchPosition(undefined, (location : any ) => {
+      console.log("Hello location ", JSON.stringify(location).toString())
+    }
+   )
+
+  }
+
+  async function watchPositionWithoutInit() {
    await LazarilloMap.watchPosition(undefined, (location : any ) => {
       console.log("Hello location ", JSON.stringify(location).toString())
     }
