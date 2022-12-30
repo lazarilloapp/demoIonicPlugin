@@ -44,10 +44,15 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   }
 
   async function createMap() {
+
+    initPlugin()
+
     if (!mapRef.current) return;
 
 
-
+    await LazarilloMap.simulateBeacons({
+      simulateBeaconsList : "a496166b2a412c02b67e127c94500625,a31ef62afe2084f9687391009a129b0e,e2d63382fb9a6ea46c7482668802430c,60c0821f78e7a51f2efa3c45949c712e"
+    })
 
     newMap = await LazarilloMap.create(
       {
@@ -412,7 +417,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
   // Get current location one time
   async function getCurrentPosition() {
-    initPlugin()
+
     LazarilloMap.getCurrentPosition().then((location : any ) => {
       console.log("Hello location ", JSON.stringify(location).toString())
     }
@@ -423,7 +428,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
   // Active current location
   async function watchPosition() {
-    initPlugin()
+
    await LazarilloMap.watchPosition(undefined, (location : any ) => {
       console.log("Hello location ", JSON.stringify(location).toString())
     }
