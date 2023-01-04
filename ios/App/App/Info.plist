@@ -31,6 +31,12 @@
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>Our app uses location services in order to show you personalized info of our market, products, services and promotions</string>
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>Our app uses location services in order to show you personalized info of our market, products, services and promotions</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>Our app uses location services in order to show you personalized info of our market, products, services and promotions</string>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
 		<string>armv7</string>
