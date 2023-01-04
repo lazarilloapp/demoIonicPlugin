@@ -4,7 +4,7 @@ import CoreLocation
 import CoreBluetooth
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate {
 
     var window: UIWindow?
     private let locationManager = CLLocationManager()
