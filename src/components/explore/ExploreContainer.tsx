@@ -1,9 +1,12 @@
 import './ExploreContainer.css';
 import { LazarilloMap, LazarilloUtils } from '@lzdevelopers/lazarillo-maps';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   IonButton,
   IonButtons,
+  IonCard,
+  IonCardHeader,
+  IonCardTitle,
   IonCol,
   IonContent,
   IonGrid,
@@ -44,7 +47,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     ? process.env.REACT_APP_YOUR_API_KEY_HERE
     : '';
 
-  async function initPlugin(){
+  async function initPlugin() {
     await LazarilloMap.initializeLazarilloPlugin({
       apiKey: apiKey,
     })
@@ -53,7 +56,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   async function createMap() {
 
     initPlugin();
-    
+
     if (!mapRef.current) return;
 
     setNewMap(await LazarilloMap.create(
@@ -128,6 +131,9 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   ];
 
   // Place list
+  /**
+ * TODO: add place on diferent floor
+ */
   const places: Place[] = [
     {
       id: '-N1PFp8NOc5m4LVoPbLY',
@@ -205,6 +211,8 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
         presentToast('top', 'Route loaded');
       },
     );
+    //to get route instructrions
+    getRouteAndAddRoute()
   }
 
   const [present] = useIonToast();
@@ -314,6 +322,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
       })
       .then((data) => {
         console.log("Got route: ", data)
+        setSteps(data[0].legs[0].steps)
         console.log(data)
         newMap?.drawRoute(
           {
@@ -327,7 +336,9 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
 
   }
-
+  /**
+   * Move the camare angle and location 
+   */
   async function setCamera() {
     newMap?.setCamera({
 
@@ -370,6 +381,12 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   async function enableCurrentLocation() {
     locationEnable = !locationEnable
     newMap?.enableCurrentLocation(locationEnable)
+    if (locationEnable) {
+      presentToast('top', 'Current location enabled');
+    }
+    else {
+      presentToast('top', 'Current location disabled');
+    }
   }
 
   return (
@@ -377,6 +394,19 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
       <IonGrid>
         <IonRow>
           <IonCol>
+
+            {newMap ? (
+              <IonCard>
+                <IonCardHeader>
+                  <IonCardTitle>{floorName}</IonCardTitle>
+                </IonCardHeader>
+              </IonCard>
+
+            ) : (<IonCard>
+              <IonCardHeader>
+                <IonCardTitle>Create a map to begin</IonCardTitle>
+              </IonCardHeader>
+            </IonCard>)}
             <IonButton onClick={createMap}>
               <IonIcon icon={mapOutline}></IonIcon>
               <IonText>Create Map</IonText>
@@ -385,33 +415,12 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
               <IonIcon icon={trashBinOutline}></IonIcon>
               <IonText>Destroy Map</IonText>
             </IonButton>
-            <IonButton onClick={setCamera}>
-              <IonIcon icon={cameraOutline}></IonIcon>
-              <IonText>Go to </IonText>
-            </IonButton>
-            
-          </IonCol>
-          <IonCol>
-          {newMap ? (<IonText id='floorName'>{floorName}</IonText>) : (<IonText></IonText>)}
           </IonCol>
         </IonRow>
 
-        {/* Cerrado hasta nuevo aviso */}
-        {/* <IonRow>
-          <IonCol>
-            <IonButton onClick={enableCurrentLocation}>
-              <IonIcon icon={locateOutline}></IonIcon>
-            </IonButton>
-            <IonButton onClick={addMarker}>
-              <IonIcon icon={location}></IonIcon>
-              <IonText> Indoor</IonText>
-            </IonButton>
-            <IonButton onClick={addOutdoorMarker}>
-              <IonIcon icon={location}></IonIcon>
-              <IonText> Outdoor</IonText>
-            </IonButton>
-          </IonCol>
-        </IonRow> */}
+        <IonRow>
+
+        </IonRow>
 
         <IonRow>
           <IonCol>
@@ -419,47 +428,64 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
           </IonCol>
         </IonRow>
 
-        {/* <IonRow>
-          <IonCol>
-            <IonTitle>Current Route Instructions:</IonTitle>
-          </IonCol>
-        </IonRow>
-
-        <IonRow>
-          <IonCol>
-            <IonList>
-              {steps.map((step, i) => (
-                <IonItem key={i}>
-                  <IonText>{step.html_instructions}</IonText>
-                </IonItem>
-              ))}
-            </IonList>
-          </IonCol>
-        </IonRow> */}
-
-
-
-
         {newMap ? (
-          <IonRow >
-            <IonButton onClick={() => setIsOpen(true)}>
-              <IonText>Destinations</IonText>
-            </IonButton>
-            <IonButton onClick={changePrevFloor}>
-              <IonIcon icon={playBackOutline}></IonIcon>
-              <IonText>Prev</IonText>
-            </IonButton>
-            <IonButton onClick={changeNextFloor}>
-              <IonIcon icon={playSkipForwardOutline}></IonIcon>
-              <IonText>Next</IonText>
-            </IonButton>
-          </IonRow>
+          <IonCol>
+            <IonRow >
 
-        ) : (
-          <IonText></IonText>
-        )
+              <IonButton onClick={() => setIsOpen(true)}>
+                <IonText>Destinations</IonText>
+              </IonButton>
+              <IonButton onClick={changePrevFloor}>
+                <IonIcon icon={playBackOutline}></IonIcon>
+                <IonText>Prev</IonText>
+              </IonButton>
+              <IonButton onClick={changeNextFloor}>
+                <IonIcon icon={playSkipForwardOutline}></IonIcon>
+                <IonText>Next</IonText>
+              </IonButton>
+            </IonRow>
+            <IonRow>
+              <IonButton onClick={enableCurrentLocation}>
+                <IonIcon icon={locateOutline}></IonIcon>
+              </IonButton>
+              <IonButton onClick={addMarker}>
+                <IonIcon icon={location}></IonIcon>
+                <IonText> Indoor</IonText>
+              </IonButton>
+              <IonButton onClick={addOutdoorMarker}>
+                <IonIcon icon={location}></IonIcon>
+                <IonText> Outdoor</IonText>
+              </IonButton>
+              <IonButton onClick={setCamera}>
+                <IonIcon icon={cameraOutline}></IonIcon>
+              </IonButton>
 
+            </IonRow>
+          </IonCol>
+
+        ) : (<IonText></IonText>)
         }
+
+
+        {steps.length > 0 ? (
+          <IonRow>
+            <IonCol>
+              <IonTitle>Current Route Instructions:</IonTitle>
+            </IonCol>
+          </IonRow>) : ''}
+
+        {steps.length > 0 ? (
+          <IonRow>
+            <IonCol>
+              <IonList>
+                {steps.map((step, i) => (
+                  <IonItem key={i}>
+                    <IonText>{step.html_instructions}</IonText>
+                  </IonItem>
+                ))}
+              </IonList>
+            </IonCol>
+          </IonRow>) : ''}
 
         <IonModal id="example-modal" isOpen={isOpen} className="ion-padding modal-demo">
           <IonHeader>
