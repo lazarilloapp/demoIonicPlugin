@@ -3,35 +3,40 @@ import { LazarilloMap, LazarilloUtils } from '@lzdevelopers/lazarillo-maps';
 import { useRef, useState } from 'react';
 import {
   IonButton,
+  IonButtons,
   IonCol,
   IonContent,
   IonGrid,
+  IonHeader,
   IonIcon,
   IonImg,
   IonItem,
   IonLabel,
   IonList,
+  IonModal,
   IonRow,
-  IonSlide,
-  IonSlides,
   IonText,
   IonThumbnail,
   IonTitle,
   IonToast,
+  IonToolbar,
   useIonToast,
 } from '@ionic/react';
-import { map, mapOutline, playSkipForwardOutline, playBackOutline, location, trashBinOutline, addCircleOutline, cameraOutline, locateOutline } from 'ionicons/icons';
+import { mapOutline, playSkipForwardOutline, playBackOutline, location, trashBinOutline, cameraOutline, locateOutline } from 'ionicons/icons';
 import { Place } from '../places/Place';
 import { RouteReadyCallbackData } from '@lzdevelopers/lazarillo-maps/dist/typings/definitions';
 import { InnerFloor } from '../places/InnerFloor';
+import { StepDTO } from '../places/Step';
 
-interface ContainerProps {}
+interface ContainerProps { }
 
 const ExploreContainer: React.FC<ContainerProps> = () => {
-  const mapRef = useRef<HTMLElement>();
-  let newMap: LazarilloMap;
 
+  const [mapRef, setMapRef] = useState(useRef<HTMLElement>())
   const [showToast1, setShowToast1] = useState(false);
+  const [steps, setSteps] = useState<StepDTO[]>([]);
+  const [isOpen, setIsOpen] = useState(false);
+  const [newMap, setNewMap] = useState<LazarilloMap>()
 
   const apiKey = process.env.REACT_APP_YOUR_API_KEY_HERE
     ? process.env.REACT_APP_YOUR_API_KEY_HERE
@@ -40,7 +45,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   async function createMap() {
     if (!mapRef.current) return;
 
-    newMap = await LazarilloMap.create(
+    setNewMap(await LazarilloMap.create(
       {
         id: 'my-cool-map',
         element: mapRef.current,
@@ -58,7 +63,8 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
         console.log('Map loaded');
         presentToast('top');
       },
-    );
+    ));
+
   }
 
   // Floor list
@@ -225,8 +231,8 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
         finalFloor: '-N1OJ6FIVBV6dpjCXEFM',
         place: '-N19VjzEVIj2RDKu7i4r',
         preferAccessibleRoute: true,
-        nextStepsRouteColor:'#ff33b5',
-        prevStepsRouteColor:'#aaaaaa',
+        nextStepsRouteColor: '#ff33b5',
+        prevStepsRouteColor: '#aaaaaa',
         polylineWidth: 10,
       },
       async (data: RouteReadyCallbackData) => {
@@ -258,10 +264,15 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
     const nextFloorId = innerFloors[currentFloorIndex].key;
 
-    newMap.setFloor({
-      mapId: 'my-cool-map',
-      floorId : nextFloorId
-    })
+    try {
+      newMap?.setFloor({
+        mapId: 'my-cool-map',
+        floorId: nextFloorId
+      })
+    }
+    catch (error) {
+      console.log(error)
+    }
 
   }
 
@@ -271,15 +282,15 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
     const prevFloorId = innerFloors[currentFloorIndex].key;
 
-    newMap.setFloor({
+    newMap?.setFloor({
       mapId: 'my-cool-map',
-      floorId : prevFloorId
+      floorId: prevFloorId
     })
 
   }
 
   async function addMarker() {
-    newMap.addMarker({
+    newMap?.addMarker({
       coordinate: {
         lat: -33.417556917537524,
         lng: -70.60716507932558,
@@ -290,7 +301,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
 
   async function addOutdoorMarker() {
-    newMap.addMarker({
+    newMap?.addMarker({
       coordinate: {
         lat: -33.417556917537524,
         lng: -70.60716507932558,
@@ -299,95 +310,96 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     });
   }
 
-  async function destroyMap(){
-    newMap.destroy()
+  async function destroyMap() {
+    newMap?.destroy()
+    setNewMap(undefined)
 
   }
 
 
-  async function getRouteAndAddRoute(){
-    
-    LazarilloUtils.fetchRoute(
-        apiKey, // api key
-        'WALKING', // travelMode
-        places[0].latitude, // fromLat
-        places[0].longitude, // fromLng
-        places[1].latitude, // toLat
-        places[1].longitude, // toLng
-        1, // withMobility
-        'RELATIVE', // announceFormat
-        undefined, // userBearing
-        '-N1OJ6FIVBV6dpjCXEFM', // fromFloor
-        '-N19VjzEVIj2RDKu7i4r', // fromBuilding|
-        '-N1OJ6FIVBV6dpjCXEFM', // toFloor
-        '-N19VjzEVIj2RDKu7i4r', // toBuilding
-        'es',
-        'METRIC'
-    ) 
-    .then((response) => {
-      
-      console.log(response.url)
-      console.log(JSON.stringify(response.body).toString())
-     return response.json()
-    
-    })
-    .then((data) => {
-      console.log("Got route: ",data)
-      newMap.drawRoute(
-        {
-          mapId: 'my-cool-map',
-          route: data
-        }
-      )
-    })
-    .catch(console.error);
+  async function getRouteAndAddRoute() {
 
-   
+    LazarilloUtils.fetchRoute(
+      apiKey, // api key
+      'WALKING', // travelMode
+      places[0].latitude, // fromLat
+      places[0].longitude, // fromLng
+      places[1].latitude, // toLat
+      places[1].longitude, // toLng
+      1, // withMobility
+      'RELATIVE', // announceFormat
+      undefined, // userBearing
+      '-N1OJ6FIVBV6dpjCXEFM', // fromFloor
+      '-N19VjzEVIj2RDKu7i4r', // fromBuilding|
+      '-N1OJ6FIVBV6dpjCXEFM', // toFloor
+      '-N19VjzEVIj2RDKu7i4r', // toBuilding
+      'es',
+      'METRIC'
+    )
+      .then((response) => {
+
+        console.log(response.url)
+        console.log(JSON.stringify(response.body).toString())
+        return response.json()
+
+      })
+      .then((data) => {
+        console.log("Got route: ", data)
+        newMap?.drawRoute(
+          {
+            mapId: 'my-cool-map',
+            route: data
+          }
+        )
+      })
+      .catch(console.error);
+
+
 
   }
 
   async function setCamera() {
-    newMap.setCamera({
+    newMap?.setCamera({
 
-     coordinate: {
+      coordinate: {
 
         lat: -33.417556917537524,
         lng: -70.60716507932558,
-     },
-     zoom: 21,
-     /**
-      * Bearing of the camera, in degrees clockwise from true north.
-      *
-      * @default 0
-      */
-     bearing: 90,
-     /**
-      * The angle, in degrees, of the camera from the nadir (directly facing the Earth).
-      *
-      * The only allowed values are 0 and 45.
-      *
-      * @default 0
-      */
-     angle: 45,
-     /**
-      * Animate the transition to the new Camera properties.
-      *
-      * @default false
-      */
-     animate: true,
-     /**
-      *
-      */
-     animationDuration: 8000,
+      },
+      zoom: 21,
+      /**
+       * Bearing of the camera, in degrees clockwise from true north.
+       *
+       * @default 0
+       */
+      bearing: 90,
+      /**
+       * The angle, in degrees, of the camera from the nadir (directly facing the Earth).
+       *
+       * The only allowed values are 0 and 45.
+       *
+       * @default 0
+       */
+      angle: 45,
+      /**
+       * Animate the transition to the new Camera properties.
+       *
+       * @default false
+       */
+      animate: true,
+      /**
+       *
+       */
+      animationDuration: 8000,
     });
-    
+
   }
 
   let locationEnable = false
 
   async function enableCurrentLocation() {
     locationEnable = !locationEnable
-    newMap.enableCurrentLocation(locationEnable)
+    newMap?.enableCurrentLocation(locationEnable)
   }
 
   return (
@@ -397,21 +409,27 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
           <IonCol>
             <IonButton onClick={createMap}>
               <IonIcon icon={mapOutline}></IonIcon>
+
             </IonButton>
             <IonButton onClick={changePrevFloor}>
               <IonIcon icon={playBackOutline}></IonIcon>
+
             </IonButton>
             <IonButton onClick={changeNextFloor}>
               <IonIcon icon={playSkipForwardOutline}></IonIcon>
+
             </IonButton>
             <IonButton onClick={destroyMap}>
               <IonIcon icon={trashBinOutline}></IonIcon>
+
             </IonButton>
             <IonButton onClick={setCamera}>
               <IonIcon icon={cameraOutline}></IonIcon>
+
             </IonButton>
             <IonButton onClick={enableCurrentLocation}>
-            <IonIcon icon={locateOutline}></IonIcon>
+              <IonIcon icon={locateOutline}></IonIcon>
+
             </IonButton>
           </IonCol>
 
@@ -419,7 +437,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
         <IonRow>
           <IonCol>
-          <IonButton onClick={addMarker}>
+            <IonButton onClick={addMarker}>
               <IonIcon icon={location}></IonIcon>
               <IonText> Indoor</IonText>
             </IonButton>
@@ -428,7 +446,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
               <IonText> Outdoor</IonText>
             </IonButton>
           </IonCol>
-          </IonRow>
+        </IonRow>
 
         <IonRow>
           <IonCol>
@@ -436,27 +454,66 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
           </IonCol>
         </IonRow>
 
-        <IonRow>
+        {/* <IonRow>
           <IonCol>
-            <IonTitle>See places of interest:</IonTitle>
+            <IonTitle>Current Route Instructions:</IonTitle>
           </IonCol>
         </IonRow>
 
         <IonRow>
           <IonCol>
             <IonList>
-              {places.map((place, i) => (
-                <IonItem key={i} onClick={() => startRoute(i)}>
-                  <IonThumbnail slot="start">
-                    <IonImg src={'https://random.imagecdn.app/150/150'} />
-                  </IonThumbnail>
-                  <IonLabel>{place._name}</IonLabel>
+              {steps.map((step, i) => (
+                <IonItem key={i}>
+                  <IonText>{step.html_instructions}</IonText>
                 </IonItem>
               ))}
             </IonList>
           </IonCol>
-        </IonRow>
+        </IonRow> */}
 
+
+
+        <IonRow >
+          {newMap ? (
+            <IonButton onClick={() => setIsOpen(true)}>
+              Route Destinations
+            </IonButton>
+          ) : (
+            <IonText></IonText>
+          )
+
+          }
+        </IonRow>
+        <IonModal id="example-modal" isOpen={isOpen} className="ion-padding modal-demo">
+          <IonHeader>
+            <IonToolbar>
+              <IonTitle>From Kaiser to: </IonTitle>
+              <IonButtons slot="end">
+                <IonButton onClick={() => setIsOpen(false)}>Close</IonButton>
+              </IonButtons>
+            </IonToolbar>
+          </IonHeader>
+          <IonContent className="ion-padding">
+            <IonRow>
+              <IonCol>
+                <IonList>
+                  {places.map((place, i) => (
+                    <IonItem key={i} onClick={() => {
+                      setIsOpen(false)
+                      startRoute(i)
+                    }}>
+                      <IonThumbnail slot="start">
+                        <IonImg src={'https://random.imagecdn.app/150/150'} />
+                      </IonThumbnail>
+                      <IonLabel>{place._name}</IonLabel>
+                    </IonItem>
+                  ))}
+                </IonList>
+              </IonCol>
+            </IonRow>
+          </IonContent>
+        </IonModal>
         <IonRow>
           <IonCol>
             <IonToast
