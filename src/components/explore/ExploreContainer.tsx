@@ -28,6 +28,20 @@ import { RouteReadyCallbackData } from '@lzdevelopers/lazarillo-maps/dist/typing
 import { InnerFloor } from '../places/InnerFloor';
 import { StepDTO } from '../places/Step';
 
+  // Floor list
+  const innerFloors: InnerFloor[] = [
+    {
+      "key": "-MuH9tsPqRPXFANSqXHI",
+      "index": 1,
+      "name": "Piso 1"
+    },
+    {
+      "key": "-MuHAz2gWGlO42yrzRzu",
+      "index": 2,
+      "name":  "Piso 2"
+    }
+  ];
+
 interface ContainerProps { }
 
 const ExploreContainer: React.FC<ContainerProps> = () => {
@@ -37,8 +51,8 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   const [steps, setSteps] = useState<StepDTO[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [newMap, setNewMap] = useState<LazarilloMap>()
-  const [currentFloorIndex, setCurrentFloorIndex] = useState(0)
-  const [floorName, setFloorName] = useState("Planta baja")
+  const [currentFloorIndex, setCurrentFloorIndex] = useState(innerFloors[0].index)
+  const [floorName, setFloorName] = useState(innerFloors[0].name)
 
   const apiKey = process.env.REACT_APP_YOUR_API_KEY_HERE
     ? process.env.REACT_APP_YOUR_API_KEY_HERE
@@ -54,11 +68,11 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
         apiKey: apiKey,
         config: {
           center: {
-            lat: -33.41758007741259,
-            lng: -70.60615300514021,
+            lat: -33.4803395,
+            lng: -70.755898,
           },
           zoom: 17,
-          parentPlaceId: '-N19VjzEVIj2RDKu7i4r',
+          parentPlaceId: '-MuH95VRaEZkS6_YIsLM',
         },
       },
       async () => {
@@ -68,55 +82,6 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     ));
 
   }
-
-  // Floor list
-  const innerFloors: InnerFloor[] = [
-    {
-      index: 0,
-      key: '-N1OJ6FIVBV6dpjCXEFM',
-      name: 'Planta baja'
-    },
-    {
-      index: 1,
-      key: '-NCtxDrJbDWE3gMkZ_45',
-      name: 'Primer piso',
-    },
-    {
-      index: 2,
-      key: '-NCtxOT4E4n3XlW_-hzL',
-      name: 'Segundo piso',
-    },
-    {
-      index: 3,
-      key: '-NCtxUY6bYLXOEndcqMl',
-      name: 'Tercer piso',
-    },
-    {
-      index: 4,
-      key: '-NCtxd01xaDOjDQSOPCT',
-      name: 'Cuarto piso',
-    },
-    {
-      index: 5,
-      key: '-NCtxg_OxCuCfGVevdck',
-      name: 'Quinto piso',
-    },
-    {
-      index: 6,
-      key: '-NCtxjm9HZsty9D0i-or',
-      name: 'Sexto piso',
-    },
-    {
-      index: 7,
-      key: '-ND-DoTPPnqUT_dWjW3e',
-      name: 'Piso 61',
-    },
-    {
-      index: 8,
-      key: '-ND-DotO0jGRTA5-D-Jv',
-      name: 'Piso 62',
-    },
-  ];
 
   // Place list
   const places: Place[] = [
@@ -164,15 +129,15 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     if (!newMap) return;
 
     let initialPos = {
-      building: '-N19VjzEVIj2RDKu7i4r',
-      floor: '-N1OJ6FIVBV6dpjCXEFM',
+      building: '-MuH95VRaEZkS6_YIsLM',
+      floor: '-MuH9tsPqRPXFANSqXHI',
       polygons: undefined,
       latitude: -33.41758007741259,
       longitude: -70.60615300514021,
     };
     let finalPos = {
-      building: '-N19VjzEVIj2RDKu7i4r',
-      floor: '-N1OJ6FIVBV6dpjCXEFM',
+      building: '-MuH95VRaEZkS6_YIsLM',
+      floor: '-MuH9tsPqRPXFANSqXHI',
       polygons: undefined,
       latitude: targetPlace.latitude,
       longitude: targetPlace.longitude,
@@ -183,9 +148,9 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
         mapId: 'my-cool-map',
         initialPos: initialPos,
         finalPos: finalPos,
-        initialFloor: '-N1OJ6FIVBV6dpjCXEFM',
-        finalFloor: '-N1OJ6FIVBV6dpjCXEFM',
-        place: '-N19VjzEVIj2RDKu7i4r',
+        initialFloor: '-MuH9tsPqRPXFANSqXHI',
+        finalFloor: '-MuH9tsPqRPXFANSqXHI',
+        place: '-MuH95VRaEZkS6_YIsLM',
         preferAccessibleRoute: true,
         nextStepsRouteColor: '#ff33b5',
         prevStepsRouteColor: '#aaaaaa',
@@ -270,8 +235,8 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   async function destroyMap() {
     newMap?.destroy()
     setNewMap(undefined)
-    setFloorName('Planta baja')
-    setCurrentFloorIndex(0)
+    setFloorName(innerFloors[0].name)
+    setCurrentFloorIndex(innerFloors[0].index)
     setSteps([])
 
   }
