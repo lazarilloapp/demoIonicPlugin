@@ -44,7 +44,16 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     ? process.env.REACT_APP_YOUR_API_KEY_HERE
     : '';
 
+  async function initPlugin(){
+    await LazarilloMap.initializeLazarilloPlugin({
+      apiKey: apiKey,
+    })
+  }
+
   async function createMap() {
+
+    initPlugin();
+    
     if (!mapRef.current) return;
 
     setNewMap(await LazarilloMap.create(
@@ -380,9 +389,11 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
               <IonIcon icon={cameraOutline}></IonIcon>
               <IonText>Go to </IonText>
             </IonButton>
-            {newMap ? (<IonText id='floorName'>{floorName}</IonText>) : (<IonText></IonText>)}
+            
           </IonCol>
-
+          <IonCol>
+          {newMap ? (<IonText id='floorName'>{floorName}</IonText>) : (<IonText></IonText>)}
+          </IonCol>
         </IonRow>
 
         {/* Cerrado hasta nuevo aviso */}
