@@ -27,16 +27,25 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+    <key>NSBluetoothAlwaysUsageDescription</key>
+    <string>To allow more precise location on indoor spaces enabled by Lazarillo</string>
+    <key>NSBluetoothPeripheralUsageDescription</key>
+    <string>To allow more precise location on places enabled with Lazarillo</string>
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>To inform you of nearby lazarillo routes</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>We use your location for guide you</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>bluetooth-central</string>
+		<string>fetch</string>
+		<string>location</string>
+		<string>processing</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
-    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-    <string>Our app uses location services in order to show you personalized info of our market, products, services and promotions</string>
-    <key>NSLocationAlwaysUsageDescription</key>
-    <string>Our app uses location services in order to show you personalized info of our market, products, services and promotions</string>
-    <key>NSLocationWhenInUseUsageDescription</key>
-    <string>Our app uses location services in order to show you personalized info of our market, products, services and promotions</string>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
 		<string>armv7</string>
