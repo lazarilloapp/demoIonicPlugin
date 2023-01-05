@@ -1,6 +1,6 @@
 import './ExploreContainer.css';
 import { LazarilloMap, LazarilloUtils } from '@lzdevelopers/lazarillo-maps';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   IonButton,
   IonButtons,
@@ -37,6 +37,8 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   const [steps, setSteps] = useState<StepDTO[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [newMap, setNewMap] = useState<LazarilloMap>()
+  const [currentFloorIndex, setCurrentFloorIndex] = useState(0)
+  const [floorName, setFloorName] = useState("Planta baja")
 
   const apiKey = process.env.REACT_APP_YOUR_API_KEY_HERE
     ? process.env.REACT_APP_YOUR_API_KEY_HERE
@@ -72,93 +74,47 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     {
       index: 0,
       key: '-N1OJ6FIVBV6dpjCXEFM',
-      level: -1,
-      name: {
-        default: 'Planta baja',
-        es: 'Planta baja',
-      },
-      vectorTile: true,
+      name: 'Planta baja'
     },
     {
       index: 1,
       key: '-NCtxDrJbDWE3gMkZ_45',
-      level: 1,
-      name: {
-        default: 'Primer piso',
-        es: 'Primer piso',
-      },
-      vectorTile: true,
+      name: 'Primer piso',
     },
     {
       index: 2,
       key: '-NCtxOT4E4n3XlW_-hzL',
-      level: 2,
-      name: {
-        default: 'Segundo piso',
-        es: 'Segundo piso',
-      },
-      vectorTile: true,
+      name: 'Segundo piso',
     },
     {
       index: 3,
       key: '-NCtxUY6bYLXOEndcqMl',
-      level: 3,
-      name: {
-        default: 'Tercer piso',
-        es: 'Tercer piso',
-      },
-      vectorTile: true,
+      name: 'Tercer piso',
     },
     {
       index: 4,
       key: '-NCtxd01xaDOjDQSOPCT',
-      level: 4,
-      name: {
-        default: 'Cuarto piso',
-        es: 'Cuarto piso',
-      },
-      vectorTile: true,
+      name: 'Cuarto piso',
     },
     {
       index: 5,
       key: '-NCtxg_OxCuCfGVevdck',
-      level: 5,
-      name: {
-        default: 'Quinto piso',
-        es: 'Quinto piso',
-      },
-      vectorTile: true,
+      name: 'Quinto piso',
     },
     {
       index: 6,
       key: '-NCtxjm9HZsty9D0i-or',
-      level: 6,
-      name: {
-        default: 'Sexto piso',
-        es: 'Sexto piso',
-      },
-      vectorTile: true,
+      name: 'Sexto piso',
     },
     {
       index: 7,
       key: '-ND-DoTPPnqUT_dWjW3e',
-      level: 7,
-      name: {
-        default: 'Piso 61',
-        es: 'Piso 61',
-      },
-
-      vectorTile: true,
+      name: 'Piso 61',
     },
     {
       index: 8,
       key: '-ND-DotO0jGRTA5-D-Jv',
-      level: 8,
-      name: {
-        default: 'Piso 62',
-        es: 'Piso 62',
-      },
-      vectorTile: true,
+      name: 'Piso 62',
     },
   ];
 
@@ -255,20 +211,20 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     });
   };
 
-  let currentFloorIndex = 0
+
 
 
   async function changeNextFloor() {
-
-    currentFloorIndex += 1
-
+    if (currentFloorIndex < innerFloors.length - 1) {
+      setCurrentFloorIndex(currentFloorIndex + 1)
+    }
     const nextFloorId = innerFloors[currentFloorIndex].key;
-
     try {
       newMap?.setFloor({
         mapId: 'my-cool-map',
         floorId: nextFloorId
       })
+      setFloorName(innerFloors[currentFloorIndex].name)
     }
     catch (error) {
       console.log(error)
@@ -277,15 +233,16 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   }
 
   async function changePrevFloor() {
-
-    currentFloorIndex -= 1
-
+    if (currentFloorIndex > 0) {
+      setCurrentFloorIndex(currentFloorIndex - 1)
+    }
     const prevFloorId = innerFloors[currentFloorIndex].key;
 
     newMap?.setFloor({
       mapId: 'my-cool-map',
       floorId: prevFloorId
     })
+    setFloorName(innerFloors[currentFloorIndex].name)
 
   }
 
@@ -313,6 +270,9 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   async function destroyMap() {
     newMap?.destroy()
     setNewMap(undefined)
+    setFloorName('Planta baja')
+    setCurrentFloorIndex(0)
+    setSteps([])
 
   }
 
@@ -345,6 +305,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
       })
       .then((data) => {
         console.log("Got route: ", data)
+        console.log(data)
         newMap?.drawRoute(
           {
             mapId: 'my-cool-map',
@@ -409,34 +370,27 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
           <IonCol>
             <IonButton onClick={createMap}>
               <IonIcon icon={mapOutline}></IonIcon>
-
-            </IonButton>
-            <IonButton onClick={changePrevFloor}>
-              <IonIcon icon={playBackOutline}></IonIcon>
-
-            </IonButton>
-            <IonButton onClick={changeNextFloor}>
-              <IonIcon icon={playSkipForwardOutline}></IonIcon>
-
+              <IonText>Create Map</IonText>
             </IonButton>
             <IonButton onClick={destroyMap}>
               <IonIcon icon={trashBinOutline}></IonIcon>
-
+              <IonText>Destroy Map</IonText>
             </IonButton>
             <IonButton onClick={setCamera}>
               <IonIcon icon={cameraOutline}></IonIcon>
-
+              <IonText>Go to </IonText>
             </IonButton>
-            <IonButton onClick={enableCurrentLocation}>
-              <IonIcon icon={locateOutline}></IonIcon>
-
-            </IonButton>
+            {newMap ? (<IonText id='floorName'>{floorName}</IonText>) : (<IonText></IonText>)}
           </IonCol>
 
         </IonRow>
 
-        <IonRow>
+        {/* Cerrado hasta nuevo aviso */}
+        {/* <IonRow>
           <IonCol>
+            <IonButton onClick={enableCurrentLocation}>
+              <IonIcon icon={locateOutline}></IonIcon>
+            </IonButton>
             <IonButton onClick={addMarker}>
               <IonIcon icon={location}></IonIcon>
               <IonText> Indoor</IonText>
@@ -446,7 +400,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
               <IonText> Outdoor</IonText>
             </IonButton>
           </IonCol>
-        </IonRow>
+        </IonRow> */}
 
         <IonRow>
           <IonCol>
@@ -474,17 +428,28 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
 
 
-        <IonRow >
-          {newMap ? (
-            <IonButton onClick={() => setIsOpen(true)}>
-              Route Destinations
-            </IonButton>
-          ) : (
-            <IonText></IonText>
-          )
 
-          }
-        </IonRow>
+        {newMap ? (
+          <IonRow >
+            <IonButton onClick={() => setIsOpen(true)}>
+              <IonText>Destinations</IonText>
+            </IonButton>
+            <IonButton onClick={changePrevFloor}>
+              <IonIcon icon={playBackOutline}></IonIcon>
+              <IonText>Prev</IonText>
+            </IonButton>
+            <IonButton onClick={changeNextFloor}>
+              <IonIcon icon={playSkipForwardOutline}></IonIcon>
+              <IonText>Next</IonText>
+            </IonButton>
+          </IonRow>
+
+        ) : (
+          <IonText></IonText>
+        )
+
+        }
+
         <IonModal id="example-modal" isOpen={isOpen} className="ion-padding modal-demo">
           <IonHeader>
             <IonToolbar>
