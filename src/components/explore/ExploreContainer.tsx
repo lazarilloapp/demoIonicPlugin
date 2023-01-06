@@ -25,15 +25,19 @@ import {
   IonToolbar,
   useIonToast,
 } from '@ionic/react';
-import { mapOutline, playSkipForwardOutline, playBackOutline, location, trashBinOutline, cameraOutline, locateOutline } from 'ionicons/icons';
-import { Place } from '../places/Place';
+import { mapOutline, location, trashBinOutline, cameraOutline, locateOutline, caretBack, caretForward } from 'ionicons/icons';
 import { RouteReadyCallbackData } from '@lzdevelopers/lazarillo-maps/dist/typings/definitions';
-import { InnerFloor } from '../places/InnerFloor';
 import { StepDTO } from '../places/Step';
+import { CustomInnerFloors } from '../data/InnerFloor';
+import { CustomPlaces } from '../data/Places';
+
 
 interface ContainerProps { }
 
 const ExploreContainer: React.FC<ContainerProps> = () => {
+
+  const innerFloors = CustomInnerFloors
+  const places = CustomPlaces
 
   const [mapRef, setMapRef] = useState(useRef<HTMLElement>())
   const [showToast1, setShowToast1] = useState(false);
@@ -80,99 +84,6 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     ));
 
   }
-
-  // Floor list
-  const innerFloors: InnerFloor[] = [
-    {
-      index: 0,
-      key: '-N1OJ6FIVBV6dpjCXEFM',
-      name: 'Planta baja'
-    },
-    {
-      index: 1,
-      key: '-NCtxDrJbDWE3gMkZ_45',
-      name: 'Primer piso',
-    },
-    {
-      index: 2,
-      key: '-NCtxOT4E4n3XlW_-hzL',
-      name: 'Segundo piso',
-    },
-    {
-      index: 3,
-      key: '-NCtxUY6bYLXOEndcqMl',
-      name: 'Tercer piso',
-    },
-    {
-      index: 4,
-      key: '-NCtxd01xaDOjDQSOPCT',
-      name: 'Cuarto piso',
-    },
-    {
-      index: 5,
-      key: '-NCtxg_OxCuCfGVevdck',
-      name: 'Quinto piso',
-    },
-    {
-      index: 6,
-      key: '-NCtxjm9HZsty9D0i-or',
-      name: 'Sexto piso',
-    },
-    {
-      index: 7,
-      key: '-ND-DoTPPnqUT_dWjW3e',
-      name: 'Piso 61',
-    },
-    {
-      index: 8,
-      key: '-ND-DotO0jGRTA5-D-Jv',
-      name: 'Piso 62',
-    },
-  ];
-
-  // Place list
-  /**
- * TODO: add place on diferent floor
- */
-  const places: Place[] = [
-    {
-      id: '-N1PFp8NOc5m4LVoPbLY',
-      _name: 'Kayser',
-      latitude: -33.41758007741259,
-      longitude: -70.60615300514021,
-    },
-    {
-      id: '-N2Ykjm5YnfNvesLgUmr',
-      _name: 'Cajero Automático',
-      latitude: -33.417556917537524,
-      longitude: -70.60716507932558,
-    },
-    {
-      id: '-N1PVMDgXNBWo1gWEpyg',
-      _name: 'Easy',
-      latitude: -33.417596318453455,
-      longitude: -70.60672561495679,
-    },
-    {
-      id: '-N1PI2eh94zmlbCLxSBl',
-      _name: 'Vivero Verde',
-      latitude: -33.41784916502634,
-      longitude: -70.60716738108904,
-    },
-    {
-      id: '-N1PF2rz-DUbQNZuuKbE',
-      _name: 'Prontomatic',
-      latitude: -33.417973584718986,
-      longitude: -70.60601659047292,
-    },
-    {
-      id: '-N2SeIeRqKV34PJ5Z6y7',
-      _name: 'BCI',
-      latitude: -33.41785379621859,
-      longitude: -70.60568241131433,
-    },
-  ];
-
   async function startRoute(targetPlaceKey: number) {
     const targetPlace = places[targetPlaceKey];
 
@@ -436,12 +347,13 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
                 <IonText>Destinations</IonText>
               </IonButton>
               <IonButton onClick={changePrevFloor}>
-                <IonIcon icon={playBackOutline}></IonIcon>
+                <IonIcon icon={caretBack}></IonIcon>
                 <IonText>Prev</IonText>
               </IonButton>
               <IonButton onClick={changeNextFloor}>
-                <IonIcon icon={playSkipForwardOutline}></IonIcon>
                 <IonText>Next</IonText>
+                <IonIcon icon={caretForward}></IonIcon>
+
               </IonButton>
             </IonRow>
             <IonRow>
@@ -506,7 +418,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
                       startRoute(i)
                     }}>
                       <IonThumbnail slot="start">
-                        <IonImg src={'https://random.imagecdn.app/150/150'} />
+                        <IonImg src={'https://ionicframework.com/docs/img/demos/thumbnail.svg'} />
                       </IonThumbnail>
                       <IonLabel>{place._name}</IonLabel>
                     </IonItem>
