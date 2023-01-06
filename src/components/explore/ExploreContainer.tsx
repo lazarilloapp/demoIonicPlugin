@@ -1,6 +1,6 @@
 import './ExploreContainer.css';
 import { LazarilloMap, LazarilloUtils } from '@lzdevelopers/lazarillo-maps';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   IonButton,
   IonButtons,
@@ -17,6 +17,8 @@ import {
   IonLabel,
   IonList,
   IonModal,
+  IonRadio,
+  IonRadioGroup,
   IonRow,
   IonText,
   IonThumbnail,
@@ -38,7 +40,10 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
   const innerFloors = CustomInnerFloors
   const places = CustomPlaces
+  let unitSystem = "METRIC" //default value
+  let anounceSystem = "RELATIVE" //default value
 
+  const [present] = useIonToast();
   const [mapRef, setMapRef] = useState(useRef<HTMLElement>())
   const [showToast1, setShowToast1] = useState(false);
   const [steps, setSteps] = useState<StepDTO[]>([]);
@@ -46,6 +51,13 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   const [newMap, setNewMap] = useState<LazarilloMap>()
   const [currentFloorIndex, setCurrentFloorIndex] = useState(0)
   const [floorName, setFloorName] = useState("Planta baja")
+  //const [randomBase, setRandomBase] = useState(0)
+
+
+  // useEffect(() => {
+  //   setRandomBase(Math.random())
+
+  // })
 
   const apiKey = process.env.REACT_APP_YOUR_API_KEY_HERE
     ? process.env.REACT_APP_YOUR_API_KEY_HERE
@@ -84,6 +96,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     ));
 
   }
+  //if you only want to show the route on the map
   async function startRoute(targetPlaceKey: number) {
     const targetPlace = places[targetPlaceKey];
 
@@ -123,10 +136,10 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
       },
     );
     //to get route instructrions
-    getRouteAndAddRoute()
+
   }
 
-  const [present] = useIonToast();
+
 
   const presentToast = (
     position: 'top' | 'middle' | 'bottom',
@@ -205,24 +218,25 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   }
 
 
-  async function getRouteAndAddRoute() {
+  async function getRouteAndAddRoute(targetPlaceKey: number) {
+    const targetPlace = places[targetPlaceKey];
 
     LazarilloUtils.fetchRoute(
       apiKey, // api key
       'WALKING', // travelMode
       places[0].latitude, // fromLat
       places[0].longitude, // fromLng
-      places[1].latitude, // toLat
-      places[1].longitude, // toLng
+      targetPlace.latitude, // toLat
+      targetPlace.longitude, // toLng
       1, // withMobility
-      'RELATIVE', // announceFormat
+      anounceSystem, // announceFormat
       undefined, // userBearing
       '-N1OJ6FIVBV6dpjCXEFM', // fromFloor
       '-N19VjzEVIj2RDKu7i4r', // fromBuilding|
       '-N1OJ6FIVBV6dpjCXEFM', // toFloor
       '-N19VjzEVIj2RDKu7i4r', // toBuilding
       'es',
-      'METRIC'
+      unitSystem
     )
       .then((response) => {
 
@@ -251,12 +265,17 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
    * Move the camare angle and location 
    */
   async function setCamera() {
+    const min = -10
+    const max = 10
+    const randomNumber = Math.floor(Math.random() * places.length)
+
+    const place = places[randomNumber]
     newMap?.setCamera({
 
       coordinate: {
 
-        lat: -33.417556917537524,
-        lng: -70.60716507932558,
+        lat: place.latitude,
+        lng: place.longitude,
       },
       zoom: 21,
       /**
@@ -264,7 +283,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
        *
        * @default 0
        */
-      bearing: 90,
+      bearing: Math.round(Math.random() * 90),
       /**
        * The angle, in degrees, of the camera from the nadir (directly facing the Earth).
        *
@@ -272,7 +291,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
        *
        * @default 0
        */
-      angle: 45,
+      angle: Math.round(Math.random() * 45),
       /**
        * Animate the transition to the new Camera properties.
        *
@@ -299,6 +318,22 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
       presentToast('top', 'Current location disabled');
     }
   }
+  async function updateUnitSytem(newUnit: string) {
+    console.log("antes", unitSystem)
+    if (newUnit !== unitSystem) {
+      unitSystem = newUnit
+    }
+    console.log("despues", unitSystem)
+
+  }
+  async function updateAnounceSystem(newAnnouncer: string) {
+    console.log("antes", anounceSystem)
+    if (newAnnouncer !== anounceSystem) {
+      anounceSystem = newAnnouncer
+    }
+    console.log("despues", anounceSystem)
+  }
+
 
   return (
     <IonContent>
@@ -415,7 +450,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
                   {places.map((place, i) => (
                     <IonItem key={i} onClick={() => {
                       setIsOpen(false)
-                      startRoute(i)
+                      getRouteAndAddRoute(i)
                     }}>
                       <IonThumbnail slot="start">
                         <IonImg src={'https://ionicframework.com/docs/img/demos/thumbnail.svg'} />
@@ -423,6 +458,58 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
                       <IonLabel>{place._name}</IonLabel>
                     </IonItem>
                   ))}
+                </IonList>
+              </IonCol>
+            </IonRow>
+            <IonRow>
+              <IonCol >
+                <IonTitle>Unit System</IonTitle>
+                <IonList>
+                  <IonRadioGroup id='anounce-format' value={anounceSystem} onIonChange={(event) => {
+                    if (event.detail.value === undefined) return;
+                    updateAnounceSystem(event.detail.value.toString())
+                  }}>
+                    <IonItem>
+                      <IonLabel>RELATIVE</IonLabel>
+                      <IonRadio slot="end" value="RELATIVE"></IonRadio>
+                    </IonItem>
+
+                    <IonItem>
+                      <IonLabel>CARDINAL</IonLabel>
+                      <IonRadio slot="end" value="CARDINAL"></IonRadio>
+                    </IonItem>
+
+                    <IonItem>
+                      <IonLabel>CLOCK</IonLabel>
+                      <IonRadio slot="end" value="CLOCK"></IonRadio>
+                    </IonItem>
+
+                  </IonRadioGroup>
+                </IonList>
+              </IonCol>
+              <IonCol >
+                <IonTitle>Anounce System</IonTitle>
+                <IonList>
+                  <IonRadioGroup id='unit-metric' value={unitSystem} onIonChange={(event) => {
+                    if (event.detail.value === undefined) return;
+                    updateUnitSytem(event.detail.value.toString())
+                  }}
+                  >
+                    <IonItem>
+                      <IonLabel>METRIC</IonLabel>
+                      <IonRadio slot="end" value="METRIC"></IonRadio>
+                    </IonItem>
+
+                    <IonItem>
+                      <IonLabel>IMPERIAL</IonLabel>
+                      <IonRadio slot="end" value="IMPERIAL"></IonRadio>
+                    </IonItem>
+
+                    <IonItem>
+                      <IonLabel>STEPS</IonLabel>
+                      <IonRadio slot="end" value="STEPS"></IonRadio>
+                    </IonItem>
+                  </IonRadioGroup>
                 </IonList>
               </IonCol>
             </IonRow>
