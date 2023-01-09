@@ -42,6 +42,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   const places = CustomPlaces
   let unitSystem = "METRIC" //default value
   let anounceSystem = "RELATIVE" //default value
+  let withMobility: boolean = false //default value
 
   const [present] = useIonToast();
   const [mapRef, setMapRef] = useState(useRef<HTMLElement>())
@@ -51,13 +52,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   const [newMap, setNewMap] = useState<LazarilloMap>()
   const [currentFloorIndex, setCurrentFloorIndex] = useState(0)
   const [floorName, setFloorName] = useState("Planta baja")
-  //const [randomBase, setRandomBase] = useState(0)
 
-
-  // useEffect(() => {
-  //   setRandomBase(Math.random())
-
-  // })
 
   const apiKey = process.env.REACT_APP_YOUR_API_KEY_HERE
     ? process.env.REACT_APP_YOUR_API_KEY_HERE
@@ -152,7 +147,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
    * @param routeId 
    * @returns 
    */
-   async function startAndWatchRoutingStatus(routeId: string) {
+  async function startAndWatchRoutingStatus(routeId: string) {
 
     if (!newMap) return;
 
@@ -165,7 +160,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     // Also add a watcher to the routing status
     LazarilloMap.watchPosition(undefined, async (data: GetPositionCallbackData) => {
       console.log('Position: ', JSON.stringify(data).toString());
-      
+
     })
   }
 
@@ -248,6 +243,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
   async function getRouteAndAddRoute(targetPlaceKey: number) {
     const targetPlace = places[targetPlaceKey];
+    let accesibility = withMobility ? 1 : 0
 
     LazarilloUtils.fetchRoute(
       apiKey, // api key
@@ -256,14 +252,14 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
       places[0].longitude, // fromLng
       targetPlace.latitude, // toLat
       targetPlace.longitude, // toLng
-      1, // withMobility
+      accesibility, // withMobility 0 Means a walking route and 1 a wheel chair route
       anounceSystem, // announceFormat
       undefined, // userBearing
       places[0].floor, // fromFloor
       parentPlace.id, // fromBuilding|
-      places[1].floor, // toFloor
+      targetPlace.floor, // toFloor
       parentPlace.id, // toBuilding
-      'es',
+      'es', //language of the instructions
       unitSystem
     )
       .then((response) => {
@@ -489,13 +485,46 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
                 </IonList>
               </IonCol>
             </IonRow>
+
             <IonRow>
+              <IonCol >
+                <IonTitle>Route Accesibility</IonTitle>
+                <IonList>
+                  <IonRadioGroup id="accesibility" value="0" onIonChange={(event) => {
+                    console.log("pre cambio de variable", withMobility)
+                    if (event.detail.value == 0) {
+                      withMobility = false
+                    }
+                    else {
+                      withMobility = true
+                    }
+                    console.log("tipo de ruta", withMobility)
+                  }}>
+                    <IonItem>
+                      <IonLabel>Walking</IonLabel>
+                      <IonRadio slot="end" value="0">
+
+                      </IonRadio>
+                    </IonItem>
+                    <IonItem>
+                      <IonLabel>Accesible</IonLabel>
+                      <IonRadio slot="end" value="1">
+
+                      </IonRadio>
+                    </IonItem>
+                  </IonRadioGroup>
+                </IonList>
+
+              </IonCol>
+
               <IonCol >
                 <IonTitle>Unit System</IonTitle>
                 <IonList>
                   <IonRadioGroup id='anounce-format' value={anounceSystem} onIonChange={(event) => {
                     if (event.detail.value === undefined) return;
-                    updateAnounceSystem(event.detail.value.toString())
+                    if (isOpen) {
+                      updateAnounceSystem(event.detail.value.toString())
+                    }
                   }}>
                     <IonItem>
                       <IonLabel>RELATIVE</IonLabel>
@@ -520,7 +549,9 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
                 <IonList>
                   <IonRadioGroup id='unit-metric' value={unitSystem} onIonChange={(event) => {
                     if (event.detail.value === undefined) return;
-                    updateUnitSytem(event.detail.value.toString())
+                    if (isOpen) {
+                      updateUnitSytem(event.detail.value.toString())
+                    }
                   }}
                   >
                     <IonItem>
@@ -554,7 +585,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
           </IonCol>
         </IonRow>
       </IonGrid>
-    </IonContent>
+    </IonContent >
   );
 };
 
