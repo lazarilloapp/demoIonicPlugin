@@ -263,8 +263,8 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
       coordinate: {
 
-        lat: -33.417556917537524,
-        lng: -70.60716507932558,
+        lat: parentPlace.latitude,
+        lng: parentPlace.longitude,
       },
       zoom: 21,
       /**
