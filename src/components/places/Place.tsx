@@ -3,5 +3,6 @@ export interface Place {
   _name: string;
   latitude: number;
   longitude: number;
+  floor: string;
 
 }

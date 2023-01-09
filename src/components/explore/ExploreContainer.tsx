@@ -69,6 +69,13 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     })
   }
 
+  const parentPlace = {
+    id: '-N19VjzEVIj2RDKu7i4r',
+    latitude: -33.417556917537524,
+    longitude: -70.60716507932558,
+  }
+
+
   async function createMap() {
 
     initPlugin();
@@ -82,11 +89,11 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
         apiKey: apiKey,
         config: {
           center: {
-            lat: -33.41758007741259,
-            lng: -70.60615300514021,
+            lat: parentPlace.latitude,
+            lng: parentPlace.longitude,
           },
           zoom: 17,
-          parentPlaceId: '-N19VjzEVIj2RDKu7i4r',
+          parentPlaceId: parentPlace.id,
         },
       },
       async () => {
@@ -102,16 +109,17 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
     if (!newMap) return;
 
+    // The intial pos for now will be the first place on the list
     let initialPos = {
-      building: '-N19VjzEVIj2RDKu7i4r',
-      floor: '-N1OJ6FIVBV6dpjCXEFM',
+      building: parentPlace.id,
+      floor: places[0].floor,
       polygons: undefined,
-      latitude: -33.41758007741259,
-      longitude: -70.60615300514021,
+      latitude: places[0].latitude,
+      longitude: places[0].longitude,
     };
     let finalPos = {
-      building: '-N19VjzEVIj2RDKu7i4r',
-      floor: '-N1OJ6FIVBV6dpjCXEFM',
+      building: parentPlace.id,
+      floor: targetPlace.floor,
       polygons: undefined,
       latitude: targetPlace.latitude,
       longitude: targetPlace.longitude,
@@ -122,9 +130,9 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
         mapId: 'my-cool-map',
         initialPos: initialPos,
         finalPos: finalPos,
-        initialFloor: '-N1OJ6FIVBV6dpjCXEFM',
-        finalFloor: '-N1OJ6FIVBV6dpjCXEFM',
-        place: '-N19VjzEVIj2RDKu7i4r',
+        initialFloor: places[0].floor,
+        finalFloor: targetPlace.floor,
+        place: parentPlace.id,
         preferAccessibleRoute: true,
         nextStepsRouteColor: '#ff33b5',
         prevStepsRouteColor: '#aaaaaa',
@@ -231,10 +239,10 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
       1, // withMobility
       anounceSystem, // announceFormat
       undefined, // userBearing
-      '-N1OJ6FIVBV6dpjCXEFM', // fromFloor
-      '-N19VjzEVIj2RDKu7i4r', // fromBuilding|
-      '-N1OJ6FIVBV6dpjCXEFM', // toFloor
-      '-N19VjzEVIj2RDKu7i4r', // toBuilding
+      places[0].floor, // fromFloor
+      parentPlace.id, // fromBuilding|
+      places[1].floor, // toFloor
+      parentPlace.id, // toBuilding
       'es',
       unitSystem
     )
