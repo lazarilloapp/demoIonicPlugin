@@ -26,7 +26,7 @@ import {
   useIonToast,
 } from '@ionic/react';
 import { mapOutline, location, trashBinOutline, cameraOutline, locateOutline, caretBack, caretForward } from 'ionicons/icons';
-import { RouteReadyCallbackData } from '@lzdevelopers/lazarillo-maps/dist/typings/definitions';
+import { GetPositionCallbackData, RouteReadyCallbackData } from '@lzdevelopers/lazarillo-maps/dist/typings/definitions';
 import { StepDTO } from '../places/Step';
 import { CustomInnerFloors } from '../data/InnerFloor';
 import { CustomPlaces } from '../data/Places';
@@ -128,11 +128,37 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
       async (data: RouteReadyCallbackData) => {
         console.log('Route added', data);
         presentToast('top', 'Route loaded');
+
+
+
+        //setSteps(data.data[0].legs[0].steps)
+
+        watchRoutingStatus(data.routeId)
+
+
       },
     );
     //to get route instructrions
     getRouteAndAddRoute()
   }
+
+  async function watchRoutingStatus(routeId: string) {
+
+    if (!newMap) return;
+
+    // Start routing
+    newMap.startRouting({
+      routeId: routeId
+    })
+
+
+    // Also add a watcher to the routing status
+    LazarilloMap.watchPosition(undefined, async (data: GetPositionCallbackData) => {
+      console.log('Position changed', JSON.stringify(data).toString());
+      
+    })
+  }
+
 
   const [present] = useIonToast();
 
@@ -212,7 +238,10 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
   }
 
-
+  /**
+   * This function could be replaced using addRoute from the Lazarillo sdk because
+   * fetchROute and drawRoute are siplified with addRoute
+   */
   async function getRouteAndAddRoute() {
 
     LazarilloUtils.fetchRoute(
