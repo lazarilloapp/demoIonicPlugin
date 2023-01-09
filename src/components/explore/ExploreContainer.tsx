@@ -28,7 +28,7 @@ import {
   useIonToast,
 } from '@ionic/react';
 import { mapOutline, location, trashBinOutline, cameraOutline, locateOutline, caretBack, caretForward } from 'ionicons/icons';
-import { RouteReadyCallbackData } from '@lzdevelopers/lazarillo-maps/dist/typings/definitions';
+import { GetPositionCallbackData, RouteReadyCallbackData } from '@lzdevelopers/lazarillo-maps/dist/typings/definitions';
 import { StepDTO } from '../places/Step';
 import { CustomInnerFloors } from '../data/InnerFloor';
 import { CustomPlaces } from '../data/Places';
@@ -147,7 +147,27 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
   }
 
+  /**
+   * This function will start the routing proccess and also set a listener for the routing status
+   * @param routeId 
+   * @returns 
+   */
+   async function startAndWatchRoutingStatus(routeId: string) {
 
+    if (!newMap) return;
+
+    // Start routing
+    newMap.startRouting({
+      routeId: routeId
+    })
+
+
+    // Also add a watcher to the routing status
+    LazarilloMap.watchPosition(undefined, async (data: GetPositionCallbackData) => {
+      console.log('Position: ', JSON.stringify(data).toString());
+      
+    })
+  }
 
   const presentToast = (
     position: 'top' | 'middle' | 'bottom',
