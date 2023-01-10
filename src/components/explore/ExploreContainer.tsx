@@ -48,6 +48,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   const [mapRef, setMapRef] = useState(useRef<HTMLElement>())
   const [showToast1, setShowToast1] = useState(false);
   const [steps, setSteps] = useState<StepDTO[]>([]);
+  const [currentPosition, setPosition] = useState<GetPositionCallbackData>();
   const [isOpen, setIsOpen] = useState(false);
   const [newMap, setNewMap] = useState<LazarilloMap>()
   const [currentFloorIndex, setCurrentFloorIndex] = useState(0)
@@ -65,9 +66,9 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   }
 
   const parentPlace = {
-    id: '-N19VjzEVIj2RDKu7i4r',
-    latitude: -33.417556917537524,
-    longitude: -70.60716507932558,
+    id: '-NGWyetk5llo1RG_11Ti',
+    latitude: -4.029755,
+    longitude: -79.207585,
   }
 
 
@@ -139,7 +140,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
       },
     );
     //to get route instructrions
-
+    getRouteAndAddRoute(targetPlaceKey)
   }
 
   /**
@@ -147,7 +148,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
    * @param routeId 
    * @returns 
    */
-  async function startAndWatchRoutingStatus(routeId: string) {
+  async function watchRoutingStatus(routeId: string) {
 
     if (!newMap) return;
 
@@ -157,10 +158,12 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     })
 
 
+
     // Also add a watcher to the routing status
     LazarilloMap.watchPosition(undefined, async (data: GetPositionCallbackData) => {
       console.log('Position: ', JSON.stringify(data).toString());
-
+      setPosition(data);
+      
     })
   }
 
@@ -277,7 +280,13 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
           {
             mapId: 'my-cool-map',
             route: data
-          }
+          },
+          async (data: RouteReadyCallbackData) => {
+            console.log('Route added', JSON.stringify(data).toString());
+            presentToast('top', 'Route loaded');
+
+            watchRoutingStatus(data.routeId)
+          },
         )
       })
       .catch(console.error);
@@ -437,6 +446,19 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
         ) : (<IonText></IonText>)
         }
 
+        {currentPosition ? (
+                  <IonRow>
+                    <IonCol>
+                      <IonTitle>Routing status:</IonTitle>
+                    </IonCol>
+                  </IonRow>) : ''}
+                  
+        {currentPosition ? (
+            <IonRow>
+            <IonCol>
+            <IonText>{JSON.stringify(currentPosition).toString()}</IonText>
+            </IonCol>
+            </IonRow>) : ''}
 
         {steps.length > 0 ? (
           <IonRow>
