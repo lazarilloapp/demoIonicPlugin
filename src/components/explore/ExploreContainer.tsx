@@ -386,6 +386,13 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
       LazarilloMap.simulateBeacons({simulateBeacons: listBeaconsToSimulate[currentBeaconIndex]})
       setSimulatedBeacon(listBeaconsToSimulate[currentBeaconIndex])
     }
+    
+    await LazarilloMap.getCurrentPosition().then((data) => {
+      console.log("Current position", JSON.stringify(data).toString())
+      setPosition(data)
+    })
+  
+    
 
   }
 
@@ -483,7 +490,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
         {currentPosition ? (
                   <IonRow>
                     <IonCol>
-                      <IonTitle>Routing status:</IonTitle>
+                      <IonTitle>Current position:</IonTitle>
                     </IonCol>
                   </IonRow>) : ''}
                   
