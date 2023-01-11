@@ -53,6 +53,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   const [newMap, setNewMap] = useState<LazarilloMap>()
   const [currentFloorIndex, setCurrentFloorIndex] = useState(0)
   const [floorName, setFloorName] = useState("Planta baja")
+  const [currentSimulatedBeacon, setSimulatedBeacon] = useState<String>()
 
 
   const apiKey = process.env.REACT_APP_YOUR_API_KEY_HERE
@@ -66,11 +67,17 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   }
 
   const parentPlace = {
-    id: '-NGWyetk5llo1RG_11Ti',
-    latitude: -4.029755,
-    longitude: -79.207585,
+    id: '-N19VjzEVIj2RDKu7i4r',
+    latitude: -33.417556917537524,
+    longitude: -70.60716507932558,
   }
 
+  const listBeaconsToSimulate = [
+    'f1a166c12ae08075dc5f40fc2eed832b',
+    '768e38b09842dba13304a8b8c91c3536',
+    'b23d1bf8a8b39ce3e379d886002c5602'
+  ]
+  var currentBeaconIndex = -1
 
   async function createMap() {
 
@@ -157,6 +164,8 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
       routeId: routeId
     })
 
+
+    LazarilloMap.simulateBeacons({simulateBeaconsList: 'b23d1bf8a8b39ce3e379d886002c5602'})
 
 
     // Also add a watcher to the routing status
@@ -368,6 +377,23 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   }
 
 
+  /**
+   * Iterate over the list of beacons to simulate. If there is the last beacon, the counter come back to the first
+   */
+  async function simulateNextBeacon() {
+    currentBeaconIndex = currentBeaconIndex + 1
+    if (currentBeaconIndex < listBeaconsToSimulate.length) {
+      LazarilloMap.simulateBeacons({simulateBeaconsList: listBeaconsToSimulate[currentBeaconIndex]})
+      setSimulatedBeacon(listBeaconsToSimulate[currentBeaconIndex])
+    }else{
+      currentBeaconIndex = 0
+      LazarilloMap.simulateBeacons({simulateBeaconsList: listBeaconsToSimulate[currentBeaconIndex]})
+      setSimulatedBeacon(listBeaconsToSimulate[currentBeaconIndex])
+    }
+
+  }
+
+
   return (
     <IonContent>
       <IonGrid>
@@ -440,6 +466,18 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
                 <IonIcon icon={cameraOutline}></IonIcon>
               </IonButton>
 
+            </IonRow>
+            <IonRow>
+              <IonCol>
+              <IonTitle>Beacons simulation</IonTitle>
+              <IonButton onClick={simulateNextBeacon}>
+                <IonIcon icon={caretForward}></IonIcon>
+              </IonButton>
+              <IonText>Current beacon {currentSimulatedBeacon}</IonText>
+
+
+              </IonCol>
+           
             </IonRow>
           </IonCol>
 
