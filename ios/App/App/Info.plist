@@ -31,8 +31,10 @@
     <string>To allow more precise location on indoor spaces enabled by Lazarillo</string>
     <key>NSBluetoothPeripheralUsageDescription</key>
     <string>To allow more precise location on places enabled with Lazarillo</string>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>We use your location for guide you</string>
     <key>NSLocationAlwaysUsageDescription</key>
-    <string>To inform you of nearby lazarillo routes</string>
+    <string>We use your location for guide you</string>
     <key>NSLocationWhenInUseUsageDescription</key>
     <string>We use your location for guide you</string>
 	<key>UIBackgroundModes</key>
