@@ -27,7 +27,7 @@ import {
   IonToolbar,
   useIonToast,
 } from '@ionic/react';
-import { mapOutline, location, trashBinOutline, cameraOutline, locateOutline, caretBack, caretForward } from 'ionicons/icons';
+import { mapOutline, location, trashBinOutline, cameraOutline, locateOutline, caretBack, caretForward, bluetooth } from 'ionicons/icons';
 import { GetPositionCallbackData, RouteReadyCallbackData } from '@lzdevelopers/lazarillo-maps/dist/typings/definitions';
 import { StepDTO } from '../places/Step';
 import { CustomInnerFloors } from '../data/InnerFloor';
@@ -44,6 +44,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   let anounceSystem = "RELATIVE" //default value
   let withMobility: boolean = false //default value
 
+
   const [present] = useIonToast();
   const [mapRef, setMapRef] = useState(useRef<HTMLElement>())
   const [showToast1, setShowToast1] = useState(false);
@@ -52,6 +53,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   const [newMap, setNewMap] = useState<LazarilloMap>()
   const [currentFloorIndex, setCurrentFloorIndex] = useState(0)
   const [floorName, setFloorName] = useState("Planta baja")
+  const [routeId, setRouteId] = useState("")
 
 
   const apiKey = process.env.REACT_APP_YOUR_API_KEY_HERE
@@ -162,6 +164,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
       console.log('Position: ', JSON.stringify(data).toString());
 
     })
+    console.log("added location watcher on route")
   }
 
   const presentToast = (
@@ -265,19 +268,26 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
       .then((response) => {
 
         console.log(response.url)
-        console.log(JSON.stringify(response.body).toString())
+        console.log(response.body)
         return response.json()
 
       })
       .then((data) => {
-        console.log("Got route: ", data)
+        console.log("Got route: ", JSON.stringify(data))
         setSteps(data[0].legs[0].steps)
-        console.log(data)
+
         newMap?.drawRoute(
           {
             mapId: 'my-cool-map',
             route: data
-          }
+          },
+          async (routeData: RouteReadyCallbackData) => {
+            console.log('Route added', routeData);
+            setRouteId(routeData.routeId)
+            //startAndWatchRoutingStatus(routeData.routeId)
+
+            presentToast('top', 'Watching Route');
+          },
         )
       })
       .catch(console.error);
@@ -416,9 +426,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
               </IonButton>
             </IonRow>
             <IonRow>
-              <IonButton onClick={enableCurrentLocation}>
-                <IonIcon icon={locateOutline}></IonIcon>
-              </IonButton>
+
               <IonButton onClick={addMarker}>
                 <IonIcon icon={location}></IonIcon>
                 <IonText> Indoor</IonText>
@@ -431,6 +439,22 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
                 <IonIcon icon={cameraOutline}></IonIcon>
               </IonButton>
 
+            </IonRow>
+
+            <IonRow>
+              <IonTitle>Location features</IonTitle>
+            </IonRow>
+            <IonRow>
+              <IonButton onClick={enableCurrentLocation}>
+                <IonIcon icon={locateOutline}></IonIcon>
+                <IonLabel>Enable location</IonLabel>
+              </IonButton>
+              <IonButton onClick={() => {
+                startAndWatchRoutingStatus(routeId)
+              }}>
+                <IonIcon icon={bluetooth}></IonIcon>
+                <IonLabel>Watch Position</IonLabel>
+              </IonButton>
             </IonRow>
           </IonCol>
 
@@ -588,5 +612,5 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     </IonContent >
   );
 };
-
 export default ExploreContainer;
+
