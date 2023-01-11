@@ -164,10 +164,6 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
       routeId: routeId
     })
 
-
-    LazarilloMap.simulateBeacons({simulateBeaconsList: 'b23d1bf8a8b39ce3e379d886002c5602'})
-
-
     // Also add a watcher to the routing status
     LazarilloMap.watchPosition(undefined, async (data: GetPositionCallbackData) => {
       console.log('Position: ', JSON.stringify(data).toString());
@@ -383,11 +379,11 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   async function simulateNextBeacon() {
     currentBeaconIndex = currentBeaconIndex + 1
     if (currentBeaconIndex < listBeaconsToSimulate.length) {
-      LazarilloMap.simulateBeacons({simulateBeaconsList: listBeaconsToSimulate[currentBeaconIndex]})
+      LazarilloMap.simulateBeacons({simulateBeacons: listBeaconsToSimulate[currentBeaconIndex]})
       setSimulatedBeacon(listBeaconsToSimulate[currentBeaconIndex])
     }else{
       currentBeaconIndex = 0
-      LazarilloMap.simulateBeacons({simulateBeaconsList: listBeaconsToSimulate[currentBeaconIndex]})
+      LazarilloMap.simulateBeacons({simulateBeacons: listBeaconsToSimulate[currentBeaconIndex]})
       setSimulatedBeacon(listBeaconsToSimulate[currentBeaconIndex])
     }
 
