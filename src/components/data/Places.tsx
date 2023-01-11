@@ -43,4 +43,11 @@ export const CustomPlaces: Place[] = [
         longitude: -70.60568241131433,
         floor: '-N1OJ6FIVBV6dpjCXEFM',
     },
+    {
+        id: '-NDZGO5_rJ8oydkxvpGT',
+        _name: 'Yogurtlife',
+        latitude: -33.417702498298034,
+        longitude: -70.60701209726123,
+        floor: '-NCtxg_OxCuCfGVevdck', //piso 5
+    },
 ];
