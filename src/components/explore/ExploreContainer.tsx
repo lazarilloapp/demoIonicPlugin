@@ -374,6 +374,11 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
       <IonGrid>
         <IonRow>
           <IonCol>
+            <capacitor-lazarillo-map ref={mapRef}></capacitor-lazarillo-map>
+          </IonCol>
+        </IonRow>
+        <IonRow>
+          <IonCol>
 
             {newMap ? (
               <IonCard>
@@ -398,20 +403,13 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
           </IonCol>
         </IonRow>
 
-        <IonRow>
-
-        </IonRow>
-
-        <IonRow>
-          <IonCol>
-            <capacitor-lazarillo-map ref={mapRef}></capacitor-lazarillo-map>
-          </IonCol>
-        </IonRow>
 
         {newMap ? (
           <IonCol>
+            <IonCardHeader>
+              Route Destination and Floor change
+            </IonCardHeader>
             <IonRow >
-
               <IonButton onClick={() => setIsOpen(true)}>
                 <IonText>Destinations</IonText>
               </IonButton>
@@ -422,9 +420,16 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
               <IonButton onClick={changeNextFloor}>
                 <IonText>Next</IonText>
                 <IonIcon icon={caretForward}></IonIcon>
-
               </IonButton>
             </IonRow>
+
+
+            <IonRow>
+              <IonCardHeader>
+                Add pin and change camera angle and zoom
+              </IonCardHeader>
+            </IonRow>
+
             <IonRow>
 
               <IonButton onClick={addMarker}>
@@ -442,7 +447,9 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
             </IonRow>
 
             <IonRow>
-              <IonTitle>Location features</IonTitle>
+              <IonCardHeader>
+                Location features
+              </IonCardHeader>
             </IonRow>
             <IonRow>
               <IonButton onClick={enableCurrentLocation}>
@@ -460,6 +467,11 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
         ) : (<IonText></IonText>)
         }
+        <IonRow>
+          <IonCardHeader>
+            End of demo :D
+          </IonCardHeader>
+        </IonRow>
 
 
         {steps.length > 0 ? (
