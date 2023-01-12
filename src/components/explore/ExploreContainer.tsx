@@ -1,6 +1,6 @@
 import './ExploreContainer.css';
 import { LazarilloMap, LazarilloUtils } from '@lzdevelopers/lazarillo-maps';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   IonButton,
   IonButtons,
@@ -66,7 +66,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     })
   }
 
-  const parentPlace = {
+  const parentPlace = {  //costanera
     id: '-N19VjzEVIj2RDKu7i4r',
     latitude: -33.417556917537524,
     longitude: -70.60716507932558,
@@ -299,8 +299,6 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
    * Move the camare angle and location 
    */
   async function setCamera() {
-    const min = -10
-    const max = 10
     const randomNumber = Math.floor(Math.random() * places.length)
 
     const place = places[randomNumber]
@@ -374,7 +372,13 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
       <IonGrid>
         <IonRow>
           <IonCol>
-
+            <capacitor-lazarillo-map ref={mapRef}></capacitor-lazarillo-map>
+          </IonCol>
+        </IonRow>
+      </IonGrid>
+      <IonGrid class="grid-2">
+        <IonRow>
+          <IonCol>
             {newMap ? (
               <IonCard>
                 <IonCardHeader>
@@ -398,20 +402,13 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
           </IonCol>
         </IonRow>
 
-        <IonRow>
-
-        </IonRow>
-
-        <IonRow>
-          <IonCol>
-            <capacitor-lazarillo-map ref={mapRef}></capacitor-lazarillo-map>
-          </IonCol>
-        </IonRow>
 
         {newMap ? (
           <IonCol>
+            <IonCardHeader>
+              <IonCardTitle> Route Destination and Floor change</IonCardTitle>
+            </IonCardHeader>
             <IonRow >
-
               <IonButton onClick={() => setIsOpen(true)}>
                 <IonText>Destinations</IonText>
               </IonButton>
@@ -422,9 +419,16 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
               <IonButton onClick={changeNextFloor}>
                 <IonText>Next</IonText>
                 <IonIcon icon={caretForward}></IonIcon>
-
               </IonButton>
             </IonRow>
+
+
+            <IonRow>
+              <IonCardHeader>
+                <IonCardTitle> Add pin and change camera angle and zoom</IonCardTitle>
+              </IonCardHeader>
+            </IonRow>
+
             <IonRow>
 
               <IonButton onClick={addMarker}>
@@ -442,19 +446,25 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
             </IonRow>
 
             <IonRow>
-              <IonTitle>Location features</IonTitle>
+              <IonCardHeader>
+                <IonCardTitle> Location features</IonCardTitle>
+              </IonCardHeader>
             </IonRow>
             <IonRow>
-              <IonButton onClick={enableCurrentLocation}>
-                <IonIcon icon={locateOutline}></IonIcon>
-                <IonLabel>Enable location</IonLabel>
-              </IonButton>
-              <IonButton onClick={() => {
-                startAndWatchRoutingStatus(routeId)
-              }}>
-                <IonIcon icon={bluetooth}></IonIcon>
-                <IonLabel>Watch Position</IonLabel>
-              </IonButton>
+              <IonCol >
+                <IonButton onClick={enableCurrentLocation}>
+                  <IonIcon icon={locateOutline}></IonIcon>
+                  <IonLabel>Enable location</IonLabel>
+                </IonButton>
+              </IonCol>
+              <IonCol>
+                <IonButton onClick={() => {
+                  startAndWatchRoutingStatus(routeId)
+                }}>
+                  <IonIcon icon={bluetooth}></IonIcon>
+                  <IonLabel>Watch Position</IonLabel>
+                </IonButton>
+              </IonCol>
             </IonRow>
           </IonCol>
 
@@ -512,11 +522,11 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
             <IonRow>
               <IonCol >
-                <IonTitle>Route Accesibility</IonTitle>
+                <IonCardHeader> <IonCardTitle> Route Accesibility</IonCardTitle></IonCardHeader>
                 <IonList>
                   <IonRadioGroup id="accesibility" value="0" onIonChange={(event) => {
                     console.log("pre cambio de variable", withMobility)
-                    if (event.detail.value == 0) {
+                    if (event.detail.value === 0) {
                       withMobility = false
                     }
                     else {
@@ -542,7 +552,8 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
               </IonCol>
 
               <IonCol >
-                <IonTitle>Unit System</IonTitle>
+                <IonCardHeader> <IonCardTitle>Unit System</IonCardTitle></IonCardHeader>
+
                 <IonList>
                   <IonRadioGroup id='anounce-format' value={anounceSystem} onIonChange={(event) => {
                     if (event.detail.value === undefined) return;
@@ -569,7 +580,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
                 </IonList>
               </IonCol>
               <IonCol >
-                <IonTitle>Anounce System</IonTitle>
+                <IonCardHeader> <IonCardTitle> Anounce System</IonCardTitle></IonCardHeader>
                 <IonList>
                   <IonRadioGroup id='unit-metric' value={unitSystem} onIonChange={(event) => {
                     if (event.detail.value === undefined) return;
