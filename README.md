@@ -31,7 +31,7 @@ Now we can run this commands to install the dependencies:
 
 Run:
 ```
-ionic build
+ionic build && npx cap sync
 ```
 ```
 ionic capacitor run [android | ios]
