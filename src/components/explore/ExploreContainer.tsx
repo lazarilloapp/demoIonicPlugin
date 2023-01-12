@@ -470,11 +470,6 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
         ) : (<IonText></IonText>)
         }
-        <IonRow>
-          <IonCardHeader>
-            <IonCardTitle>End of demo :D</IonCardTitle>
-          </IonCardHeader>
-        </IonRow>
 
 
         {steps.length > 0 ? (
