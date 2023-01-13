@@ -74,7 +74,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
   const listBeaconsToSimulate = [
     'f1a166c12ae08075dc5f40fc2eed832b',
-    '768e38b09842dba13304a8b8c91c3536',
+    'e2d63382fb9a6ea46c7482668802430c',
     'b23d1bf8a8b39ce3e379d886002c5602'
   ]
   var currentBeaconIndex = -1
@@ -386,11 +386,13 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
       LazarilloMap.simulateBeacons({simulateBeacons: listBeaconsToSimulate[currentBeaconIndex]})
       setSimulatedBeacon(listBeaconsToSimulate[currentBeaconIndex])
     }
+
+      await new Promise(f => setTimeout(f, 10000));
     
-    await LazarilloMap.getCurrentPosition().then((data) => {
-      console.log("Current position", JSON.stringify(data).toString())
-      setPosition(data)
-    })
+      await LazarilloMap.getCurrentPosition().then((data) => {
+        console.log("Current position", JSON.stringify(data).toString())
+        setPosition(data)
+      })
   
     
 
