@@ -63,6 +63,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   async function initPlugin() {
     await LazarilloMap.initializeLazarilloPlugin({
       apiKey: apiKey,
+      place: parentPlace.id,
     })
   }
 
@@ -377,17 +378,19 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
    * Iterate over the list of beacons to simulate. If there is the last beacon, the counter come back to the first
    */
   async function simulateNextBeacon() {
+    initPlugin();
+
+
     currentBeaconIndex = currentBeaconIndex + 1
     if (currentBeaconIndex < listBeaconsToSimulate.length) {
-      LazarilloMap.simulateBeacons({simulateBeacons: listBeaconsToSimulate[currentBeaconIndex]})
+      await LazarilloMap.simulateBeacons({simulateBeacons: listBeaconsToSimulate[currentBeaconIndex]})
       setSimulatedBeacon(listBeaconsToSimulate[currentBeaconIndex])
     }else{
       currentBeaconIndex = 0
-      LazarilloMap.simulateBeacons({simulateBeacons: listBeaconsToSimulate[currentBeaconIndex]})
+      await LazarilloMap.simulateBeacons({simulateBeacons: listBeaconsToSimulate[currentBeaconIndex]})
       setSimulatedBeacon(listBeaconsToSimulate[currentBeaconIndex])
     }
 
-      await new Promise(f => setTimeout(f, 10000));
     
       await LazarilloMap.getCurrentPosition().then((data) => {
         console.log("Current position", JSON.stringify(data).toString())
@@ -438,6 +441,26 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
           </IonCol>
         </IonRow>
 
+        <IonRow>
+              <IonCol>
+              <IonTitle>Beacons simulation</IonTitle>
+              <IonButton onClick={simulateNextBeacon}>
+                <IonIcon icon={caretForward}></IonIcon>
+              </IonButton>
+              <IonText>Current beacon {currentSimulatedBeacon}</IonText>
+
+
+              </IonCol>
+           
+            </IonRow>
+
+            {currentPosition ? (
+                  <IonRow>
+                    <IonCol>
+                      <IonTitle>Current position:</IonTitle>
+                    </IonCol>
+                  </IonRow>) : ''}
+
         {newMap ? (
           <IonCol>
             <IonRow >
@@ -472,29 +495,13 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
               </IonButton>
 
             </IonRow>
-            <IonRow>
-              <IonCol>
-              <IonTitle>Beacons simulation</IonTitle>
-              <IonButton onClick={simulateNextBeacon}>
-                <IonIcon icon={caretForward}></IonIcon>
-              </IonButton>
-              <IonText>Current beacon {currentSimulatedBeacon}</IonText>
-
-
-              </IonCol>
-           
-            </IonRow>
+      
           </IonCol>
 
         ) : (<IonText></IonText>)
         }
 
-        {currentPosition ? (
-                  <IonRow>
-                    <IonCol>
-                      <IonTitle>Current position:</IonTitle>
-                    </IonCol>
-                  </IonRow>) : ''}
+
                   
         {currentPosition ? (
             <IonRow>
