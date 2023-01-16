@@ -54,7 +54,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   const [currentFloorIndex, setCurrentFloorIndex] = useState(0)
   const [floorName, setFloorName] = useState("Planta baja")
   const [currentSimulatedBeacon, setSimulatedBeacon] = useState<String>()
-
+  const [currentRouteId, setCurrentRouteId] = useState("")
 
   const apiKey = process.env.REACT_APP_YOUR_API_KEY_HERE
     ? process.env.REACT_APP_YOUR_API_KEY_HERE
@@ -291,6 +291,8 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
             console.log('Route added', JSON.stringify(data).toString());
             presentToast('top', 'Route loaded');
 
+            setCurrentRouteId(data.routeId)
+
             watchRoutingStatus(data.routeId)
           },
         )
@@ -402,6 +404,14 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   }
 
 
+ async function destroyRoute() {
+
+  if(newMap != undefined){
+    newMap.destroyRouting({routeId: currentRouteId})
+  }
+
+ }
+
   return (
     <IonContent>
       <IonGrid>
@@ -442,6 +452,10 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
         </IonRow>
 
         <IonRow>
+        <IonButton onClick={destroyRoute}>
+              <IonIcon icon={trashBinOutline}></IonIcon>
+              <IonText>Destroy Routing</IonText>
+            </IonButton>
               <IonCol>
               <IonTitle>Beacons simulation</IonTitle>
               <IonButton onClick={simulateNextBeacon}>
