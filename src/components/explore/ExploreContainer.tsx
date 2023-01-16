@@ -20,6 +20,7 @@ import {
   IonRadio,
   IonRadioGroup,
   IonRow,
+  IonSkeletonText,
   IonText,
   IonThumbnail,
   IonTitle,
@@ -49,6 +50,8 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   const [mapRef, setMapRef] = useState(useRef<HTMLElement>())
   const [showToast1, setShowToast1] = useState(false);
   const [steps, setSteps] = useState<StepDTO[]>([]);
+  const [currentPosition, setPosition] = useState<GetPositionCallbackData>();
+  const [initialized, setInitialized] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [newMap, setNewMap] = useState<LazarilloMap>()
   const [currentFloorIndex, setCurrentFloorIndex] = useState(0)
@@ -61,9 +64,15 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     : '';
 
   async function initPlugin() {
-    await LazarilloMap.initializeLazarilloPlugin({
-      apiKey: apiKey,
-    })
+
+    if(!initialized){
+      await LazarilloMap.initializeLazarilloPlugin({
+        apiKey: apiKey,
+        place: parentPlace.id
+      })
+    }
+
+
   }
 
   const parentPlace = {  //costanera
@@ -366,6 +375,19 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     console.log("despues", anounceSystem)
   }
 
+  /**
+   * Ask the plugin for the position
+   */
+  async function getCurrentPosition() {
+    await initPlugin()
+
+    await LazarilloMap.getCurrentPosition().then((response : GetPositionCallbackData) => {
+      console.log("Current position", JSON.stringify(response).toString())
+      setPosition(response)
+
+    })
+  }
+
 
   return (
     <IonContent>
@@ -402,6 +424,31 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
           </IonCol>
         </IonRow>
 
+
+        <IonRow>
+          <IonCol>
+            <IonButton onClick={getCurrentPosition}>
+              <IonText>Get current position</IonText>
+            </IonButton>
+          </IonCol>
+
+          {currentPosition ? (
+
+            <IonCol>
+              <IonSkeletonText>Position:
+                {JSON.stringify(currentPosition).toString()} </IonSkeletonText>
+            </IonCol>
+          ) : ''}
+
+
+        </IonRow>
+
+        {currentPosition ? (
+          <IonRow>
+            <IonCol>
+              <IonText>{JSON.stringify(currentPosition).toString()}</IonText>
+            </IonCol>
+          </IonRow>) : ''}
 
         {newMap ? (
           <IonCol>
