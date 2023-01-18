@@ -1,6 +1,6 @@
 import './ExploreContainer.css';
 import { LazarilloMap, LazarilloUtils } from '@lzdevelopers/lazarillo-maps';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   IonButton,
   IonButtons,
@@ -20,6 +20,7 @@ import {
   IonRadio,
   IonRadioGroup,
   IonRow,
+  IonSkeletonText,
   IonText,
   IonThumbnail,
   IonTitle,
@@ -27,7 +28,7 @@ import {
   IonToolbar,
   useIonToast,
 } from '@ionic/react';
-import { mapOutline, location, trashBinOutline, cameraOutline, locateOutline, caretBack, caretForward } from 'ionicons/icons';
+import { mapOutline, location, trashBinOutline, cameraOutline, locateOutline, caretBack, caretForward, bluetooth } from 'ionicons/icons';
 import { GetPositionCallbackData, RouteReadyCallbackData } from '@lzdevelopers/lazarillo-maps/dist/typings/definitions';
 import { StepDTO } from '../places/Step';
 import { CustomInnerFloors } from '../data/InnerFloor';
@@ -44,30 +45,37 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   let anounceSystem = "RELATIVE" //default value
   let withMobility: boolean = false //default value
 
+
   const [present] = useIonToast();
   const [mapRef, setMapRef] = useState(useRef<HTMLElement>())
   const [showToast1, setShowToast1] = useState(false);
   const [steps, setSteps] = useState<StepDTO[]>([]);
   const [currentPosition, setPosition] = useState<GetPositionCallbackData>();
+  const [initialized, setInitialized] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [newMap, setNewMap] = useState<LazarilloMap>()
   const [currentFloorIndex, setCurrentFloorIndex] = useState(0)
   const [floorName, setFloorName] = useState("Planta baja")
   const [currentSimulatedBeacon, setSimulatedBeacon] = useState<String>()
-  const [currentRouteId, setCurrentRouteId] = useState("")
+  const [routeId, setRouteId] = useState("")
 
   const apiKey = process.env.REACT_APP_YOUR_API_KEY_HERE
     ? process.env.REACT_APP_YOUR_API_KEY_HERE
     : '';
 
   async function initPlugin() {
-    await LazarilloMap.initializeLazarilloPlugin({
-      apiKey: apiKey,
-      place: parentPlace.id,
-    })
+
+    if(!initialized){
+      await LazarilloMap.initializeLazarilloPlugin({
+        apiKey: apiKey,
+        place: parentPlace.id
+      })
+    }
+
+
   }
 
-  const parentPlace = {
+  const parentPlace = {  //costanera
     id: '-N19VjzEVIj2RDKu7i4r',
     latitude: -33.417556917537524,
     longitude: -70.60716507932558,
@@ -171,6 +179,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
       setPosition(data);
       
     })
+    console.log("added location watcher on route")
   }
 
   const presentToast = (
@@ -274,26 +283,25 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
       .then((response) => {
 
         console.log(response.url)
-        console.log(JSON.stringify(response.body).toString())
+        console.log(response.body)
         return response.json()
 
       })
       .then((data) => {
-        console.log("Got route: ", data)
+        console.log("Got route: ", JSON.stringify(data))
         setSteps(data[0].legs[0].steps)
-        console.log(data)
+
         newMap?.drawRoute(
           {
             mapId: 'my-cool-map',
             route: data
           },
-          async (data: RouteReadyCallbackData) => {
-            console.log('Route added', JSON.stringify(data).toString());
-            presentToast('top', 'Route loaded');
+          async (routeData: RouteReadyCallbackData) => {
+            console.log('Route added', routeData);
+            setRouteId(routeData.routeId)
+            //startAndWatchRoutingStatus(routeData.routeId)
 
-            setCurrentRouteId(data.routeId)
-
-            watchRoutingStatus(data.routeId)
+            presentToast('top', 'Watching Route');
           },
         )
       })
@@ -306,8 +314,6 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
    * Move the camare angle and location 
    */
   async function setCamera() {
-    const min = -10
-    const max = 10
     const randomNumber = Math.floor(Math.random() * places.length)
 
     const place = places[randomNumber]
@@ -375,6 +381,19 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     console.log("despues", anounceSystem)
   }
 
+  /**
+   * Ask the plugin for the position
+   */
+  async function getCurrentPosition() {
+    await initPlugin()
+
+    await LazarilloMap.getCurrentPosition().then((response : GetPositionCallbackData) => {
+      console.log("Current position", JSON.stringify(response).toString())
+      setPosition(response)
+
+    })
+  }
+
 
   /**
    * Iterate over the list of beacons to simulate. If there is the last beacon, the counter come back to the first
@@ -382,12 +401,11 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   async function simulateNextBeacon() {
     initPlugin();
 
-
     currentBeaconIndex = currentBeaconIndex + 1
     if (currentBeaconIndex < listBeaconsToSimulate.length) {
       await LazarilloMap.simulateBeacons({simulateBeacons: listBeaconsToSimulate[currentBeaconIndex]})
       setSimulatedBeacon(listBeaconsToSimulate[currentBeaconIndex])
-    }else{
+    } else {
       currentBeaconIndex = 0
       await LazarilloMap.simulateBeacons({simulateBeacons: listBeaconsToSimulate[currentBeaconIndex]})
       setSimulatedBeacon(listBeaconsToSimulate[currentBeaconIndex])
@@ -407,7 +425,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
  async function destroyRoute() {
 
   if(newMap != undefined){
-    newMap.destroyRouting({routeId: currentRouteId})
+    newMap.destroyRouting({routeId: routeId})
   }
 
  }
@@ -417,7 +435,13 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
       <IonGrid>
         <IonRow>
           <IonCol>
-
+            <capacitor-lazarillo-map ref={mapRef}></capacitor-lazarillo-map>
+          </IonCol>
+        </IonRow>
+      </IonGrid>
+      <IonGrid class="grid-2">
+        <IonRow>
+          <IonCol>
             {newMap ? (
               <IonCard>
                 <IonCardHeader>
@@ -441,44 +465,38 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
           </IonCol>
         </IonRow>
 
-        <IonRow>
-
-        </IonRow>
 
         <IonRow>
           <IonCol>
-            <capacitor-lazarillo-map ref={mapRef}></capacitor-lazarillo-map>
+            <IonButton onClick={getCurrentPosition}>
+              <IonText>Get current position</IonText>
+            </IonButton>
           </IonCol>
+
+          {currentPosition ? (
+
+            <IonCol>
+              <IonSkeletonText>Position:
+                {JSON.stringify(currentPosition).toString()} </IonSkeletonText>
+            </IonCol>
+          ) : ''}
+
+
         </IonRow>
 
-        <IonRow>
-        <IonButton onClick={destroyRoute}>
-              <IonIcon icon={trashBinOutline}></IonIcon>
-              <IonText>Destroy Routing</IonText>
-            </IonButton>
-              <IonCol>
-              <IonTitle>Beacons simulation</IonTitle>
-              <IonButton onClick={simulateNextBeacon}>
-                <IonIcon icon={caretForward}></IonIcon>
-              </IonButton>
-              <IonText>Current beacon {currentSimulatedBeacon}</IonText>
-
-
-              </IonCol>
-           
-            </IonRow>
-
-            {currentPosition ? (
-                  <IonRow>
-                    <IonCol>
-                      <IonTitle>Current position:</IonTitle>
-                    </IonCol>
-                  </IonRow>) : ''}
+        {currentPosition ? (
+          <IonRow>
+            <IonCol>
+              <IonText>{JSON.stringify(currentPosition).toString()}</IonText>
+            </IonCol>
+          </IonRow>) : ''}
 
         {newMap ? (
           <IonCol>
+            <IonCardHeader>
+              <IonCardTitle> Route Destination and Floor change</IonCardTitle>
+            </IonCardHeader>
             <IonRow >
-
               <IonButton onClick={() => setIsOpen(true)}>
                 <IonText>Destinations</IonText>
               </IonButton>
@@ -489,13 +507,18 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
               <IonButton onClick={changeNextFloor}>
                 <IonText>Next</IonText>
                 <IonIcon icon={caretForward}></IonIcon>
-
               </IonButton>
             </IonRow>
+
+
             <IonRow>
-              <IonButton onClick={enableCurrentLocation}>
-                <IonIcon icon={locateOutline}></IonIcon>
-              </IonButton>
+              <IonCardHeader>
+                <IonCardTitle> Add pin and change camera angle and zoom</IonCardTitle>
+              </IonCardHeader>
+            </IonRow>
+
+            <IonRow>
+
               <IonButton onClick={addMarker}>
                 <IonIcon icon={location}></IonIcon>
                 <IonText> Indoor</IonText>
@@ -509,21 +532,51 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
               </IonButton>
 
             </IonRow>
-      
+
+            <IonRow>
+              <IonCardHeader>
+                <IonCardTitle> Location features</IonCardTitle>
+              </IonCardHeader>
+            </IonRow>
+            <IonRow>
+              <IonCol>
+                <IonButton onClick={enableCurrentLocation}>
+                  <IonIcon icon={locateOutline}></IonIcon>
+                  <IonLabel>Enable location</IonLabel>
+                </IonButton>
+              </IonCol>
+              <IonCol>
+                <IonButton onClick={() => {
+                  watchRoutingStatus(routeId)
+                }}>
+                  <IonIcon icon={bluetooth}></IonIcon>
+                  <IonLabel>Watch Position</IonLabel>
+                </IonButton>
+              </IonCol>
+            </IonRow>
+            <IonRow>
+              <IonCardHeader>
+                <IonCardTitle>Beacons simulation</IonCardTitle>
+              </IonCardHeader>
+            </IonRow>
+            <IonRow>
+              <IonCol>
+                <IonButton onClick={simulateNextBeacon}>
+                  <IonIcon icon={caretForward}></IonIcon>
+                  <IonLabel>Simulate Next Beacon</IonLabel>
+                </IonButton>
+              </IonCol>
+            </IonRow>
+            <IonRow>
+              <IonText>Current beacon {currentSimulatedBeacon}</IonText>
+            </IonRow>
           </IonCol>
 
         ) : (<IonText></IonText>)
         }
 
 
-                  
-        {currentPosition ? (
-            <IonRow>
-            <IonCol>
-            <IonText>{JSON.stringify(currentPosition).toString()}</IonText>
-            </IonCol>
-            </IonRow>) : ''}
-
+      
         {steps.length > 0 ? (
           <IonRow>
             <IonCol>
@@ -574,11 +627,11 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
             <IonRow>
               <IonCol >
-                <IonTitle>Route Accesibility</IonTitle>
+                <IonCardHeader> <IonCardTitle> Route Accesibility</IonCardTitle></IonCardHeader>
                 <IonList>
                   <IonRadioGroup id="accesibility" value="0" onIonChange={(event) => {
                     console.log("pre cambio de variable", withMobility)
-                    if (event.detail.value == 0) {
+                    if (event.detail.value === 0) {
                       withMobility = false
                     }
                     else {
@@ -604,7 +657,8 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
               </IonCol>
 
               <IonCol >
-                <IonTitle>Unit System</IonTitle>
+                <IonCardHeader> <IonCardTitle>Unit System</IonCardTitle></IonCardHeader>
+
                 <IonList>
                   <IonRadioGroup id='anounce-format' value={anounceSystem} onIonChange={(event) => {
                     if (event.detail.value === undefined) return;
@@ -631,7 +685,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
                 </IonList>
               </IonCol>
               <IonCol >
-                <IonTitle>Anounce System</IonTitle>
+                <IonCardHeader> <IonCardTitle> Anounce System</IonCardTitle></IonCardHeader>
                 <IonList>
                   <IonRadioGroup id='unit-metric' value={unitSystem} onIonChange={(event) => {
                     if (event.detail.value === undefined) return;
@@ -674,5 +728,5 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     </IonContent >
   );
 };
-
 export default ExploreContainer;
+
