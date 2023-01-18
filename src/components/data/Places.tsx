@@ -43,4 +43,11 @@ export const CustomPlaces: Place[] = [
         longitude: -70.60568241131433,
         floor: '-N1OJ6FIVBV6dpjCXEFM',
     },
+    {
+        id: '-NCzJim-CVnbrzSGVcvF',
+        _name: 'Kuna',
+        latitude: -33.41762637698051,
+        longitude: -70.60645650816643,
+        floor: '-NCtxDrJbDWE3gMkZ_45',
+    },
 ];
