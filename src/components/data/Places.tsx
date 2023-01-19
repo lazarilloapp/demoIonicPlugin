@@ -2,6 +2,13 @@ import { Place } from "../places/Place";
 
 export const CustomPlaces: Place[] = [
     {
+        id: '-N1PHAsreM59Qust1UNb',
+        _name: 'PC Factory',
+        latitude: -33.417429308544556,
+        longitude: -70.60685728495696,
+        floor: '-N1OJ6FIVBV6dpjCXEFM',
+    },
+    {
         id: '-N1PFp8NOc5m4LVoPbLY',
         _name: 'Kayser',
         latitude: -33.41758007741259,
@@ -49,5 +56,12 @@ export const CustomPlaces: Place[] = [
         latitude: -33.41762637698051,
         longitude: -70.60645650816643,
         floor: '-NCtxDrJbDWE3gMkZ_45',
+    },
+    {
+        id: '-N1PFFX-qEqknjwn9Pl6',
+        _name: 'Espacio Salcobrand',
+        latitude: -33.41780208365955,
+        longitude: -70.60574456359895,
+        floor: '-N1OJ6FIVBV6dpjCXEFM',
     },
 ];
