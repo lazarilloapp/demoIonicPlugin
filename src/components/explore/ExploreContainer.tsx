@@ -58,6 +58,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   const [floorName, setFloorName] = useState("Planta baja")
   const [currentSimulatedBeacon, setSimulatedBeacon] = useState<String>()
   const [routeId, setRouteId] = useState("")
+  const [currentBeaconIndex, setCurrentBeaconIndex] = useState(-1)
 
   const apiKey = process.env.REACT_APP_YOUR_API_KEY_HERE
     ? process.env.REACT_APP_YOUR_API_KEY_HERE
@@ -86,7 +87,6 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     'e2d63382fb9a6ea46c7482668802430c',
     'b23d1bf8a8b39ce3e379d886002c5602'
   ]
-  var currentBeaconIndex = -1
 
   async function createMap() {
 
@@ -401,12 +401,12 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   async function simulateNextBeacon() {
     initPlugin();
 
-    currentBeaconIndex = currentBeaconIndex + 1
+    setCurrentBeaconIndex(currentBeaconIndex + 1)
     if (currentBeaconIndex < listBeaconsToSimulate.length) {
       await LazarilloMap.simulateBeacons({simulateBeacons: listBeaconsToSimulate[currentBeaconIndex]})
       setSimulatedBeacon(listBeaconsToSimulate[currentBeaconIndex])
     } else {
-      currentBeaconIndex = 0
+      setCurrentBeaconIndex(0)
       await LazarilloMap.simulateBeacons({simulateBeacons: listBeaconsToSimulate[currentBeaconIndex]})
       setSimulatedBeacon(listBeaconsToSimulate[currentBeaconIndex])
     }
