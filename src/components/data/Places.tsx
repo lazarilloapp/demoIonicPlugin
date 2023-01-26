@@ -16,6 +16,13 @@ export const CustomPlaces: Place[] = [
         floor: '-N1OJ6FIVBV6dpjCXEFM',
     },
     {
+        id: '-N2SRcOa7uYI8gYIZZb4',
+        _name: 'Cajero Automático (Baños)',
+        latitude: -33.417478405397176,
+        longitude: -70.60596998769914,
+        floor: '-N1OJ6FIVBV6dpjCXEFM',
+    },
+    {
         id: '-N1PVMDgXNBWo1gWEpyg',
         _name: 'Easy',
         latitude: -33.417596318453455,

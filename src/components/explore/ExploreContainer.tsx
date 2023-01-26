@@ -53,12 +53,13 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   const [currentPosition, setPosition] = useState<GetPositionCallbackData>();
   const [initialized, setInitialized] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [newMap, setNewMap] = useState<LazarilloMap>()
-  const [currentFloorIndex, setCurrentFloorIndex] = useState(0)
-  const [floorName, setFloorName] = useState("Planta baja")
-  const [currentSimulatedBeacon, setSimulatedBeacon] = useState<String>()
-  const [routeId, setRouteId] = useState("")
-  const [currentBeaconIndex, setCurrentBeaconIndex] = useState(-1)
+  const [newMap, setNewMap] = useState<LazarilloMap>();
+  const [currentFloorIndex, setCurrentFloorIndex] = useState(0);
+  const [floorName, setFloorName] = useState("Planta baja");
+  const [currentSimulatedBeacon, setSimulatedBeacon] = useState<String>();
+  const [routeId, setRouteId] = useState("");
+  const [currentBeaconIndex, setCurrentBeaconIndex] = useState(-1);
+  const [currentPositionWatching, setCurrentPositionWatching] = useState<GetPositionCallbackData>();
 
   const apiKey = process.env.REACT_APP_YOUR_API_KEY_HERE
     ? process.env.REACT_APP_YOUR_API_KEY_HERE
@@ -84,8 +85,8 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
   const listBeaconsToSimulate = [
     'f1a166c12ae08075dc5f40fc2eed832b',
-    'e2d63382fb9a6ea46c7482668802430c',
-    'b23d1bf8a8b39ce3e379d886002c5602'
+    'c2f88d6fc12c645bc443ea3f1837301a',
+    '5433ba3787ec662b0984457abbe36933'
   ]
 
   async function createMap() {
@@ -168,6 +169,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
     if (!newMap) return;
 
+    console.log("LZ routeId", routeId);
     // Start routing
     newMap.startRouting({
       routeId: routeId
@@ -176,7 +178,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     // Also add a watcher to the routing status
     LazarilloMap.watchPosition(undefined, async (data: GetPositionCallbackData) => {
       console.log('Position: ', JSON.stringify(data).toString());
-      setPosition(data);
+      setCurrentPositionWatching(data);
       
     })
     console.log("added location watcher on route")
@@ -554,6 +556,29 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
                 </IonButton>
               </IonCol>
             </IonRow>
+            {currentPositionWatching ? (
+              <IonList>
+                <IonItem>
+                  <IonLabel>Latitude: {currentPositionWatching.location.latitude}</IonLabel>
+                </IonItem>
+                <IonItem>
+                  <IonLabel>Longitude: {currentPositionWatching.location.longitude}</IonLabel>
+                </IonItem>
+                <IonItem>
+                  <IonLabel>Floor: {currentPositionWatching.location.floor}</IonLabel>
+                </IonItem>
+                <IonItem>
+                  <IonLabel>Building: {currentPositionWatching.location.building}</IonLabel>
+                </IonItem>
+                <IonItem>
+                  <IonLabel>Current Step: {currentPositionWatching.routingStatus?.currentStep}</IonLabel>
+                </IonItem>
+                <IonItem>
+                  <IonLabel>Route ID: {routeId}</IonLabel>
+                </IonItem>
+              </IonList>
+              ) : ''
+            }
             <IonRow>
               <IonCardHeader>
                 <IonCardTitle>Beacons simulation</IonCardTitle>
