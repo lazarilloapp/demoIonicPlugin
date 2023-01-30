@@ -20,6 +20,8 @@ import {
   IonRadio,
   IonRadioGroup,
   IonRow,
+  IonSelect,
+  IonSelectOption,
   IonSkeletonText,
   IonText,
   IonThumbnail,
@@ -502,17 +504,14 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
               <IonButton onClick={() => setIsOpen(true)}>
                 <IonText>Destinations</IonText>
               </IonButton>
-              <IonButton onClick={changePrevFloor}>
-                <IonIcon icon={caretBack}></IonIcon>
-                <IonText>Prev</IonText>
-              </IonButton>
-              <IonButton onClick={changeNextFloor}>
-                <IonText>Next</IonText>
-                <IonIcon icon={caretForward}></IonIcon>
-              </IonButton>
+              <IonItem>
+                <IonSelect interface="popover" placeholder="Select fruit" onIonChange={changeNextFloor} >
+                  <IonSelectOption value="apples">Apples</IonSelectOption>
+                  <IonSelectOption value="oranges">Oranges</IonSelectOption>
+                  <IonSelectOption value="bananas">Bananas</IonSelectOption>
+                </IonSelect>
+              </IonItem>
             </IonRow>
-
-
             <IonRow>
               <IonCardHeader>
                 <IonCardTitle> Add pin and change camera angle and zoom</IonCardTitle>
