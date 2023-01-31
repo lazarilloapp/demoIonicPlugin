@@ -200,10 +200,8 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
 
 
-  async function changeNextFloor() {
-    if (currentFloorIndex < innerFloors.length - 1) {
-      setCurrentFloorIndex(currentFloorIndex + 1)
-    }
+  async function changeFloor(e: CustomEvent) {
+    setCurrentFloorIndex(e.detail.value)
     const nextFloorId = innerFloors[currentFloorIndex].key;
     try {
       newMap?.setFloor({
@@ -505,10 +503,10 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
                 <IonText>Destinations</IonText>
               </IonButton>
               <IonItem>
-                <IonSelect interface="popover" placeholder="Select fruit" onIonChange={changeNextFloor} >
-                  <IonSelectOption value="apples">Apples</IonSelectOption>
-                  <IonSelectOption value="oranges">Oranges</IonSelectOption>
-                  <IonSelectOption value="bananas">Bananas</IonSelectOption>
+                <IonSelect interface="popover" placeholder="Select floor" onIonChange={changeFloor} >
+                  {innerFloors.map((floor, i) => (
+                   <IonSelectOption value={i}>{floor.name}</IonSelectOption>
+                  ))}
                 </IonSelect>
               </IonItem>
             </IonRow>
