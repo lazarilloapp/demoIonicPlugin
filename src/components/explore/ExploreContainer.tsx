@@ -503,7 +503,11 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
                 <IonText>Destinations</IonText>
               </IonButton>
               <IonItem>
-                <IonSelect interface="popover" placeholder="Select floor" onIonChange={changeFloor} >
+                <IonSelect
+                  interface="popover"
+                  placeholder="Select floor"
+                  onIonChange={changeFloor}
+                  >
                   {innerFloors.map((floor, i) => (
                    <IonSelectOption value={i}>{floor.name}</IonSelectOption>
                   ))}

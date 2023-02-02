@@ -15,3 +15,16 @@ ion-modal#example-modal {
   height: 300px;
   overflow: auto;
 }
+
+ion-popover {
+  --background: white;
+  --backdrop-opacity: 0.6;
+  --box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.6);
+  --color: white;
+  justify-content: center;
+}
+
+ion-popover ion-content {
+  --background: rgb(255, 255, 255);
+
+}
