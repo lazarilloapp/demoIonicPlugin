@@ -1,6 +1,6 @@
 import './ExploreContainer.css';
 import { LazarilloMap, LazarilloUtils } from '@lzdevelopers/lazarillo-maps';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   IonButton,
   IonButtons,
@@ -198,10 +198,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   };
 
 
-
-
-  async function changeFloor(e: CustomEvent) {
-    setCurrentFloorIndex(e.detail.value)
+  function updateFloorMap() {
     const nextFloorId = innerFloors[currentFloorIndex].key;
     try {
       newMap?.setFloor({
@@ -213,21 +210,16 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     catch (error) {
       console.log(error)
     }
-
   }
 
-  async function changePrevFloor() {
-    if (currentFloorIndex > 0) {
-      setCurrentFloorIndex(currentFloorIndex - 1)
-    }
-    const prevFloorId = innerFloors[currentFloorIndex].key;
+  useEffect(()=> {
+    updateFloorMap()
+  }, [currentFloorIndex])
 
-    newMap?.setFloor({
-      mapId: 'my-cool-map',
-      floorId: prevFloorId
-    })
-    setFloorName(innerFloors[currentFloorIndex].name)
 
+
+  async function changeFloor(e: CustomEvent) {
+    setCurrentFloorIndex(e.detail.value)
   }
 
   async function addMarker() {
