@@ -214,7 +214,8 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
   useEffect(()=> {
     updateFloorMap()
-  }, [currentFloorIndex])
+    simulateNextBeacon()
+  }, [currentFloorIndex, currentBeaconIndex])
 
 
 
@@ -395,7 +396,6 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   async function simulateNextBeacon() {
     initPlugin();
 
-    setCurrentBeaconIndex(currentBeaconIndex + 1)
     if (currentBeaconIndex < listBeaconsToSimulate.length) {
       await LazarilloMap.simulateBeacons({simulateBeacons: listBeaconsToSimulate[currentBeaconIndex]})
       setSimulatedBeacon(listBeaconsToSimulate[currentBeaconIndex])
@@ -579,7 +579,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
             </IonRow>
             <IonRow>
               <IonCol>
-                <IonButton onClick={simulateNextBeacon}>
+                <IonButton onClick={() => setCurrentBeaconIndex(currentBeaconIndex + 1)}>
                   <IonIcon icon={caretForward}></IonIcon>
                   <IonLabel>Simulate Next Beacon</IonLabel>
                 </IonButton>
