@@ -1,6 +1,6 @@
 import './ExploreContainer.css';
 import { LazarilloMap, LazarilloUtils } from '@lzdevelopers/lazarillo-maps';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   IonButton,
   IonButtons,
@@ -20,6 +20,8 @@ import {
   IonRadio,
   IonRadioGroup,
   IonRow,
+  IonSelect,
+  IonSelectOption,
   IonSkeletonText,
   IonText,
   IonThumbnail,
@@ -196,12 +198,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   };
 
 
-
-
-  async function changeNextFloor() {
-    if (currentFloorIndex < innerFloors.length - 1) {
-      setCurrentFloorIndex(currentFloorIndex + 1)
-    }
+  function updateFloorMap() {
     const nextFloorId = innerFloors[currentFloorIndex].key;
     try {
       newMap?.setFloor({
@@ -213,21 +210,17 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     catch (error) {
       console.log(error)
     }
-
   }
 
-  async function changePrevFloor() {
-    if (currentFloorIndex > 0) {
-      setCurrentFloorIndex(currentFloorIndex - 1)
-    }
-    const prevFloorId = innerFloors[currentFloorIndex].key;
+  useEffect(()=> {
+    updateFloorMap()
+    simulateNextBeacon()
+  }, [currentFloorIndex, currentBeaconIndex])
 
-    newMap?.setFloor({
-      mapId: 'my-cool-map',
-      floorId: prevFloorId
-    })
-    setFloorName(innerFloors[currentFloorIndex].name)
 
+
+  async function changeFloor(e: CustomEvent) {
+    setCurrentFloorIndex(e.detail.value)
   }
 
   async function addMarker() {
@@ -403,7 +396,6 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   async function simulateNextBeacon() {
     initPlugin();
 
-    setCurrentBeaconIndex(currentBeaconIndex + 1)
     if (currentBeaconIndex < listBeaconsToSimulate.length) {
       await LazarilloMap.simulateBeacons({simulateBeacons: listBeaconsToSimulate[currentBeaconIndex]})
       setSimulatedBeacon(listBeaconsToSimulate[currentBeaconIndex])
@@ -502,17 +494,18 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
               <IonButton onClick={() => setIsOpen(true)}>
                 <IonText>Destinations</IonText>
               </IonButton>
-              <IonButton onClick={changePrevFloor}>
-                <IonIcon icon={caretBack}></IonIcon>
-                <IonText>Prev</IonText>
-              </IonButton>
-              <IonButton onClick={changeNextFloor}>
-                <IonText>Next</IonText>
-                <IonIcon icon={caretForward}></IonIcon>
-              </IonButton>
+              <IonItem>
+                <IonSelect
+                  interface="popover"
+                  placeholder="Select floor"
+                  onIonChange={changeFloor}
+                  >
+                  {innerFloors.map((floor, i) => (
+                   <IonSelectOption value={i}>{floor.name}</IonSelectOption>
+                  ))}
+                </IonSelect>
+              </IonItem>
             </IonRow>
-
-
             <IonRow>
               <IonCardHeader>
                 <IonCardTitle> Add pin and change camera angle and zoom</IonCardTitle>
@@ -586,7 +579,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
             </IonRow>
             <IonRow>
               <IonCol>
-                <IonButton onClick={simulateNextBeacon}>
+                <IonButton onClick={() => setCurrentBeaconIndex(currentBeaconIndex + 1)}>
                   <IonIcon icon={caretForward}></IonIcon>
                   <IonLabel>Simulate Next Beacon</IonLabel>
                 </IonButton>
