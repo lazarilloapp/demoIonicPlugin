@@ -266,50 +266,97 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     const targetPlace = places[targetPlaceKey];
     let accesibility = withMobility ? 1 : 0
 
-    LazarilloUtils.fetchRoute(
-      apiKey, // api key
-      'WALKING', // travelMode
-      places[0].latitude, // fromLat
-      places[0].longitude, // fromLng
-      targetPlace.latitude, // toLat
-      targetPlace.longitude, // toLng
-      accesibility, // withMobility 0 Means a walking route and 1 a wheel chair route
-      anounceSystem, // announceFormat
-      undefined, // userBearing
-      places[0].floor, // fromFloor
-      parentPlace.id, // fromBuilding|
-      targetPlace.floor, // toFloor
-      parentPlace.id, // toBuilding
-      'es', //language of the instructions
-      unitSystem
-    )
-      .then((response) => {
+    newMap?.addRoute(
+      {
+        mapId: 'my-cool-map',
+        initialPos: {
+          building: parentPlace.id,
+          floor: places[0].floor,
+          polygons: undefined,
+          latitude: places[0].latitude,
+          longitude: places[0].longitude,
+        },
+        finalPos: {
+          building: parentPlace.id,
+          floor: targetPlace.floor,
+          polygons: undefined,
+          latitude: targetPlace.latitude,
+          longitude: targetPlace.longitude,
+        },
+        initialFloor: places[0].floor,
+        finalFloor: targetPlace.floor,
+        place: parentPlace.id,
+        preferAccessibleRoute: withMobility,
+        nextStepsRouteColor: '#ff33b5',
+        prevStepsRouteColor: '#aaaaaa',
+        polylineWidth: 10,
+      },
+      async (routeReadyCallback: RouteReadyCallbackData) => {
+        console.log('Route added', JSON.stringify(routeReadyCallback.data).toString());
+        console.log('Route added', (routeReadyCallback.data as any)['legs'][0]['steps']);
+        presentToast('top', 'Route loaded');
 
-        console.log(response.url)
-        console.log(JSON.stringify(response.body).toString())
-        return response.json()
+        setSteps((routeReadyCallback.data as any)['legs'][0]['steps'])
 
-      })
-      .then((data) => {
-        console.log("Got route: ", data)
-        setSteps(data[0].legs[0].steps)
-        console.log(data)
-        newMap?.drawRoute(
-          {
-            mapId: 'my-cool-map',
-            route: data
-          },
-          async (data: RouteReadyCallbackData) => {
-            console.log('Route added', JSON.stringify(data).toString());
-            presentToast('top', 'Route loaded');
+        setCurrentRouteId(routeReadyCallback.routeId)
 
-            setCurrentRouteId(data.routeId)
+        watchRoutingStatus(routeReadyCallback.routeId)
+      }
+    );
 
-            watchRoutingStatus(data.routeId)
-          },
-        )
-      })
-      .catch(console.error);
+
+
+
+    // LazarilloUtils.fetchRoute(
+    //   apiKey, // api key
+    //   'WALKING', // travelMode
+    //   places[0].latitude, // fromLat
+    //   places[0].longitude, // fromLng
+    //   targetPlace.latitude, // toLat
+    //   targetPlace.longitude, // toLng
+    //   accesibility, // withMobility 0 Means a walking route and 1 a wheel chair route
+    //   anounceSystem, // announceFormat
+    //   undefined, // userBearing
+    //   places[0].floor, // fromFloor
+    //   parentPlace.id, // fromBuilding|
+    //   targetPlace.floor, // toFloor
+    //   parentPlace.id, // toBuilding
+    //   'es', //language of the instructions
+    //   unitSystem
+    // )
+    //   .then((response) => {
+
+    //     console.log(response.url)
+    //     console.log(JSON.stringify(response.body).toString())
+    //     return response.json()
+
+    //   })
+    //   .then((data) => {
+    //     console.log("Got route: ", data)
+        
+    //     console.log(data)
+    //     newMap?.drawRoute(
+    //       {
+    //         mapId: 'my-cool-map',
+    //         route: data
+    //       },
+    //       async (routeReadyCallback: RouteReadyCallbackData) => {
+    //         console.log('Route added', JSON.stringify(routeReadyCallback.data).toString());
+    //         console.log('Route added', (routeReadyCallback.data as any)['legs'][0]['steps']);
+    //         presentToast('top', 'Route loaded');
+
+          
+    
+
+    //         setSteps((routeReadyCallback.data as any)['legs'][0]['steps'])
+
+    //         setCurrentRouteId(routeReadyCallback.routeId)
+
+    //         watchRoutingStatus(routeReadyCallback.routeId)
+    //       },
+    //     )
+    //   })
+    //   .catch(console.error);
 
 
 
