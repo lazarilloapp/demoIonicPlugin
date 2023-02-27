@@ -30,7 +30,7 @@ import {
   IonToolbar,
   useIonToast,
 } from '@ionic/react';
-import { mapOutline, location, trashBinOutline, cameraOutline, locateOutline, caretBack, caretForward, bluetooth } from 'ionicons/icons';
+import { mapOutline, location, trashBinOutline, cameraOutline, locateOutline, caretBack, caretForward, bluetooth, walk } from 'ionicons/icons';
 import { GetPositionCallbackData, RouteReadyCallbackData } from '@lzdevelopers/lazarillo-maps/dist/typings/definitions';
 import { StepDTO } from '../places/Step';
 import { CustomInnerFloors } from '../data/InnerFloor';
@@ -46,13 +46,24 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   let unitSystem = "METRIC" //default value
   let anounceSystem = "RELATIVE" //default value
   let withMobility: boolean = false //default value
+  let startPosition = 0
+  let finalPosition = 0
+  let currentPosition: GetPositionCallbackData = {
+    location: {
+      building: "",
+      floor: "", 
+      polygons: undefined, 
+      latitude: 0.0, 
+      longitude: 0.0
+    }
+  };
 
 
   const [present] = useIonToast();
   const [mapRef, setMapRef] = useState(useRef<HTMLElement>())
   const [showToast1, setShowToast1] = useState(false);
   const [steps, setSteps] = useState<StepDTO[]>([]);
-  const [currentPosition, setPosition] = useState<GetPositionCallbackData>();
+  const [currentPositionState, setPosition] = useState<GetPositionCallbackData>();
   const [initialized, setInitialized] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [newMap, setNewMap] = useState<LazarilloMap>();
@@ -119,19 +130,44 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
   }
   //if you only want to show the route on the map
-  async function startRoute(targetPlaceKey: number) {
+  //if startLocationIndex is -1, it starts from user location
+  async function startRoute(startLocationIndex: number, targetPlaceKey: number) {
     const targetPlace = places[targetPlaceKey];
 
     if (!newMap) return;
 
-    // The intial pos for now will be the first place on the list
     let initialPos = {
       building: parentPlace.id,
-      floor: places[0].floor,
+      floor: targetPlace.floor,
       polygons: undefined,
-      latitude: places[0].latitude,
-      longitude: places[0].longitude,
+      latitude: targetPlace.latitude,
+      longitude: targetPlace.longitude,
     };
+    // Using user location as initial position
+    if (startLocationIndex == -1) {
+      await getCurrentPosition();
+      if (currentPosition.location.building != undefined && 
+        currentPosition.location.floor != undefined &&
+        currentPosition.location.latitude != undefined &&
+        currentPosition.location.longitude != undefined) {
+          initialPos = {
+            building: currentPosition.location.building,
+            floor: currentPosition.location.floor,
+            polygons: undefined,
+            latitude: currentPosition.location.latitude,
+            longitude: currentPosition.location.longitude,
+          };
+      }
+    } else {
+      let initialPlace = places[startLocationIndex];
+      initialPos = {
+        building: parentPlace.id,
+        floor: initialPlace.floor,
+        polygons: undefined,
+        latitude: initialPlace.latitude,
+        longitude: initialPlace.longitude,
+      };
+    }
     let finalPos = {
       building: parentPlace.id,
       floor: targetPlace.floor,
@@ -148,18 +184,17 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
         initialFloor: places[0].floor,
         finalFloor: targetPlace.floor,
         place: parentPlace.id,
-        preferAccessibleRoute: true,
-        nextStepsRouteColor: '#ff33b5',
+        preferAccessibleRoute: false,
+        nextStepsRouteColor: '#0000FF',
         prevStepsRouteColor: '#aaaaaa',
         polylineWidth: 10,
       },
       async (data: RouteReadyCallbackData) => {
         console.log('Route added', data);
+        setRouteId(data.routeId);
         presentToast('top', 'Route loaded');
       },
     );
-    //to get route instructrions
-    getRouteAndAddRoute(targetPlaceKey)
   }
 
   /**
@@ -383,10 +418,11 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     await initPlugin()
 
     await LazarilloMap.getCurrentPosition().then((response : GetPositionCallbackData) => {
-      console.log("Current position", JSON.stringify(response).toString())
-      setPosition(response)
+      console.log("Current position", JSON.stringify(response).toString());
+      currentPosition = response;
+      setPosition(response);
 
-    })
+    });
   }
 
 
@@ -467,21 +503,21 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
             </IonButton>
           </IonCol>
 
-          {currentPosition ? (
+          {currentPositionState ? (
 
             <IonCol>
               <IonSkeletonText>Position:
-                {JSON.stringify(currentPosition).toString()} </IonSkeletonText>
+                {JSON.stringify(currentPositionState).toString()} </IonSkeletonText>
             </IonCol>
           ) : ''}
 
 
         </IonRow>
 
-        {currentPosition ? (
+        {currentPositionState ? (
           <IonRow>
             <IonCol>
-              <IonText>{JSON.stringify(currentPosition).toString()}</IonText>
+              <IonText>{JSON.stringify(currentPositionState).toString()}</IonText>
             </IonCol>
           </IonRow>) : ''}
 
@@ -618,27 +654,74 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
         <IonModal id="example-modal" isOpen={isOpen} className="ion-padding modal-demo">
           <IonHeader>
             <IonToolbar>
-              <IonTitle>From Kaiser to: </IonTitle>
+              <IonButtons slot="start">
+              <IonButton onClick={() => setIsOpen(false)}>Close</IonButton>
+              </IonButtons>
+              <IonTitle>Route Options: </IonTitle>
               <IonButtons slot="end">
-                <IonButton onClick={() => setIsOpen(false)}>Close</IonButton>
+                <IonButton onClick={() => {
+                  startRoute(startPosition, finalPosition);
+                  setIsOpen(false);
+                }}>Start <IonIcon icon={walk}></IonIcon></IonButton>
               </IonButtons>
             </IonToolbar>
           </IonHeader>
           <IonContent className="ion-padding">
             <IonRow>
               <IonCol>
+                <IonCardHeader> <IonCardTitle> From: </IonCardTitle></IonCardHeader>
                 <IonList>
-                  {places.map((place, i) => (
-                    <IonItem key={i} onClick={() => {
-                      setIsOpen(false)
-                      getRouteAndAddRoute(i)
-                    }}>
+                  <IonRadioGroup id="start_point" value={startPosition} onIonChange={(event) => {
+                    if (event.detail.value === undefined) return;
+                    startPosition = event.detail.value
+                  }}>              
+                    <IonItem onClick={() => {startPosition = -1}}>
                       <IonThumbnail slot="start">
                         <IonImg src={'https://ionicframework.com/docs/img/demos/thumbnail.svg'} />
                       </IonThumbnail>
-                      <IonLabel>{place._name}</IonLabel>
+                      <IonLabel>User Position</IonLabel>
+                      <IonRadio slot="end" value={-1}></IonRadio>
                     </IonItem>
-                  ))}
+                    {places.map((place, i) => (
+                      <IonItem key={i} onClick={() => {
+                        //setIsOpen(false)
+                        //getRouteAndAddRoute(i)
+                        startPosition = i
+                      }}>
+                        <IonThumbnail slot="start">
+                          <IonImg src={'https://ionicframework.com/docs/img/demos/thumbnail.svg'} />
+                        </IonThumbnail>
+                        <IonLabel>{place._name}</IonLabel>
+                        <IonRadio slot="end" value={i}></IonRadio>
+                      </IonItem>
+                    ))}
+                  </IonRadioGroup>
+                </IonList>
+              </IonCol>
+            </IonRow>
+            
+            <IonRow>
+              <IonCol>
+                <IonCardHeader> <IonCardTitle> To: </IonCardTitle></IonCardHeader>
+                <IonList>
+                <IonRadioGroup id="start_point" value={finalPosition} onIonChange={(event) => {
+                    if (event.detail.value === undefined) return;
+                    finalPosition = event.detail.value
+                  }}>
+                    {places.map((place, i) => (
+                      <IonItem key={i} onClick={() => {
+                        //setIsOpen(false)
+                        //getRouteAndAddRoute(i)
+                        finalPosition = i
+                      }}>
+                        <IonThumbnail slot="start">
+                          <IonImg src={'https://ionicframework.com/docs/img/demos/thumbnail.svg'} />
+                        </IonThumbnail>
+                        <IonLabel>{place._name}</IonLabel>
+                        <IonRadio slot="end" value={i}></IonRadio>
+                      </IonItem>
+                    ))}
+                  </IonRadioGroup>
                 </IonList>
               </IonCol>
             </IonRow>
