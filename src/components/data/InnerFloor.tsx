@@ -46,4 +46,17 @@ export const CustomInnerFloors: InnerFloor[] = [
         key: '-ND-DotO0jGRTA5-D-Jv',
         name: 'Piso 62',
     },
-]; 
+];
+
+export const CustomInnerFloorOffice: InnerFloor[] = [
+    {
+        index: 0,
+        key: '-Ldjg3g-jWTJybENFfsq',
+        name: 'Piso 1'
+    },
+    {
+        index: 1,
+        key: '-LeTEP6hth2YkX3mKExo',
+        name: 'Piso 2'
+    },
+]

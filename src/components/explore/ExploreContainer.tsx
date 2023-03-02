@@ -33,16 +33,14 @@ import {
 import { mapOutline, location, trashBinOutline, cameraOutline, locateOutline, caretBack, caretForward, bluetooth, walk } from 'ionicons/icons';
 import { GetPositionCallbackData, RouteReadyCallbackData } from '@lzdevelopers/lazarillo-maps/dist/typings/definitions';
 import { StepDTO } from '../places/Step';
-import { CustomInnerFloors } from '../data/InnerFloor';
-import { CustomPlaces } from '../data/Places';
+import { CustomInnerFloors, CustomInnerFloorOffice } from '../data/InnerFloor';
+import { CustomPlaces, CustomPlacesOffice } from '../data/Places';
 
 
 interface ContainerProps { }
 
 const ExploreContainer: React.FC<ContainerProps> = () => {
 
-  const innerFloors = CustomInnerFloors
-  const places = CustomPlaces
   let unitSystem = "METRIC" //default value
   let anounceSystem = "RELATIVE" //default value
   let withMobility: boolean = false //default value
@@ -90,12 +88,27 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
   }
 
-  const parentPlace = {  //costanera
-    id: '-N19VjzEVIj2RDKu7i4r',
-    latitude: -33.417556917537524,
-    longitude: -70.60716507932558,
-  }
+  const parentPlaces = [
+    {  //costanera
+      id: '-N19VjzEVIj2RDKu7i4r',
+      latitude: -33.417556917537524,
+      longitude: -70.60716507932558,
+    },
+    {  //iF Blanco
+      id: '-LdjeDDrwPryMJ6Fq5_X',
+      latitude: -33.419093363868576,
+      longitude: -70.64183857116393,
+    }
+  ]
 
+  // 0 => Costanera
+  // 1 => iF Blanco
+  const parentPlace = parentPlaces[1];
+
+  const innerFloors = (parentPlace == parentPlaces[0]) ? CustomInnerFloors : CustomInnerFloorOffice;
+  const places = (parentPlace == parentPlaces[0]) ? CustomPlaces : CustomPlacesOffice;
+
+  // Costanera center beacons
   const listBeaconsToSimulate = [
     'f1a166c12ae08075dc5f40fc2eed832b',
     'c2f88d6fc12c645bc443ea3f1837301a',
@@ -415,7 +428,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
    * Ask the plugin for the position
    */
   async function getCurrentPosition() {
-    await initPlugin()
+    await initPlugin();
 
     await LazarilloMap.getCurrentPosition().then((response : GetPositionCallbackData) => {
       console.log("Current position", JSON.stringify(response).toString());

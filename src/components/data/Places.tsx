@@ -58,3 +58,27 @@ export const CustomPlaces: Place[] = [
         floor: '-NCtxg_OxCuCfGVevdck', //piso 5
     },
 ];
+
+export const CustomPlacesOffice: Place[] = [
+    {
+        id: '-LdjlYhKTeVpPRlhGxSQ',
+        _name: 'Entrada Principal',
+        latitude: -33.41912737898038,
+        longitude: -70.64187189627079,
+        floor: '-Ldjg3g-jWTJybENFfsq',
+    },
+    {
+        id: '-LdjlGspWMTTqhVOa-91',
+        _name: 'Laboratoria',
+        latitude: -33.418837239313106,
+        longitude: -70.64236684194702,
+        floor: '-Ldjg3g-jWTJybENFfsq',
+    },
+    {
+        id: '-NPNjksvlTEfeZj2Cbly',
+        _name: 'Sala de Reuniones',
+        latitude: -33.419014934368334,
+        longitude: -70.64183291258034,
+        floor: '-LeTEP6hth2YkX3mKExo',
+    },
+]
