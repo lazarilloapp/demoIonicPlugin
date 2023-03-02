@@ -2,10 +2,14 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	</array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-        <string>demoLZSDK</string>
+	<string>demoLZSDK</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -27,16 +31,16 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
-    <key>NSBluetoothAlwaysUsageDescription</key>
-    <string>To allow more precise location on indoor spaces enabled by Lazarillo</string>
-    <key>NSBluetoothPeripheralUsageDescription</key>
-    <string>To allow more precise location on places enabled with Lazarillo</string>
-    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-    <string>We use your location for guide you</string>
-    <key>NSLocationAlwaysUsageDescription</key>
-    <string>We use your location for guide you</string>
-    <key>NSLocationWhenInUseUsageDescription</key>
-    <string>We use your location for guide you</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>To allow more precise location on indoor spaces enabled by Lazarillo</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>To allow more precise location on places enabled with Lazarillo</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>We use your location for guide you</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>We use your location for guide you</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>We use your location for guide you</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>bluetooth-central</string>
