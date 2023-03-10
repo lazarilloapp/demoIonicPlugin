@@ -581,7 +581,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
                   watchRoutingStatus(routeId)
                 }}>
                   <IonIcon icon={bluetooth}></IonIcon>
-                  <IonLabel>Watch Position</IonLabel>
+                  <IonLabel>Start Routing</IonLabel>
                 </IonButton>
               </IonCol>
             </IonRow>
