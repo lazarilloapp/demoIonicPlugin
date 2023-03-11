@@ -8,6 +8,6 @@ export interface Place {
     default : string;
     es: string;
     en: string | null;
-  } | null;
+  };
 
 }

@@ -46,21 +46,14 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   let unitSystem = "METRIC" //default value
   let anounceSystem = "RELATIVE" //default value
   let withMobility: boolean = false //default value
-  let startPosition = 0
-  let finalPosition = 0
-  let currentPosition: GetPositionCallbackData = {
-    location: {
-      building: "",
-      floor: "", 
-      polygons: undefined, 
-      latitude: 0.0, 
-      longitude: 0.0
-    }
-  };
+
+
 
   const [places, setPlaces] = useState<Place[]>([]);
 
   const [present] = useIonToast();
+  const [startPosition, setStartPosition] = useState(0);
+  const [finalPosition, setFinalPosition] = useState(0);
   const [mapRef, setMapRef] = useState(useRef<HTMLElement>())
   const [showToast1, setShowToast1] = useState(false);
   const [steps, setSteps] = useState<StepDTO[]>([]);
@@ -85,7 +78,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     if(!initialized){
 
       console.log("Getting subplaces")
-      await getSublaces(parentPlace.id);
+      getSublaces(parentPlace.id);
       console.log("Subplaces got")
 
       await LazarilloMap.initializeLazarilloPlugin({
@@ -94,7 +87,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
       })
     }
 
-
+    setInitialized(true);
   }
 
   const parentPlace = {  //costanera
@@ -102,6 +95,8 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     lat: -33.417556917537524,
     lng: -70.60716507932558,
   }
+
+
 
   const listBeaconsToSimulate = [
     'f1a166c12ae08075dc5f40fc2eed832b',
@@ -153,16 +148,16 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     // Using user location as initial position
     if (startLocationIndex == -1) {
       await getCurrentPosition();
-      if (currentPosition.location.building != undefined && 
-        currentPosition.location.floor != undefined &&
-        currentPosition.location.latitude != undefined &&
-        currentPosition.location.longitude != undefined) {
+      if (currentPositionState?.location.building != undefined && 
+        currentPositionState.location.floor != undefined &&
+        currentPositionState.location.latitude != undefined &&
+        currentPositionState.location.longitude != undefined) {
           initialPos = {
-            building: currentPosition.location.building,
-            floor: currentPosition.location.floor,
+            building: currentPositionState.location.building,
+            floor: currentPositionState.location.floor,
             polygons: undefined,
-            latitude: currentPosition.location.latitude,
-            longitude: currentPosition.location.longitude,
+            latitude: currentPositionState.location.latitude,
+            longitude: currentPositionState.location.longitude,
           };
       }
     } else {
@@ -426,7 +421,6 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
     await LazarilloMap.getCurrentPosition().then((response : GetPositionCallbackData) => {
       console.log("Current position", JSON.stringify(response).toString());
-      currentPosition = response;
       setPosition(response);
 
     });
@@ -443,6 +437,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
         // Load the places in the places variable
         response.json().then((data) => {
           const preparedPlaces : Place[] = []
+          data.sort((a: Place, b: Place) => a.title.default.toLowerCase() > b.title.default.toLowerCase() ? 1 : -1);
           data.forEach((place: Place) => {
             preparedPlaces.push(place)
           })
@@ -700,9 +695,9 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
                 <IonList>
                   <IonRadioGroup id="start_point" value={startPosition} onIonChange={(event) => {
                     if (event.detail.value === undefined) return;
-                    startPosition = event.detail.value
+                    setStartPosition(event.detail.value)
                   }}>              
-                    <IonItem onClick={() => {startPosition = -1}}>
+                    <IonItem onClick={() => {setStartPosition(-1)}}>
                       <IonThumbnail slot="start">
                         <IonImg src={'https://ionicframework.com/docs/img/demos/thumbnail.svg'} />
                       </IonThumbnail>
@@ -713,7 +708,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
                       <IonItem key={i} onClick={() => {
                         //setIsOpen(false)
                         //getRouteAndAddRoute(i)
-                        startPosition = i
+                        setStartPosition(i)
                       }}>
                         <IonThumbnail slot="start">
                           <IonImg src={'https://ionicframework.com/docs/img/demos/thumbnail.svg'} />
@@ -733,13 +728,13 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
                 <IonList>
                 <IonRadioGroup id="start_point" value={finalPosition} onIonChange={(event) => {
                     if (event.detail.value === undefined) return;
-                    finalPosition = event.detail.value
+                    setFinalPosition(event.detail.value)
                   }}>
                     {places.map((place, i) => (
                       <IonItem key={i} onClick={() => {
                         //setIsOpen(false)
                         //getRouteAndAddRoute(i)
-                        finalPosition = i
+                        setFinalPosition(i)
                       }}>
                         <IonThumbnail slot="start">
                           <IonImg src={'https://ionicframework.com/docs/img/demos/thumbnail.svg'} />
