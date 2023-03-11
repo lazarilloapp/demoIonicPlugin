@@ -33,8 +33,8 @@ import {
 import { mapOutline, location, trashBinOutline, cameraOutline, locateOutline, caretBack, caretForward, bluetooth, walk } from 'ionicons/icons';
 import { GetPositionCallbackData, RouteReadyCallbackData } from '@lzdevelopers/lazarillo-maps/dist/typings/definitions';
 import { StepDTO } from '../places/Step';
+import { Place } from '../places/Place';
 import { CustomInnerFloors } from '../data/InnerFloor';
-import { CustomPlaces } from '../data/Places';
 
 
 interface ContainerProps { }
@@ -42,7 +42,7 @@ interface ContainerProps { }
 const ExploreContainer: React.FC<ContainerProps> = () => {
 
   const innerFloors = CustomInnerFloors
-  const places = CustomPlaces
+
   let unitSystem = "METRIC" //default value
   let anounceSystem = "RELATIVE" //default value
   let withMobility: boolean = false //default value
@@ -58,6 +58,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     }
   };
 
+  const [places, setPlaces] = useState<Place[]>([]);
 
   const [present] = useIonToast();
   const [mapRef, setMapRef] = useState(useRef<HTMLElement>())
@@ -72,6 +73,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   const [currentSimulatedBeacon, setSimulatedBeacon] = useState<String>();
   const [routeId, setRouteId] = useState("");
   const [currentBeaconIndex, setCurrentBeaconIndex] = useState(-1);
+
   const [currentPositionWatching, setCurrentPositionWatching] = useState<GetPositionCallbackData>();
 
   const apiKey = process.env.REACT_APP_YOUR_API_KEY_HERE
@@ -81,6 +83,11 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   async function initPlugin() {
 
     if(!initialized){
+
+      console.log("Getting subplaces")
+      await getSublaces(parentPlace.id);
+      console.log("Subplaces got")
+
       await LazarilloMap.initializeLazarilloPlugin({
         apiKey: apiKey,
         place: parentPlace.id
@@ -92,8 +99,8 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
   const parentPlace = {  //costanera
     id: '-N19VjzEVIj2RDKu7i4r',
-    latitude: -33.417556917537524,
-    longitude: -70.60716507932558,
+    lat: -33.417556917537524,
+    lng: -70.60716507932558,
   }
 
   const listBeaconsToSimulate = [
@@ -104,7 +111,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
   async function createMap() {
 
-    initPlugin();
+    await initPlugin();
 
     if (!mapRef.current) return;
 
@@ -115,8 +122,8 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
         apiKey: apiKey,
         config: {
           center: {
-            lat: parentPlace.latitude,
-            lng: parentPlace.longitude,
+            lat: parentPlace.lat,
+            lng: parentPlace.lng,
           },
           zoom: 17,
           parentPlaceId: parentPlace.id,
@@ -138,10 +145,10 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
     let initialPos = {
       building: parentPlace.id,
-      floor: targetPlace.floor,
+      floor: targetPlace.inFloor[0],
       polygons: undefined,
-      latitude: targetPlace.latitude,
-      longitude: targetPlace.longitude,
+      latitude: targetPlace.lat,
+      longitude: targetPlace.lng,
     };
     // Using user location as initial position
     if (startLocationIndex == -1) {
@@ -162,18 +169,18 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
       let initialPlace = places[startLocationIndex];
       initialPos = {
         building: parentPlace.id,
-        floor: initialPlace.floor,
+        floor: initialPlace.inFloor[0],
         polygons: undefined,
-        latitude: initialPlace.latitude,
-        longitude: initialPlace.longitude,
+        latitude: initialPlace.lat,
+        longitude: initialPlace.lng,
       };
     }
     let finalPos = {
       building: parentPlace.id,
-      floor: targetPlace.floor,
+      floor: targetPlace.inFloor[0],
       polygons: undefined,
-      latitude: targetPlace.latitude,
-      longitude: targetPlace.longitude,
+      latitude: targetPlace.lat,
+      longitude: targetPlace.lng,
     };
 
     newMap.addRoute(
@@ -181,8 +188,8 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
         mapId: 'my-cool-map',
         initialPos: initialPos,
         finalPos: finalPos,
-        initialFloor: places[0].floor,
-        finalFloor: targetPlace.floor,
+        initialFloor: places[0].inFloor[0],
+        finalFloor: targetPlace.inFloor[0],
         place: parentPlace.id,
         preferAccessibleRoute: false,
         nextStepsRouteColor: '#0000FF',
@@ -296,16 +303,16 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     LazarilloUtils.fetchRoute(
       apiKey, // api key
       'WALKING', // travelMode
-      places[0].latitude, // fromLat
-      places[0].longitude, // fromLng
-      targetPlace.latitude, // toLat
-      targetPlace.longitude, // toLng
+      places[0].lat, // fromLat
+      places[0].lng, // fromLng
+      targetPlace.lat, // toLat
+      targetPlace.lng, // toLng
       accesibility, // withMobility 0 Means a walking route and 1 a wheel chair route
       anounceSystem, // announceFormat
       undefined, // userBearing
-      places[0].floor, // fromFloor
+      places[0].inFloor[0], // fromFloor
       parentPlace.id, // fromBuilding|
-      targetPlace.floor, // toFloor
+      targetPlace.inFloor[0], // toFloor
       parentPlace.id, // toBuilding
       'es', //language of the instructions
       unitSystem
@@ -351,8 +358,8 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
       coordinate: {
 
-        lat: place.latitude,
-        lng: place.longitude,
+        lat: place.lat,
+        lng: place.lng,
       },
       zoom: 21,
       /**
@@ -425,12 +432,32 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     });
   }
 
+  /**
+   * This funciton will use th service for fetch all the subplaces of the parent place
+   * @param placeId
+   */
+  async function getSublaces(placeId: string) {
+    LazarilloUtils.fetchSubplaces(apiKey, placeId)
+      .then((response) => {
+
+        // Load the places in the places variable
+        response.json().then((data) => {
+          const preparedPlaces : Place[] = []
+          data.forEach((place: Place) => {
+            preparedPlaces.push(place)
+          })
+          setPlaces(preparedPlaces)
+        })
+
+      })
+  }
+
 
   /**
    * Iterate over the list of beacons to simulate. If there is the last beacon, the counter come back to the first
    */
   async function simulateNextBeacon() {
-    initPlugin();
+    await initPlugin();
 
     if (currentBeaconIndex < listBeaconsToSimulate.length) {
       await LazarilloMap.simulateBeacons({simulateBeacons: listBeaconsToSimulate[currentBeaconIndex]})
@@ -691,7 +718,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
                         <IonThumbnail slot="start">
                           <IonImg src={'https://ionicframework.com/docs/img/demos/thumbnail.svg'} />
                         </IonThumbnail>
-                        <IonLabel>{place._name}</IonLabel>
+                        <IonLabel>{place.title?.default}</IonLabel>
                         <IonRadio slot="end" value={i}></IonRadio>
                       </IonItem>
                     ))}
@@ -717,7 +744,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
                         <IonThumbnail slot="start">
                           <IonImg src={'https://ionicframework.com/docs/img/demos/thumbnail.svg'} />
                         </IonThumbnail>
-                        <IonLabel>{place._name}</IonLabel>
+                        <IonLabel>{place.title?.default}</IonLabel>
                         <IonRadio slot="end" value={i}></IonRadio>
                       </IonItem>
                     ))}
