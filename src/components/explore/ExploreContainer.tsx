@@ -75,6 +75,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [newMap, setNewMap] = useState<LazarilloMap>();
   const [currentFloorKey, setCurrentFloorKey] = useState("");
+  const [innerFloors, setInnerFloors] = useState<InnerFloor[]>([])
   const [floorName, setFloorName] = useState("Planta baja");
   const [currentSimulatedBeacon, setSimulatedBeacon] = useState<String>();
   const [routeId, setRouteId] = useState("");
@@ -481,6 +482,10 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
         await response.json().then((data) => {
           
           parentPlaceRef.current = data
+          setInnerFloors(Object.values(parentPlaceRef.current.innerFloors ?? {}))
+
+          console.log("Inner floors :", Object.values(parentPlaceRef.current.innerFloors ?? {}))
+          
 
         })
       })
@@ -614,11 +619,10 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
                   onIonChange={changeFloor}
                   >
                   { 
-                    // Iterate over the parentPLaceRef.current.innerFloors to get the floors
-                    // getListOfInnerFloors().map((floor) => {
-                    //   return (<IonSelectOption value={floor.key}>{floor.title}</IonSelectOption>)
+                    innerFloors.map((floor) => {
+                      return (<IonSelectOption value={floor.key}>{floor.title}</IonSelectOption>)
 
-                    // })
+                    })
                   }
                   
                 </IonSelect>
