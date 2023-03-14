@@ -34,20 +34,34 @@ import { mapOutline, location, trashBinOutline, cameraOutline, locateOutline, ca
 import { GetPositionCallbackData, RouteReadyCallbackData } from '@lzdevelopers/lazarillo-maps/dist/typings/definitions';
 import { StepDTO } from '../places/Step';
 import { Place } from '../places/Place';
-import { CustomInnerFloors } from '../data/InnerFloor';
+
+import { InnerFloor } from '../places/InnerFloor';
 
 
 interface ContainerProps { }
 
 const ExploreContainer: React.FC<ContainerProps> = () => {
 
-  const innerFloors = CustomInnerFloors
 
   let unitSystem = "METRIC" //default value
   let anounceSystem = "RELATIVE" //default value
   let withMobility: boolean = false //default value
 
+  const parentPlaceRef = useRef<Place>(
+    {  //costanera
+      id: '-N19VjzEVIj2RDKu7i4r',
+      lat: 0,
+      lng: 0,
+      alias: '446564f853914c81d3158b8ad396680b',
+      title: {
+        default : 'Costanera Center',
+        es : 'Costanera Center'
+      }
+    }
+  );
 
+
+  const innerFloors = useRef<InnerFloor[]>([])
 
   const [places, setPlaces] = useState<Place[]>([]);
 
@@ -77,9 +91,10 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
     if(!initialized){
 
-      console.log("Getting subplaces")
+      console.log("Loading parent place in: ", parentPlaceRef.current)
+      await getParentPlace(parentPlace.alias);
+      console.log("Loading parent place finished: ", JSON.stringify(parentPlaceRef.current).toString())
       getSublaces(parentPlace.id);
-      console.log("Subplaces got")
 
       await LazarilloMap.initializeLazarilloPlugin({
         apiKey: apiKey,
@@ -94,6 +109,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     id: '-N19VjzEVIj2RDKu7i4r',
     lat: -33.417556917537524,
     lng: -70.60716507932558,
+    alias: '446564f853914c81d3158b8ad396680b'
   }
 
 
@@ -140,7 +156,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
     let initialPos = {
       building: parentPlace.id,
-      floor: targetPlace.inFloor[0],
+      floor: targetPlace.inFloor ? targetPlace.inFloor[0] : undefined,
       polygons: undefined,
       latitude: targetPlace.lat,
       longitude: targetPlace.lng,
@@ -164,7 +180,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
       let initialPlace = places[startLocationIndex];
       initialPos = {
         building: parentPlace.id,
-        floor: initialPlace.inFloor[0],
+        floor: targetPlace.inFloor ? targetPlace.inFloor[0] : undefined,
         polygons: undefined,
         latitude: initialPlace.lat,
         longitude: initialPlace.lng,
@@ -172,7 +188,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     }
     let finalPos = {
       building: parentPlace.id,
-      floor: targetPlace.inFloor[0],
+      floor: targetPlace.inFloor ? targetPlace.inFloor[0] : undefined,
       polygons: undefined,
       latitude: targetPlace.lat,
       longitude: targetPlace.lng,
@@ -183,8 +199,8 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
         mapId: 'my-cool-map',
         initialPos: initialPos,
         finalPos: finalPos,
-        initialFloor: places[0].inFloor[0],
-        finalFloor: targetPlace.inFloor[0],
+        initialFloor: places[0].inFloor ? places[0].inFloor[0] : undefined,
+        finalFloor: targetPlace.inFloor ? targetPlace.inFloor[0] : undefined,
         place: parentPlace.id,
         preferAccessibleRoute: false,
         nextStepsRouteColor: '#0000FF',
@@ -236,13 +252,19 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
 
   function updateFloorMap() {
-    const nextFloorId = innerFloors[currentFloorIndex].key;
+
+
+
     try {
+          const nextFloorId = innerFloors.current[currentFloorIndex].key;
       newMap?.setFloor({
         mapId: 'my-cool-map',
         floorId: nextFloorId
       })
-      setFloorName(innerFloors[currentFloorIndex].name)
+
+      setFloorName(innerFloors.current[currentFloorIndex].title)
+      
+      
     }
     catch (error) {
       console.log(error)
@@ -305,9 +327,9 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
       accesibility, // withMobility 0 Means a walking route and 1 a wheel chair route
       anounceSystem, // announceFormat
       undefined, // userBearing
-      places[0].inFloor[0], // fromFloor
+      places[0].inFloor ? places[0].inFloor[0] : undefined, // fromFloor
       parentPlace.id, // fromBuilding|
-      targetPlace.inFloor[0], // toFloor
+      targetPlace.inFloor ? targetPlace.inFloor[0] : undefined, // toFloor
       parentPlace.id, // toBuilding
       'es', //language of the instructions
       unitSystem
@@ -447,6 +469,31 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
       })
   }
 
+  /**
+   * This function will use the service fetchPlaceInfo to get the parent place
+   * @param placeId
+   */
+  async function getParentPlace(placeId: string) {
+    await LazarilloUtils.fetchPlaceInfo(apiKey, placeId)
+      .then((response) => {
+  
+        // Load the place in the parentPlace variable
+        response.json().then((data) => {
+          
+          parentPlaceRef.current = data
+
+          let targetInnerFloors : InnerFloor[] = []
+
+
+
+
+          innerFloors.current = targetInnerFloors
+          console.log("Inner floors inside parent places", JSON.stringify(parentPlaceRef.current.innerFloors).toString());
+          console.log("Got inner floors", JSON.stringify(innerFloors.current).toString());
+        })
+      })
+    }
+
 
   /**
    * Iterate over the list of beacons to simulate. If there is the last beacon, the counter come back to the first
@@ -558,9 +605,10 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
                   placeholder="Select floor"
                   onIonChange={changeFloor}
                   >
-                  {innerFloors.map((floor, i) => (
+                  {innerFloors.current.map((floor, i) => (
                    <IonSelectOption value={i}>{floor.name}</IonSelectOption>
                   ))}
+                  
                 </IonSelect>
               </IonItem>
             </IonRow>
