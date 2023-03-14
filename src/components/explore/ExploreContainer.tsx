@@ -90,18 +90,19 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
     if(!initialized){
 
-      console.log("Loading parent place in: ", parentPlaceRef.current)
+
       await getParentPlace(parentPlaceRef.current.alias ? parentPlaceRef.current.alias : parentPlaceRef.current.id);
-      console.log("Loading parent place finished: ", JSON.stringify(parentPlaceRef.current).toString())
-      getSublaces(parentPlaceRef.current.id);
+
+      await getSublaces(parentPlaceRef.current.id);
 
       await LazarilloMap.initializeLazarilloPlugin({
         apiKey: apiKey,
         place: parentPlaceRef.current.id
       })
+      setInitialized(true);
     }
 
-    setInitialized(true);
+
   }
 
 
@@ -474,16 +475,12 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
    */
   async function getParentPlace(alias: string) {
     await LazarilloUtils.fetchPlaceInfo(apiKey, alias)
-      .then((response) => {
-  
+      .then(async (response) => {
+
         // Load the place in the parentPlace variable
-        response.json().then((data) => {
+        await response.json().then((data) => {
           
           parentPlaceRef.current = data
-
-
-
-          console.log("Inner floors inside parent places", JSON.stringify(parentPlaceRef.current.innerFloors).toString());
 
         })
       })
