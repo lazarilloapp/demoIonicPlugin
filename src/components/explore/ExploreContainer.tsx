@@ -49,7 +49,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
   const parentPlaceRef = useRef<Place>(
     {  //costanera
-      id: '-N19VjzEVIj2RDKu7i4r',
+      id: '',
       lat: 0,
       lng: 0,
       alias: '446564f853914c81d3158b8ad396680b',
@@ -61,7 +61,6 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   );
 
 
-  const innerFloors = useRef<InnerFloor[]>([])
 
   const [places, setPlaces] = useState<Place[]>([]);
 
@@ -75,7 +74,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   const [initialized, setInitialized] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [newMap, setNewMap] = useState<LazarilloMap>();
-  const [currentFloorIndex, setCurrentFloorIndex] = useState(0);
+  const [currentFloorKey, setCurrentFloorKey] = useState("");
   const [floorName, setFloorName] = useState("Planta baja");
   const [currentSimulatedBeacon, setSimulatedBeacon] = useState<String>();
   const [routeId, setRouteId] = useState("");
@@ -92,25 +91,19 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     if(!initialized){
 
       console.log("Loading parent place in: ", parentPlaceRef.current)
-      await getParentPlace(parentPlace.alias);
+      await getParentPlace(parentPlaceRef.current.alias ? parentPlaceRef.current.alias : parentPlaceRef.current.id);
       console.log("Loading parent place finished: ", JSON.stringify(parentPlaceRef.current).toString())
-      getSublaces(parentPlace.id);
+      getSublaces(parentPlaceRef.current.id);
 
       await LazarilloMap.initializeLazarilloPlugin({
         apiKey: apiKey,
-        place: parentPlace.id
+        place: parentPlaceRef.current.id
       })
     }
 
     setInitialized(true);
   }
 
-  const parentPlace = {  //costanera
-    id: '-N19VjzEVIj2RDKu7i4r',
-    lat: -33.417556917537524,
-    lng: -70.60716507932558,
-    alias: '446564f853914c81d3158b8ad396680b'
-  }
 
 
 
@@ -133,11 +126,11 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
         apiKey: apiKey,
         config: {
           center: {
-            lat: parentPlace.lat,
-            lng: parentPlace.lng,
+            lat: parentPlaceRef.current.lat,
+            lng: parentPlaceRef.current.lng,
           },
           zoom: 17,
-          parentPlaceId: parentPlace.id,
+          parentPlaceId: parentPlaceRef.current.id,
         },
       },
       async () => {
@@ -155,7 +148,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     if (!newMap) return;
 
     let initialPos = {
-      building: parentPlace.id,
+      building: parentPlaceRef.current.id,
       floor: targetPlace.inFloor ? targetPlace.inFloor[0] : undefined,
       polygons: undefined,
       latitude: targetPlace.lat,
@@ -179,7 +172,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     } else {
       let initialPlace = places[startLocationIndex];
       initialPos = {
-        building: parentPlace.id,
+        building: parentPlaceRef.current.id,
         floor: targetPlace.inFloor ? targetPlace.inFloor[0] : undefined,
         polygons: undefined,
         latitude: initialPlace.lat,
@@ -187,7 +180,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
       };
     }
     let finalPos = {
-      building: parentPlace.id,
+      building: parentPlaceRef.current.id,
       floor: targetPlace.inFloor ? targetPlace.inFloor[0] : undefined,
       polygons: undefined,
       latitude: targetPlace.lat,
@@ -201,7 +194,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
         finalPos: finalPos,
         initialFloor: places[0].inFloor ? places[0].inFloor[0] : undefined,
         finalFloor: targetPlace.inFloor ? targetPlace.inFloor[0] : undefined,
-        place: parentPlace.id,
+        place: parentPlaceRef.current.id,
         preferAccessibleRoute: false,
         nextStepsRouteColor: '#0000FF',
         prevStepsRouteColor: '#aaaaaa',
@@ -256,13 +249,19 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
 
     try {
-          const nextFloorId = innerFloors.current[currentFloorIndex].key;
-      newMap?.setFloor({
-        mapId: 'my-cool-map',
-        floorId: nextFloorId
-      })
 
-      setFloorName(innerFloors.current[currentFloorIndex].title)
+
+
+      const nextFloorId = parentPlaceRef.current.innerFloors?.get(currentFloorKey);
+      if(nextFloorId){
+        newMap?.setFloor({
+          mapId: 'my-cool-map',
+          floorId: nextFloorId?.key
+        })
+  
+        setFloorName(nextFloorId.title)
+      }
+
       
       
     }
@@ -274,12 +273,12 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   useEffect(()=> {
     updateFloorMap()
     simulateNextBeacon()
-  }, [currentFloorIndex, currentBeaconIndex])
+  }, [currentFloorKey, currentBeaconIndex])
 
 
 
   async function changeFloor(e: CustomEvent) {
-    setCurrentFloorIndex(e.detail.value)
+    setCurrentFloorKey(e.detail.value)
   }
 
   async function addMarker() {
@@ -307,7 +306,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     newMap?.destroy()
     setNewMap(undefined)
     setFloorName('Planta baja')
-    setCurrentFloorIndex(0)
+    setCurrentFloorKey("")
     setSteps([])
 
   }
@@ -328,9 +327,9 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
       anounceSystem, // announceFormat
       undefined, // userBearing
       places[0].inFloor ? places[0].inFloor[0] : undefined, // fromFloor
-      parentPlace.id, // fromBuilding|
+      parentPlaceRef.current.id, // fromBuilding|
       targetPlace.inFloor ? targetPlace.inFloor[0] : undefined, // toFloor
-      parentPlace.id, // toBuilding
+      parentPlaceRef.current.id, // toBuilding
       'es', //language of the instructions
       unitSystem
     )
@@ -471,10 +470,10 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
   /**
    * This function will use the service fetchPlaceInfo to get the parent place
-   * @param placeId
+   * @param alias
    */
-  async function getParentPlace(placeId: string) {
-    await LazarilloUtils.fetchPlaceInfo(apiKey, placeId)
+  async function getParentPlace(alias: string) {
+    await LazarilloUtils.fetchPlaceInfo(apiKey, alias)
       .then((response) => {
   
         // Load the place in the parentPlace variable
@@ -482,14 +481,10 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
           
           parentPlaceRef.current = data
 
-          let targetInnerFloors : InnerFloor[] = []
 
 
-
-
-          innerFloors.current = targetInnerFloors
           console.log("Inner floors inside parent places", JSON.stringify(parentPlaceRef.current.innerFloors).toString());
-          console.log("Got inner floors", JSON.stringify(innerFloors.current).toString());
+
         })
       })
     }
@@ -518,6 +513,22 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   
     
 
+  }
+
+  function getListOfInnerFloors(){
+
+    const targetFloors : InnerFloor[] = []
+
+    if(parentPlaceRef.current.innerFloors != undefined){
+      
+      parentPlaceRef.current.innerFloors.forEach(function(value,key){
+        console.log(`Map key is:${key} and value is:${value}`);
+        targetFloors.push(value)
+      })
+
+    }
+
+    return targetFloors
   }
 
 
@@ -605,9 +616,13 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
                   placeholder="Select floor"
                   onIonChange={changeFloor}
                   >
-                  {innerFloors.current.map((floor, i) => (
-                   <IonSelectOption value={i}>{floor.name}</IonSelectOption>
-                  ))}
+                  { 
+                    // Iterate over the parentPLaceRef.current.innerFloors to get the floors
+                    // getListOfInnerFloors().map((floor) => {
+                    //   return (<IonSelectOption value={floor.key}>{floor.title}</IonSelectOption>)
+
+                    // })
+                  }
                   
                 </IonSelect>
               </IonItem>
