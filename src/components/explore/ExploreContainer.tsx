@@ -247,14 +247,8 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
 
   function updateFloorMap() {
-
-
-
     try {
-
-
-
-      const nextFloorId = parentPlaceRef.current.innerFloors?.get(currentFloorKey);
+      const nextFloorId = innerFloors.find(i => i.key === currentFloorKey)
       if(nextFloorId){
         newMap?.setFloor({
           mapId: 'my-cool-map',
