@@ -94,7 +94,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
       await getParentPlace(parentPlaceRef.current.alias ? parentPlaceRef.current.alias : parentPlaceRef.current.id);
 
-      await getSublaces(parentPlaceRef.current.id);
+      await getSubPlaces(parentPlaceRef.current.id);
 
       await LazarilloMap.initializeLazarilloPlugin({
         apiKey: apiKey,
@@ -460,7 +460,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
    * This funciton will use th service for fetch all the subplaces of the parent place
    * @param placeId
    */
-  async function getSublaces(placeId: string) {
+  async function getSubPlaces(placeId: string) {
     LazarilloUtils.fetchSubplaces(apiKey, placeId)
       .then((response) => {
 
@@ -553,7 +553,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
    * Will query the parent place for the given id and return the floor name
    * @param floorId 
    */
-  function getFloorNmaeById(floorId: string){
+  function getFloorNameById(floorId: string){
     const innerFloors = Object.values(parentPlaceRef.current.innerFloors ?? {}) ?? []
     const floor = innerFloors.find((floor) => floor.key === floorId)
     return floor?.title ?? ""
@@ -803,7 +803,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
                         <IonThumbnail slot="start">
                           <IonImg src={'https://ionicframework.com/docs/img/demos/thumbnail.svg'} />
                         </IonThumbnail>
-                        <IonLabel>{place.title?.default} - {place.inFloor ? getFloorNmaeById(place.inFloor[0]) : ''}</IonLabel>
+                        <IonLabel>{place.title?.default} - {place.inFloor ? getFloorNameById(place.inFloor[0]) : ''}</IonLabel>
                         <IonRadio slot="end" value={i}></IonRadio>
                       </IonItem>
                     ))}
@@ -829,7 +829,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
                         <IonThumbnail slot="start">
                           <IonImg src={'https://ionicframework.com/docs/img/demos/thumbnail.svg'} />
                         </IonThumbnail>
-                        <IonLabel>{place.title?.default} - {place.inFloor ? getFloorNmaeById(place.inFloor[0]) : ''}</IonLabel>
+                        <IonLabel>{place.title?.default} - {place.inFloor ? getFloorNameById(place.inFloor[0]) : ''}</IonLabel>
                         <IonRadio slot="end" value={i}></IonRadio>
                       </IonItem>
                     ))}
