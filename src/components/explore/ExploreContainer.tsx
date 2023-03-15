@@ -163,6 +163,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
         currentPositionState.location.floor != undefined &&
         currentPositionState.location.latitude != undefined &&
         currentPositionState.location.longitude != undefined) {
+          console.log(`Using current user position ${JSON.stringify(currentPositionState).toString()}`)
           initialPos = {
             building: currentPositionState.location.building,
             floor: currentPositionState.location.floor,
@@ -172,6 +173,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
           };
       }
     } else {
+      console.log(`Dont sing current user position ${JSON.stringify(currentPositionState).toString()}`)
       let initialPlace = places[startLocationIndex];
       initialPos = {
         building: parentPlaceRef.current.id,
@@ -194,8 +196,8 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
         mapId: 'my-cool-map',
         initialPos: initialPos,
         finalPos: finalPos,
-        initialFloor: places[0].inFloor ? places[0].inFloor[0] : undefined,
-        finalFloor: targetPlace.inFloor ? targetPlace.inFloor[0] : undefined,
+        initialFloor: initialPos.floor,
+        finalFloor: finalPos.floor,
         place: parentPlaceRef.current.id,
         preferAccessibleRoute: false,
         nextStepsRouteColor: '#0000FF',
@@ -229,6 +231,14 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     LazarilloMap.watchPosition(undefined, async (data: GetPositionCallbackData) => {
       console.log('Position: ', JSON.stringify(data).toString());
       setCurrentPositionWatching(data);
+
+      // Change to the floor of the user
+      if (data.location.floor != undefined) {
+        newMap?.setFloor({
+          mapId: 'my-cool-map',
+          floorId: data.location.floor
+        })
+      }
       
     })
     console.log("added location watcher on route")
