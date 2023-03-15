@@ -489,7 +489,12 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
         await response.json().then((data) => {
           
           parentPlaceRef.current = data
-          setInnerFloors(Object.values(parentPlaceRef.current.innerFloors ?? {}))
+          
+          let innerFloors: InnerFloor[] = []
+          for (let [key, value] of Object.entries(parentPlaceRef.current.innerFloors ?? {})){
+            innerFloors.push({...value, key: key})
+          }
+          setInnerFloors(innerFloors)
 
           console.log("Inner floors :", Object.values(parentPlaceRef.current.innerFloors ?? {}))
           
