@@ -110,10 +110,13 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
 
   const listBeaconsToSimulate = [
-    'f1a166c12ae08075dc5f40fc2eed832b',
     'c2f88d6fc12c645bc443ea3f1837301a',
-    '5433ba3787ec662b0984457abbe36933'
-  ]
+    'a4c8f860cee20daa0c1cb0724a109218',
+    'b8617a25013260f55ac8d8483bba4136',
+    'b3cd13d94c6de4a94e6dc2ee10639114',
+    '576d4cf8b412f1c5a8a4d9ee3773d22e',
+    '6bcb004299eaff5da7deda7f42004217',
+]
 
   async function createMap() {
 
@@ -521,6 +524,10 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
   }
 
+  /**
+   * @Deprecated
+   * @returns
+   */
   function getListOfInnerFloors(){
 
     const targetFloors : InnerFloor[] = []
@@ -535,6 +542,16 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     }
 
     return targetFloors
+  }
+
+  /**
+   * Will query the parent place for the given id and return the floor name
+   * @param floorId 
+   */
+  function getFloorNmaeById(floorId: string){
+    const innerFloors = Object.values(parentPlaceRef.current.innerFloors ?? {}) ?? []
+    const floor = innerFloors.find((floor) => floor.key === floorId)
+    return floor?.title ?? ""
   }
 
 
@@ -781,7 +798,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
                         <IonThumbnail slot="start">
                           <IonImg src={'https://ionicframework.com/docs/img/demos/thumbnail.svg'} />
                         </IonThumbnail>
-                        <IonLabel>{place.title?.default}</IonLabel>
+                        <IonLabel>{place.title?.default} - {place.inFloor ? getFloorNmaeById(place.inFloor[0]) : ''}</IonLabel>
                         <IonRadio slot="end" value={i}></IonRadio>
                       </IonItem>
                     ))}
@@ -807,7 +824,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
                         <IonThumbnail slot="start">
                           <IonImg src={'https://ionicframework.com/docs/img/demos/thumbnail.svg'} />
                         </IonThumbnail>
-                        <IonLabel>{place.title?.default}</IonLabel>
+                        <IonLabel>{place.title?.default} - {place.inFloor ? getFloorNmaeById(place.inFloor[0]) : ''}</IonLabel>
                         <IonRadio slot="end" value={i}></IonRadio>
                       </IonItem>
                     ))}
