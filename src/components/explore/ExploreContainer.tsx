@@ -34,31 +34,18 @@ import { mapOutline, location, trashBinOutline, cameraOutline, locateOutline, ca
 import { GetPositionCallbackData, RouteReadyCallbackData } from '@lzdevelopers/lazarillo-maps/dist/typings/definitions';
 import { StepDTO } from '../places/Step';
 import { Place } from '../places/Place';
-
-import { InnerFloor } from '../places/InnerFloor';
+import { CustomInnerFloors } from '../data/InnerFloor';
 
 
 interface ContainerProps { }
 
 const ExploreContainer: React.FC<ContainerProps> = () => {
 
+  const innerFloors = CustomInnerFloors
 
   let unitSystem = "METRIC" //default value
   let anounceSystem = "RELATIVE" //default value
   let withMobility: boolean = false //default value
-
-  const parentPlaceRef = useRef<Place>(
-    {  //costanera
-      id: '',
-      lat: 0,
-      lng: 0,
-      alias: '446564f853914c81d3158b8ad396680b',
-      title: {
-        default : 'Costanera Center',
-        es : 'Costanera Center'
-      }
-    }
-  );
 
 
 
@@ -74,8 +61,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   const [initialized, setInitialized] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [newMap, setNewMap] = useState<LazarilloMap>();
-  const [currentFloorKey, setCurrentFloorKey] = useState("");
-  const [innerFloors, setInnerFloors] = useState<InnerFloor[]>([])
+  const [currentFloorIndex, setCurrentFloorIndex] = useState(0);
   const [floorName, setFloorName] = useState("Planta baja");
   const [currentSimulatedBeacon, setSimulatedBeacon] = useState<String>();
   const [routeId, setRouteId] = useState("");
@@ -91,32 +77,32 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
     if(!initialized){
 
-
-      await getParentPlace(parentPlaceRef.current.alias ? parentPlaceRef.current.alias : parentPlaceRef.current.id);
-
-      await getSubPlaces(parentPlaceRef.current.id);
+      console.log("Getting subplaces")
+      getSublaces(parentPlace.id);
+      console.log("Subplaces got")
 
       await LazarilloMap.initializeLazarilloPlugin({
         apiKey: apiKey,
-        place: parentPlaceRef.current.id
+        place: parentPlace.id
       })
-      setInitialized(true);
     }
 
+    setInitialized(true);
+  }
 
+  const parentPlace = {  //costanera
+    id: '-N19VjzEVIj2RDKu7i4r',
+    lat: -33.417556917537524,
+    lng: -70.60716507932558,
   }
 
 
 
-
   const listBeaconsToSimulate = [
+    'f1a166c12ae08075dc5f40fc2eed832b',
     'c2f88d6fc12c645bc443ea3f1837301a',
-    'a4c8f860cee20daa0c1cb0724a109218',
-    'b8617a25013260f55ac8d8483bba4136',
-    'b3cd13d94c6de4a94e6dc2ee10639114',
-    '576d4cf8b412f1c5a8a4d9ee3773d22e',
-    '6bcb004299eaff5da7deda7f42004217',
-]
+    '5433ba3787ec662b0984457abbe36933'
+  ]
 
   async function createMap() {
 
@@ -131,11 +117,11 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
         apiKey: apiKey,
         config: {
           center: {
-            lat: parentPlaceRef.current.lat,
-            lng: parentPlaceRef.current.lng,
+            lat: parentPlace.lat,
+            lng: parentPlace.lng,
           },
           zoom: 17,
-          parentPlaceId: parentPlaceRef.current.id,
+          parentPlaceId: parentPlace.id,
         },
       },
       async () => {
@@ -153,8 +139,8 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     if (!newMap) return;
 
     let initialPos = {
-      building: parentPlaceRef.current.id,
-      floor: targetPlace.inFloor ? targetPlace.inFloor[0] : undefined,
+      building: parentPlace.id,
+      floor: targetPlace.inFloor[0],
       polygons: undefined,
       latitude: targetPlace.lat,
       longitude: targetPlace.lng,
@@ -166,7 +152,6 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
         currentPositionState.location.floor != undefined &&
         currentPositionState.location.latitude != undefined &&
         currentPositionState.location.longitude != undefined) {
-          console.log(`Using current user position ${JSON.stringify(currentPositionState).toString()}`)
           initialPos = {
             building: currentPositionState.location.building,
             floor: currentPositionState.location.floor,
@@ -176,19 +161,18 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
           };
       }
     } else {
-      console.log(`Dont sing current user position ${JSON.stringify(currentPositionState).toString()}`)
       let initialPlace = places[startLocationIndex];
       initialPos = {
-        building: parentPlaceRef.current.id,
-        floor: targetPlace.inFloor ? targetPlace.inFloor[0] : undefined,
+        building: parentPlace.id,
+        floor: initialPlace.inFloor[0],
         polygons: undefined,
         latitude: initialPlace.lat,
         longitude: initialPlace.lng,
       };
     }
     let finalPos = {
-      building: parentPlaceRef.current.id,
-      floor: targetPlace.inFloor ? targetPlace.inFloor[0] : undefined,
+      building: parentPlace.id,
+      floor: targetPlace.inFloor[0],
       polygons: undefined,
       latitude: targetPlace.lat,
       longitude: targetPlace.lng,
@@ -199,9 +183,9 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
         mapId: 'my-cool-map',
         initialPos: initialPos,
         finalPos: finalPos,
-        initialFloor: initialPos.floor,
-        finalFloor: finalPos.floor,
-        place: parentPlaceRef.current.id,
+        initialFloor: places[0].inFloor[0],
+        finalFloor: targetPlace.inFloor[0],
+        place: parentPlace.id,
         preferAccessibleRoute: false,
         nextStepsRouteColor: '#0000FF',
         prevStepsRouteColor: '#aaaaaa',
@@ -234,14 +218,6 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     LazarilloMap.watchPosition(undefined, async (data: GetPositionCallbackData) => {
       console.log('Position: ', JSON.stringify(data).toString());
       setCurrentPositionWatching(data);
-
-      // Change to the floor of the user
-      if (data.location.floor != undefined) {
-        newMap?.setFloor({
-          mapId: 'my-cool-map',
-          floorId: data.location.floor
-        })
-      }
       
     })
     console.log("added location watcher on route")
@@ -260,19 +236,13 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
 
   function updateFloorMap() {
+    const nextFloorId = innerFloors[currentFloorIndex].key;
     try {
-      const nextFloorId = innerFloors.find(i => i.key === currentFloorKey)
-      if(nextFloorId){
-        newMap?.setFloor({
-          mapId: 'my-cool-map',
-          floorId: nextFloorId?.key
-        })
-  
-        setFloorName(nextFloorId.title)
-      }
-
-      
-      
+      newMap?.setFloor({
+        mapId: 'my-cool-map',
+        floorId: nextFloorId
+      })
+      setFloorName(innerFloors[currentFloorIndex].name)
     }
     catch (error) {
       console.log(error)
@@ -282,12 +252,12 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   useEffect(()=> {
     updateFloorMap()
     simulateNextBeacon()
-  }, [currentFloorKey, currentBeaconIndex])
+  }, [currentFloorIndex, currentBeaconIndex])
 
 
 
   async function changeFloor(e: CustomEvent) {
-    setCurrentFloorKey(e.detail.value)
+    setCurrentFloorIndex(e.detail.value)
   }
 
   async function addMarker() {
@@ -315,7 +285,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     newMap?.destroy()
     setNewMap(undefined)
     setFloorName('Planta baja')
-    setCurrentFloorKey("")
+    setCurrentFloorIndex(0)
     setSteps([])
 
   }
@@ -335,10 +305,10 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
       accesibility, // withMobility 0 Means a walking route and 1 a wheel chair route
       anounceSystem, // announceFormat
       undefined, // userBearing
-      places[0].inFloor ? places[0].inFloor[0] : undefined, // fromFloor
-      parentPlaceRef.current.id, // fromBuilding|
-      targetPlace.inFloor ? targetPlace.inFloor[0] : undefined, // toFloor
-      parentPlaceRef.current.id, // toBuilding
+      places[0].inFloor[0], // fromFloor
+      parentPlace.id, // fromBuilding|
+      targetPlace.inFloor[0], // toFloor
+      parentPlace.id, // toBuilding
       'es', //language of the instructions
       unitSystem
     )
@@ -460,7 +430,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
    * This funciton will use th service for fetch all the subplaces of the parent place
    * @param placeId
    */
-  async function getSubPlaces(placeId: string) {
+  async function getSublaces(placeId: string) {
     LazarilloUtils.fetchSubplaces(apiKey, placeId)
       .then((response) => {
 
@@ -476,32 +446,6 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
       })
   }
-
-  /**
-   * This function will use the service fetchPlaceInfo to get the parent place
-   * @param alias
-   */
-  async function getParentPlace(alias: string) {
-    await LazarilloUtils.fetchPlaceInfo(apiKey, alias)
-      .then(async (response) => {
-
-        // Load the place in the parentPlace variable
-        await response.json().then((data) => {
-          
-          parentPlaceRef.current = data
-          
-          let innerFloors: InnerFloor[] = []
-          for (let [key, value] of Object.entries(parentPlaceRef.current.innerFloors ?? {})){
-            innerFloors.push({...value, key: key})
-          }
-          setInnerFloors(innerFloors)
-
-          console.log("Inner floors :", Object.values(parentPlaceRef.current.innerFloors ?? {}))
-          
-
-        })
-      })
-    }
 
 
   /**
@@ -527,36 +471,6 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   
     
 
-  }
-
-  /**
-   * @Deprecated
-   * @returns
-   */
-  function getListOfInnerFloors(){
-
-    const targetFloors : InnerFloor[] = []
-
-    if(parentPlaceRef.current.innerFloors != undefined){
-      
-      parentPlaceRef.current.innerFloors.forEach(function(value,key){
-        console.log(`Map key is:${key} and value is:${value}`);
-        targetFloors.push(value)
-      })
-
-    }
-
-    return targetFloors
-  }
-
-  /**
-   * Will query the parent place for the given id and return the floor name
-   * @param floorId 
-   */
-  function getFloorNameById(floorId: string){
-    const innerFloors = Object.values(parentPlaceRef.current.innerFloors ?? {}) ?? []
-    const floor = innerFloors.find((floor) => floor.key === floorId)
-    return floor?.title ?? ""
   }
 
 
@@ -644,13 +558,9 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
                   placeholder="Select floor"
                   onIonChange={changeFloor}
                   >
-                  { 
-                    innerFloors.map((floor) => {
-                      return (<IonSelectOption value={floor.key}>{floor.title}</IonSelectOption>)
-
-                    })
-                  }
-                  
+                  {innerFloors.map((floor, i) => (
+                   <IonSelectOption value={i}>{floor.name}</IonSelectOption>
+                  ))}
                 </IonSelect>
               </IonItem>
             </IonRow>
@@ -803,7 +713,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
                         <IonThumbnail slot="start">
                           <IonImg src={'https://ionicframework.com/docs/img/demos/thumbnail.svg'} />
                         </IonThumbnail>
-                        <IonLabel>{place.title?.default} - {place.inFloor ? getFloorNameById(place.inFloor[0]) : ''}</IonLabel>
+                        <IonLabel>{place.title?.default}</IonLabel>
                         <IonRadio slot="end" value={i}></IonRadio>
                       </IonItem>
                     ))}
@@ -829,7 +739,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
                         <IonThumbnail slot="start">
                           <IonImg src={'https://ionicframework.com/docs/img/demos/thumbnail.svg'} />
                         </IonThumbnail>
-                        <IonLabel>{place.title?.default} - {place.inFloor ? getFloorNameById(place.inFloor[0]) : ''}</IonLabel>
+                        <IonLabel>{place.title?.default}</IonLabel>
                         <IonRadio slot="end" value={i}></IonRadio>
                       </IonItem>
                     ))}

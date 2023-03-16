@@ -1,0 +1,60 @@
+import { Place } from "../places/Place";
+
+export const CustomPlaces: Place[] = [
+    // {
+    //     id: '-N1PFp8NOc5m4LVoPbLY',
+    //     _name: 'Kayser',
+    //     lat: -33.41758007741259,
+    //     lng: -70.60615300514021,
+    //     floor: '-N1OJ6FIVBV6dpjCXEFM',
+    // },
+    // {
+    //     id: '-N2Ykjm5YnfNvesLgUmr',
+    //     _name: 'Cajero Automático',
+    //     lat: -33.417556917537524,
+    //     lng: -70.60716507932558,
+    //     floor: '-N1OJ6FIVBV6dpjCXEFM',
+    // },
+    // {
+    //     id: '-N2SRcOa7uYI8gYIZZb4',
+    //     _name: 'Cajero Automático (Baños)',
+    //     lat: -33.417478405397176,
+    //     lng: -70.60596998769914,
+    //     floor: '-N1OJ6FIVBV6dpjCXEFM',
+    // },
+    // {
+    //     id: '-N1PVMDgXNBWo1gWEpyg',
+    //     _name: 'Easy',
+    //     lat: -33.417596318453455,
+    //     lng: -70.60672561495679,
+    //     floor: '-N1OJ6FIVBV6dpjCXEFM',
+    // },
+    // {
+    //     id: '-N1PI2eh94zmlbCLxSBl',
+    //     _name: 'Vivero Verde',
+    //     lat: -33.41784916502634,
+    //     lng: -70.60716738108904,
+    //     floor: '-N1OJ6FIVBV6dpjCXEFM',
+    // },
+    // {
+    //     id: '-N1PF2rz-DUbQNZuuKbE',
+    //     _name: 'Prontomatic',
+    //     lat: -33.417973584718986,
+    //     lng: -70.60601659047292,
+    //     floor: '-N1OJ6FIVBV6dpjCXEFM',
+    // },
+    // {
+    //     id: '-N2SeIeRqKV34PJ5Z6y7',
+    //     _name: 'BCI',
+    //     lat: -33.41785379621859,
+    //     lng: -70.60568241131433,
+    //     floor: '-N1OJ6FIVBV6dpjCXEFM',
+    // },
+    // {
+    //     id: '-NDZGO5_rJ8oydkxvpGT',
+    //     _name: 'Yogurtlife',
+    //     lat: -33.417702498298034,
+    //     lng: -70.60701209726123,
+    //     floor: '-NCtxg_OxCuCfGVevdck', //piso 5
+    // },
+];

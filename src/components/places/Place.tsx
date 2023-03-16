@@ -1,20 +1,13 @@
-import { InnerFloor } from "./InnerFloor";
-
-
 export interface Place {
   id: string;
+  _name: string;
   lat: number;
   lng: number;
-  inFloor?: string[];
-  alias? : string;
+  inFloor: string[];
   title: {
     default : string;
     es: string;
-    en?: string;
+    en: string | null;
   };
-  address?: string;
-  externalId?: string;
-  innerFloors?: Map<string, InnerFloor>;
-  hasBeacons?: boolean;
 
 }
