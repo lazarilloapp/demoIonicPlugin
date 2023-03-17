@@ -193,6 +193,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
       latitude: targetPlace.lat,
       longitude: targetPlace.lng,
     };
+    console.log(`Add route from ${JSON.stringify(initialPos).toString()} to ${JSON.stringify(finalPos).toString()}`)
 
     newMap.addRoute(
       {
