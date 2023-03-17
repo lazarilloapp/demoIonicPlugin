@@ -450,11 +450,9 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   async function getCurrentPosition() {
     await initPlugin()
 
-    await LazarilloMap.getCurrentPosition().then((response : GetPositionCallbackData) => {
-      console.log("Current position", JSON.stringify(response).toString());
-      setPosition(response);
-
-    });
+    const response = await LazarilloMap.getCurrentPosition()
+    console.log("Current position", JSON.stringify(response).toString());
+    setPosition(response);
   }
 
   /**
