@@ -161,18 +161,18 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     };
     // Using user location as initial position
     if (startLocationIndex == -1) {
-      await getCurrentPosition();
-      if (currentPositionState?.location.building != undefined && 
-        currentPositionState.location.floor != undefined &&
-        currentPositionState.location.latitude != undefined &&
-        currentPositionState.location.longitude != undefined) {
-          console.log(`Using current user position ${JSON.stringify(currentPositionState).toString()}`)
+      const position = await getCurrentPositionForRoute();
+      console.log("Called get current position for route and get ", position)
+      if (position.location.building != undefined && 
+        position.location.floor != undefined &&
+        position.location.latitude != undefined &&
+        position.location.longitude != undefined) {
           initialPos = {
-            building: currentPositionState.location.building,
-            floor: currentPositionState.location.floor,
+            building: position.location.building,
+            floor: position.location.floor,
             polygons: undefined,
-            latitude: currentPositionState.location.latitude,
-            longitude: currentPositionState.location.longitude,
+            latitude: position.location.latitude,
+            longitude: position.location.longitude,
           };
       }
     } else {
