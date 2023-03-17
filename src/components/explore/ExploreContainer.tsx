@@ -30,7 +30,7 @@ import {
   IonToolbar,
   useIonToast,
 } from '@ionic/react';
-import { mapOutline, location, trashBinOutline, cameraOutline, locateOutline, caretBack, caretForward, bluetooth, walk } from 'ionicons/icons';
+import { mapOutline, location, trashBinOutline, cameraOutline, locateOutline, caretForward, bluetooth, walk } from 'ionicons/icons';
 import { GetPositionCallbackData, RouteReadyCallbackData } from '@lzdevelopers/lazarillo-maps/dist/typings/definitions';
 import { StepDTO } from '../places/Step';
 import { Place } from '../places/Place';
