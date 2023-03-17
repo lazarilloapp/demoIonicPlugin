@@ -456,6 +456,17 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   }
 
   /**
+   * Ask the plugin for the current position.
+   * This function does not save the position to the component state.
+   * @returns The current position
+   */
+  async function getCurrentPositionForRoute(): Promise<GetPositionCallbackData> {
+    await initPlugin()
+    const response = await LazarilloMap.getCurrentPosition()
+    return response
+  }
+
+  /**
    * This funciton will use th service for fetch all the subplaces of the parent place
    * @param placeId
    */
