@@ -49,13 +49,13 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
   const parentPlaceRef = useRef<Place>(
     {  //costanera
-      id: '',
+      id: '-NGWyetk5llo1RG_11Ti',
       lat: 0,
       lng: 0,
-      alias: '446564f853914c81d3158b8ad396680b',
+      alias: 'casa-renato',
       title: {
-        default : 'Costanera Center',
-        es : 'Costanera Center'
+        default : 'Casa Renato',
+        es : 'Casa Renato'
       }
     }
   );
@@ -166,12 +166,12 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     // Using user location as initial position
     if (startLocationIndex == -1) {
       await getCurrentPosition();
-      console.log(`STARTING ROUTE Current position ${currentPostionRef.current}`)
+      console.log(`STARTING ROUTE Current position ${JSON.stringify(currentPostionRef.current).toString()}`)
       if (currentPostionRef.current?.location.building != undefined && 
         currentPostionRef.current.location.floor != undefined &&
         currentPostionRef.current.location.latitude != undefined &&
         currentPostionRef.current.location.longitude != undefined) {
-          console.log(`STARTING ROUTE Using current user position ${currentPostionRef.current}`)
+          console.log(`STARTING ROUTE Using current user position ${JSON.stringify(currentPostionRef.current).toString()}`)
           initialPos = {
             building: currentPostionRef.current.location.building,
             floor: currentPostionRef.current.location.floor,
@@ -181,7 +181,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
           };
       }
     } else {
-      console.log(`STARTING ROUTE Dont using current user position ${currentPostionRef.current}`)
+      console.log(`STARTING ROUTE Dont using current user position ${JSON.stringify(currentPostionRef.current).toString()}`)
       let initialPlace = places[startLocationIndex];
       initialPos = {
         building: parentPlaceRef.current.id,
@@ -198,6 +198,11 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
       latitude: targetPlace.lat,
       longitude: targetPlace.lng,
     };
+
+    console.log(`STARTING ROUTE Initial position ${JSON.stringify(initialPos).toString()}`)
+    console.log(`STARTING ROUTE Final position ${JSON.stringify(finalPos).toString()}`)
+
+
 
     newMap.addRoute(
       {
