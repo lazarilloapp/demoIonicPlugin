@@ -31,7 +31,7 @@ import {
   useIonToast,
 } from '@ionic/react';
 import { mapOutline, location, trashBinOutline, cameraOutline, locateOutline, caretBack, caretForward, bluetooth, walk } from 'ionicons/icons';
-import { GetPositionCallbackData, RouteReadyCallbackData } from '@lzdevelopers/lazarillo-maps/dist/typings/definitions';
+import { GetPositionCallbackData, LzLocation, RouteReadyCallbackData } from '@lzdevelopers/lazarillo-maps/dist/typings/definitions';
 import { StepDTO } from '../places/Step';
 import { Place } from '../places/Place';
 
@@ -49,13 +49,13 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
   const parentPlaceRef = useRef<Place>(
     {  //costanera
-      id: '',
-      lat: 0,
-      lng: 0,
-      alias: '446564f853914c81d3158b8ad396680b',
+      id: '-NGWyetk5llo1RG_11Ti',
+      lat: -4.029755,
+      lng: -79.207585,
+      alias: 'casa-renato',
       title: {
-        default : 'Costanera Center',
-        es : 'Costanera Center'
+        default : 'Casa Renato',
+        es : 'Casa Renato'
       }
     }
   );
@@ -70,7 +70,10 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   const [mapRef, setMapRef] = useState(useRef<HTMLElement>())
   const [showToast1, setShowToast1] = useState(false);
   const [steps, setSteps] = useState<StepDTO[]>([]);
+
   const [currentPositionState, setPosition] = useState<GetPositionCallbackData>();
+  const currentPostionRef = useRef<GetPositionCallbackData>();
+
   const [initialized, setInitialized] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [newMap, setNewMap] = useState<LazarilloMap>();
@@ -152,35 +155,37 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
     if (!newMap) return;
 
-    let initialPos = {
-      building: parentPlaceRef.current.id,
-      floor: targetPlace.inFloor ? targetPlace.inFloor[0] : undefined,
+
+    let initialPos : LzLocation = {
+      building: undefined,
+      floor: undefined,
       polygons: undefined,
-      latitude: targetPlace.lat,
-      longitude: targetPlace.lng,
-    };
+      latitude: undefined,
+      longitude: undefined
+    }
     // Using user location as initial position
     if (startLocationIndex == -1) {
       await getCurrentPosition();
-      if (currentPositionState?.location.building != undefined && 
-        currentPositionState.location.floor != undefined &&
-        currentPositionState.location.latitude != undefined &&
-        currentPositionState.location.longitude != undefined) {
-          console.log(`Using current user position ${JSON.stringify(currentPositionState).toString()}`)
+      console.log(`STARTING ROUTE Current position ${currentPostionRef.current}`)
+      if (currentPostionRef.current?.location.building != undefined && 
+        currentPostionRef.current.location.floor != undefined &&
+        currentPostionRef.current.location.latitude != undefined &&
+        currentPostionRef.current.location.longitude != undefined) {
+          console.log(`STARTING ROUTE Using current user position ${currentPostionRef.current}`)
           initialPos = {
-            building: currentPositionState.location.building,
-            floor: currentPositionState.location.floor,
+            building: currentPostionRef.current.location.building,
+            floor: currentPostionRef.current.location.floor,
             polygons: undefined,
-            latitude: currentPositionState.location.latitude,
-            longitude: currentPositionState.location.longitude,
+            latitude: currentPostionRef.current.location.latitude,
+            longitude: currentPostionRef.current.location.longitude,
           };
       }
     } else {
-      console.log(`Dont sing current user position ${JSON.stringify(currentPositionState).toString()}`)
+      console.log(`STARTING ROUTE Dont using current user position ${currentPostionRef.current}`)
       let initialPlace = places[startLocationIndex];
       initialPos = {
         building: parentPlaceRef.current.id,
-        floor: targetPlace.inFloor ? targetPlace.inFloor[0] : undefined,
+        floor: initialPlace.inFloor ? initialPlace.inFloor[0] : undefined,
         polygons: undefined,
         latitude: initialPlace.lat,
         longitude: initialPlace.lng,
@@ -233,7 +238,8 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     // Also add a watcher to the routing status
     LazarilloMap.watchPosition(undefined, async (data: GetPositionCallbackData) => {
       console.log('Position: ', JSON.stringify(data).toString());
-      setCurrentPositionWatching(data);
+      currentPostionRef.current = data
+      setPosition(data);
 
       // Change to the floor of the user
       if (data.location.floor != undefined) {
@@ -451,6 +457,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
     await LazarilloMap.getCurrentPosition().then((response : GetPositionCallbackData) => {
       console.log("Current position", JSON.stringify(response).toString());
+      currentPostionRef.current = response
       setPosition(response);
 
     });
@@ -522,6 +529,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     
       await LazarilloMap.getCurrentPosition().then((data) => {
         console.log("Current position", JSON.stringify(data).toString())
+        currentPostionRef.current = data
         setPosition(data)
       })
   
@@ -611,21 +619,21 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
             </IonButton>
           </IonCol>
 
-          {currentPositionState ? (
+          {currentPostionRef.current ? (
 
             <IonCol>
               <IonSkeletonText>Position:
-                {JSON.stringify(currentPositionState).toString()} </IonSkeletonText>
+                {JSON.stringify(currentPostionRef.current).toString()} </IonSkeletonText>
             </IonCol>
           ) : ''}
 
 
         </IonRow>
 
-        {currentPositionState ? (
+        {currentPostionRef.current ? (
           <IonRow>
             <IonCol>
-              <IonText>{JSON.stringify(currentPositionState).toString()}</IonText>
+              <IonText>{JSON.stringify(currentPostionRef.current).toString()}</IonText>
             </IonCol>
           </IonRow>) : ''}
 
@@ -697,22 +705,22 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
                 </IonButton>
               </IonCol>
             </IonRow>
-            {currentPositionWatching ? (
+            {currentPostionRef.current ? (
               <IonList>
                 <IonItem>
-                  <IonLabel>Latitude: {currentPositionWatching.location.latitude}</IonLabel>
+                  <IonLabel>Latitude: {currentPostionRef.current.location.latitude}</IonLabel>
                 </IonItem>
                 <IonItem>
-                  <IonLabel>Longitude: {currentPositionWatching.location.longitude}</IonLabel>
+                  <IonLabel>Longitude: {currentPostionRef.current.location.longitude}</IonLabel>
                 </IonItem>
                 <IonItem>
-                  <IonLabel>Floor: {currentPositionWatching.location.floor}</IonLabel>
+                  <IonLabel>Floor: {currentPostionRef.current.location.floor}</IonLabel>
                 </IonItem>
                 <IonItem>
-                  <IonLabel>Building: {currentPositionWatching.location.building}</IonLabel>
+                  <IonLabel>Building: {currentPostionRef.current.location.building}</IonLabel>
                 </IonItem>
                 <IonItem>
-                  <IonLabel>Current Step: {currentPositionWatching.routingStatus?.currentStep}</IonLabel>
+                  <IonLabel>Current Step: {currentPostionRef.current.routingStatus?.currentStep}</IonLabel>
                 </IonItem>
                 <IonItem>
                   <IonLabel>Route ID: {routeId}</IonLabel>
