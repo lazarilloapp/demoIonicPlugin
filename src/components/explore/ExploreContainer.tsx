@@ -5,6 +5,7 @@ import {
   IonButton,
   IonButtons,
   IonCard,
+  IonCardContent,
   IonCardHeader,
   IonCardTitle,
   IonCol,
@@ -78,7 +79,6 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   const [newMap, setNewMap] = useState<LazarilloMap>();
   const [currentFloorKey, setCurrentFloorKey] = useState("");
   const [innerFloors, setInnerFloors] = useState<InnerFloor[]>([])
-  const [floorName, setFloorName] = useState("Planta baja");
   const [currentSimulatedBeacon, setSimulatedBeacon] = useState<String>();
   const [routeId, setRouteId] = useState("");
   const [currentBeaconIndex, setCurrentBeaconIndex] = useState(-1);
@@ -124,8 +124,13 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
     await initPlugin();
 
-    if (!mapRef.current) return;
+    if (!mapRef.current || !parentPlaceRef.current) return;
 
+    const floors = Object.keys(parentPlaceRef.current.innerFloors ?? {}) ;
+    console.log("asdada: "+ floors.length);
+    if(floors.length > 0){
+      setCurrentFloorKey( floors[0]|| "")
+    }
     setNewMap(await LazarilloMap.create(
       {
         id: 'my-cool-map',
@@ -289,8 +294,6 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
           mapId: 'my-cool-map',
           floorId: nextFloorId?.key
         })
-  
-        setFloorName(nextFloorId.title)
       }
 
       
@@ -336,7 +339,6 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   async function destroyMap() {
     newMap?.destroy()
     setNewMap(undefined)
-    setFloorName('Planta baja')
     setCurrentFloorKey("")
     setSteps([])
 
@@ -554,26 +556,6 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   }
 
   /**
-   * @Deprecated
-   * @returns
-   */
-  function getListOfInnerFloors(){
-
-    const targetFloors : InnerFloor[] = []
-
-    if(parentPlaceRef.current.innerFloors != undefined){
-      
-      parentPlaceRef.current.innerFloors.forEach(function(value,key){
-        console.log(`Map key is:${key} and value is:${value}`);
-        targetFloors.push(value)
-      })
-
-    }
-
-    return targetFloors
-  }
-
-  /**
    * Will query the parent place for the given id and return the floor name
    * @param floorId 
    */
@@ -606,81 +588,93 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
           <IonCol>
             {newMap ? (
               <IonCard>
-                <IonCardHeader>
-                  <IonCardTitle>{floorName}</IonCardTitle>
-                </IonCardHeader>
+                <IonCardTitle>
+                  <IonSelect
+                      interface="popover"
+                      onIonChange={changeFloor}
+                      value={currentFloorKey}
+                      defaultValue={currentFloorKey}
+                      >
+                      { 
+                        innerFloors.map((floor) => {
+                          return (<IonSelectOption value={floor.key}>{floor.title}</IonSelectOption>)
+                        })
+                      }
+                  </IonSelect>
+                </IonCardTitle>
+                <IonCardContent>
+                  <IonButton onClick={destroyMap}>
+                    <IonIcon icon={trashBinOutline}></IonIcon>
+                    <IonText>Destroy Map</IonText>
+                  </IonButton>
+                </IonCardContent>
               </IonCard>
-
             ) : (<IonCard>
               <IonCardHeader>
                 <IonCardTitle>Create a map to begin</IonCardTitle>
               </IonCardHeader>
+              <IonCardContent>
+                <IonButton onClick={createMap}>
+                  <IonIcon icon={mapOutline}></IonIcon>
+                  <IonText>Create Map</IonText>
+                </IonButton>
+              </IonCardContent>
             </IonCard>)}
-            <IonButton onClick={createMap}>
-              <IonIcon icon={mapOutline}></IonIcon>
-              <IonText>Create Map</IonText>
-            </IonButton>
-            <IonButton onClick={destroyMap}>
-              <IonIcon icon={trashBinOutline}></IonIcon>
-              <IonText>Destroy Map</IonText>
-            </IonButton>
           </IonCol>
         </IonRow>
 
-
+        <IonRow>
+          <IonCardHeader>
+            <IonCardTitle> Location Response</IonCardTitle>
+          </IonCardHeader>
+        </IonRow>
         <IonRow>
           <IonCol>
             <IonButton onClick={getCurrentPosition}>
               <IonText>Get current position</IonText>
             </IonButton>
           </IonCol>
-
-          {currentPositionRef.current ? (
-
-            <IonCol>
-              <IonText >Position:
-                {JSON.stringify(currentPositionRef.current).toString()} </IonText>
-            </IonCol>
-          ) : ''}
-
-
         </IonRow>
 
         {currentPositionRef.current ? (
-          <p>
-              <IonText>{JSON.stringify(currentPositionRef.current).toString()}</IonText>
-          </p>) : ''}
+              <IonList> 
+              <IonItem>
+                <IonLabel>Latitude: {currentPositionRef.current.location.latitude}</IonLabel>
+              </IonItem>
+              <IonItem>
+                <IonLabel>Longitude: {currentPositionRef.current.location.longitude}</IonLabel>
+              </IonItem>
+              <IonItem>
+                <IonLabel>Floor: {currentPositionRef.current.location.floor}</IonLabel>
+              </IonItem>
+              <IonItem>
+                <IonLabel>Building: {currentPositionRef.current.location.building}</IonLabel>
+              </IonItem>
+              <IonItem>
+                <IonLabel>Current Step: {currentPositionRef.current.routingStatus?.currentStep}</IonLabel>
+              </IonItem>
+              <IonItem>
+                <IonLabel>Routing Status: {currentPositionRef.current.routingStatus?.status}</IonLabel>
+              </IonItem>
+              <IonItem>
+                <IonLabel>Building Status: {currentPositionRef.current.insideBuilding}</IonLabel>
+              </IonItem>
+              <IonItem>
+                <IonLabel>Route ID: {routeId}</IonLabel>
+              </IonItem>
+            </IonList>
+              ) : ''
+            }
 
         {newMap ? (
           <IonCol>
             <IonCardHeader>
-              <IonCardTitle> Route Destination and Floor change</IonCardTitle>
+              <IonCardTitle> Route</IonCardTitle>
             </IonCardHeader>
             <IonRow >
               <IonButton onClick={() => setIsOpen(true)}>
-                <IonText>Destinations</IonText>
+                <IonText>Make Route</IonText>
               </IonButton>
-              <IonItem>
-                <IonSelect
-                  interface="popover"
-                  placeholder="Select floor"
-                  onIonChange={changeFloor}
-                  value={currentFloorKey}
-                  >
-                  { 
-                    innerFloors.map((floor) => {
-                      return (<IonSelectOption value={floor.key}>{floor.title}</IonSelectOption>)
-
-                    })
-                  }
-                  
-                </IonSelect>
-              </IonItem>
-            </IonRow>
-            <IonRow>
-              <IonCardHeader>
-                <IonCardTitle> Add pin and change camera angle and zoom</IonCardTitle>
-              </IonCardHeader>
             </IonRow>
 
 
@@ -715,32 +709,6 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
                 </IonButton>
               </IonCol>
             </IonRow>
-            {currentPositionRef.current ? (
-              <IonList>
-                <IonItem>
-                  <IonLabel>Latitude: {currentPositionRef.current.location.latitude}</IonLabel>
-                </IonItem>
-                <IonItem>
-                  <IonLabel>Longitude: {currentPositionRef.current.location.longitude}</IonLabel>
-                </IonItem>
-                <IonItem>
-                  <IonLabel>Floor: {currentPositionRef.current.location.floor}</IonLabel>
-                </IonItem>
-                <IonItem>
-                  <IonLabel>Building: {currentPositionRef.current.location.building}</IonLabel>
-                </IonItem>
-                <IonItem>
-                  <IonLabel>Current Step: {currentPositionRef.current.routingStatus?.currentStep}</IonLabel>
-                </IonItem>
-                <IonItem>
-                  <IonLabel>Route ID: {routeId}</IonLabel>
-                </IonItem>
-                <IonItem>
-                  <IonLabel>Routing Status: {currentPositionRef.current.routingStatus?.status}</IonLabel>
-                </IonItem>
-              </IonList>
-              ) : ''
-            }
             <IonRow>
               <IonCardHeader>
                 <IonCardTitle>Beacons simulation</IonCardTitle>
@@ -759,6 +727,11 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
             </IonRow>
 
 
+            <IonRow>
+              <IonCardHeader>
+                <IonCardTitle> Add pin and change camera angle and zoom</IonCardTitle>
+              </IonCardHeader>
+            </IonRow>
             <IonRow>
               <IonButton onClick={addMarker}>
                 <IonIcon icon={location}></IonIcon>
@@ -822,10 +795,10 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
                   <IonSelect id="start_point" interface="popover" value={startPosition} onIonChange={(event) => {
                     if (event.detail.value === undefined) return;
                     setStartPosition(event.detail.value)
-                  }} interfaceOptions={{translucent: false, cssClass: 'actionSheet'}}>              
-                  <IonSelectOption value={-1} >User Position</IonSelectOption>
+                  }} interfaceOptions={{translucent: false, cssClass: 'actionSheet'}}  defaultValue={-1}>              
+                  <IonSelectOption value={-1} key="user-loc">User Position</IonSelectOption>
                     {places.map((place, i) => (
-                      <IonSelectOption value={i}>
+                      <IonSelectOption value={i} key={place.id}>
                         <IonLabel class="ion-text-wrap">
                         {place.title?.default} - {place.inFloor ? getFloorNameById(place.inFloor[0]) : ''}
                         </IonLabel>
@@ -844,10 +817,10 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
                   <IonSelect id="final_point" value={finalPosition} interface="popover" onIonChange={(event) => {
                     if (event.detail.value === undefined) return;
                     setFinalPosition(event.detail.value)
-                  }} interfaceOptions={{translucent: false, cssClass: 'actionSheet'}}>              
-                  <IonSelectOption value={-1} >User Position</IonSelectOption>
+                  }} interfaceOptions={{translucent: false, cssClass: 'actionSheet'}} defaultValue={-1}>              
+                  <IonSelectOption value={-1} key="user-loc">User Position</IonSelectOption>
                     {places.map((place, i) => (
-                      <IonSelectOption value={i}>
+                      <IonSelectOption value={i} key={place.id}>
                         {place.title?.default} - {place.inFloor ? getFloorNameById(place.inFloor[0]) : ''}
                       </IonSelectOption>
                     ))}

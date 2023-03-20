@@ -9,12 +9,12 @@ export interface Place {
   alias? : string;
   title: {
     default : string;
-    es: string;
+    es?: string;
     en?: string;
   };
   address?: string;
   externalId?: string;
-  innerFloors?: Map<string, InnerFloor>;
+  innerFloors?: {[key: string]: InnerFloor};
   hasBeacons?: boolean;
 
 }
