@@ -53,8 +53,8 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
       lng: 0,
       alias: '446564f853914c81d3158b8ad396680b',
       title: {
-        default : 'Costanera Center',
-        es : 'Costanera Center'
+        default : 'Costanera',
+        es : 'Costanera'
       }
     }
   );
