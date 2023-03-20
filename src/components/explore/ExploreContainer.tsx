@@ -12,8 +12,8 @@ import {
   IonGrid,
   IonHeader,
   IonIcon,
-  IonImg,
   IonItem,
+  IonItemDivider,
   IonLabel,
   IonList,
   IonModal,
@@ -24,13 +24,12 @@ import {
   IonSelectOption,
   IonSkeletonText,
   IonText,
-  IonThumbnail,
   IonTitle,
   IonToast,
   IonToolbar,
   useIonToast,
 } from '@ionic/react';
-import { mapOutline, location, trashBinOutline, cameraOutline, locateOutline, caretBack, caretForward, bluetooth, walk } from 'ionicons/icons';
+import { mapOutline, location, trashBinOutline, cameraOutline, locateOutline, caretForward, bluetooth, walk } from 'ionicons/icons';
 import { GetPositionCallbackData, LzLocation, RouteReadyCallbackData } from '@lzdevelopers/lazarillo-maps/dist/typings/definitions';
 import { StepDTO } from '../places/Step';
 import { Place } from '../places/Place';
@@ -44,18 +43,18 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
 
   let unitSystem = "METRIC" //default value
-  let anounceSystem = "RELATIVE" //default value
+  let announceSystem = "RELATIVE" //default value
   let withMobility: boolean = false //default value
 
   const parentPlaceRef = useRef<Place>(
     {  //costanera
-      id: '-NGWyetk5llo1RG_11Ti',
+      id: '',
       lat: 0,
       lng: 0,
-      alias: 'casa-renato',
+      alias: '446564f853914c81d3158b8ad396680b',
       title: {
-        default : 'Casa Renato',
-        es : 'Casa Renato'
+        default : 'Costanera Center',
+        es : 'Costanera Center'
       }
     }
   );
@@ -72,7 +71,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   const [steps, setSteps] = useState<StepDTO[]>([]);
 
   const [currentPositionState, setPosition] = useState<GetPositionCallbackData>();
-  const currentPostionRef = useRef<GetPositionCallbackData>();
+  const currentPositionRef = useRef<GetPositionCallbackData>();
 
   const [initialized, setInitialized] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -166,22 +165,22 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     // Using user location as initial position
     if (startLocationIndex == -1) {
       await getCurrentPosition();
-      console.log(`STARTING ROUTE Current position ${JSON.stringify(currentPostionRef.current).toString()}`)
-      if (currentPostionRef.current?.location.building != undefined && 
-        currentPostionRef.current.location.floor != undefined &&
-        currentPostionRef.current.location.latitude != undefined &&
-        currentPostionRef.current.location.longitude != undefined) {
-          console.log(`STARTING ROUTE Using current user position ${JSON.stringify(currentPostionRef.current).toString()}`)
+      console.log(`STARTING ROUTE Current position ${JSON.stringify(currentPositionRef.current).toString()}`)
+      if (currentPositionRef.current?.location.building != undefined && 
+        currentPositionRef.current.location.floor != undefined &&
+        currentPositionRef.current.location.latitude != undefined &&
+        currentPositionRef.current.location.longitude != undefined) {
+          console.log(`STARTING ROUTE Using current user position ${JSON.stringify(currentPositionRef.current).toString()}`)
           initialPos = {
-            building: currentPostionRef.current.location.building,
-            floor: currentPostionRef.current.location.floor,
+            building: currentPositionRef.current.location.building,
+            floor: currentPositionRef.current.location.floor,
             polygons: undefined,
-            latitude: currentPostionRef.current.location.latitude,
-            longitude: currentPostionRef.current.location.longitude,
+            latitude: currentPositionRef.current.location.latitude,
+            longitude: currentPositionRef.current.location.longitude,
           };
       }
     } else {
-      console.log(`STARTING ROUTE Dont using current user position ${JSON.stringify(currentPostionRef.current).toString()}`)
+      console.log(`STARTING ROUTE Dont using current user position ${JSON.stringify(currentPositionRef.current).toString()}`)
       let initialPlace = places[startLocationIndex];
       initialPos = {
         building: parentPlaceRef.current.id,
@@ -226,11 +225,11 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   }
 
   /**
-   * This function will start the routing proccess and also set a listener for the routing status
+   * This function will start the routing process and also set a listener for the routing status
    * @param routeId 
    * @returns 
    */
-  async function watchRoutingStatus(routeId: string) {
+  async function watchPosition(routeId: string) {
 
     if (!newMap) return;
 
@@ -243,19 +242,31 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     // Also add a watcher to the routing status
     LazarilloMap.watchPosition(undefined, async (data: GetPositionCallbackData) => {
       console.log('Position: ', JSON.stringify(data).toString());
-      currentPostionRef.current = data
+      currentPositionRef.current = data
       setPosition(data);
 
       // Change to the floor of the user
-      if (data.location.floor != undefined) {
+      if (data.location.floor !== undefined && data.location.floor !== null) {
         newMap?.setFloor({
           mapId: 'my-cool-map',
           floorId: data.location.floor
         })
+        setCurrentFloorKey(data.location.floor)
+
       }
       
     })
     console.log("added location watcher on route")
+  }
+
+  async function stopWatchPosition(routeId: string) {
+
+    if (!newMap) return;
+
+    console.log("LZ routeId", routeId);
+    
+    newMap.destroyRouting({routeId})
+    // TODO: STOP watchPosition
   }
 
   const presentToast = (
@@ -334,7 +345,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
   async function getRouteAndAddRoute(targetPlaceKey: number) {
     const targetPlace = places[targetPlaceKey];
-    let accesibility = withMobility ? 1 : 0
+    let accessibility = withMobility ? 1 : 0
 
     LazarilloUtils.fetchRoute(
       apiKey, // api key
@@ -343,8 +354,8 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
       places[0].lng, // fromLng
       targetPlace.lat, // toLat
       targetPlace.lng, // toLng
-      accesibility, // withMobility 0 Means a walking route and 1 a wheel chair route
-      anounceSystem, // announceFormat
+      accessibility, // withMobility 0 Means a walking route and 1 a wheel chair route
+      announceSystem, // announceFormat
       undefined, // userBearing
       places[0].inFloor ? places[0].inFloor[0] : undefined, // fromFloor
       parentPlaceRef.current.id, // fromBuilding|
@@ -378,7 +389,10 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
           },
         )
       })
-      .catch(console.error);
+      .catch(error => {
+        console.error(error);
+        presentToast("top", "ERROR: Cannot got route")
+      });
 
 
 
@@ -426,19 +440,16 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
   }
 
-  let locationEnable = false
-
   async function enableCurrentLocation() {
-    locationEnable = !locationEnable
-    newMap?.enableCurrentLocation(locationEnable)
-    if (locationEnable) {
-      presentToast('top', 'Current location enabled');
-    }
-    else {
-      presentToast('top', 'Current location disabled');
-    }
+    newMap?.enableCurrentLocation(true)
+    presentToast('top', 'Current location enabled');
   }
-  async function updateUnitSytem(newUnit: string) {
+  async function disableCurrentLocation() {
+    newMap?.enableCurrentLocation(false)
+    presentToast('top', 'Current location disabled');
+  }
+
+  async function updateUnitSystem(newUnit: string) {
     console.log("antes", unitSystem)
     if (newUnit !== unitSystem) {
       unitSystem = newUnit
@@ -446,12 +457,12 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     console.log("despues", unitSystem)
 
   }
-  async function updateAnounceSystem(newAnnouncer: string) {
-    console.log("antes", anounceSystem)
-    if (newAnnouncer !== anounceSystem) {
-      anounceSystem = newAnnouncer
+  async function updateAnnounceSystem(newAnnouncer: string) {
+    console.log("antes", announceSystem)
+    if (newAnnouncer !== announceSystem) {
+      announceSystem = newAnnouncer
     }
-    console.log("despues", anounceSystem)
+    console.log("despues", announceSystem)
   }
 
   /**
@@ -462,7 +473,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
     await LazarilloMap.getCurrentPosition().then((response : GetPositionCallbackData) => {
       console.log("Current position", JSON.stringify(response).toString());
-      currentPostionRef.current = response
+      currentPositionRef.current = response
       setPosition(response);
 
     });
@@ -534,7 +545,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
     
       await LazarilloMap.getCurrentPosition().then((data) => {
         console.log("Current position", JSON.stringify(data).toString())
-        currentPostionRef.current = data
+        currentPositionRef.current = data
         setPosition(data)
       })
   
@@ -575,7 +586,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
  async function destroyRoute() {
 
-  if(newMap != undefined){
+  if(newMap !== undefined){
     newMap.destroyRouting({routeId: routeId})
   }
 
@@ -624,23 +635,21 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
             </IonButton>
           </IonCol>
 
-          {currentPostionRef.current ? (
+          {currentPositionRef.current ? (
 
             <IonCol>
-              <IonSkeletonText>Position:
-                {JSON.stringify(currentPostionRef.current).toString()} </IonSkeletonText>
+              <IonText >Position:
+                {JSON.stringify(currentPositionRef.current).toString()} </IonText>
             </IonCol>
           ) : ''}
 
 
         </IonRow>
 
-        {currentPostionRef.current ? (
-          <IonRow>
-            <IonCol>
-              <IonText>{JSON.stringify(currentPostionRef.current).toString()}</IonText>
-            </IonCol>
-          </IonRow>) : ''}
+        {currentPositionRef.current ? (
+          <p>
+              <IonText>{JSON.stringify(currentPositionRef.current).toString()}</IonText>
+          </p>) : ''}
 
         {newMap ? (
           <IonCol>
@@ -656,6 +665,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
                   interface="popover"
                   placeholder="Select floor"
                   onIonChange={changeFloor}
+                  value={currentFloorKey}
                   >
                   { 
                     innerFloors.map((floor) => {
@@ -673,21 +683,6 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
               </IonCardHeader>
             </IonRow>
 
-            <IonRow>
-
-              <IonButton onClick={addMarker}>
-                <IonIcon icon={location}></IonIcon>
-                <IonText> Indoor</IonText>
-              </IonButton>
-              <IonButton onClick={addOutdoorMarker}>
-                <IonIcon icon={location}></IonIcon>
-                <IonText> Outdoor</IonText>
-              </IonButton>
-              <IonButton onClick={setCamera}>
-                <IonIcon icon={cameraOutline}></IonIcon>
-              </IonButton>
-
-            </IonRow>
 
             <IonRow>
               <IonCardHeader>
@@ -700,35 +695,48 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
                   <IonIcon icon={locateOutline}></IonIcon>
                   <IonLabel>Enable location</IonLabel>
                 </IonButton>
+                <IonButton onClick={disableCurrentLocation}>
+                  <IonIcon icon={locateOutline}></IonIcon>
+                  <IonLabel>Disable location</IonLabel>
+                </IonButton>
               </IonCol>
               <IonCol>
                 <IonButton onClick={() => {
-                  watchRoutingStatus(routeId)
+                  watchPosition(routeId)
                 }}>
                   <IonIcon icon={bluetooth}></IonIcon>
-                  <IonLabel>Start Routing</IonLabel>
+                  <IonLabel>Start updating location</IonLabel>
+                </IonButton>
+                <IonButton onClick={() => {
+                  stopWatchPosition(routeId)
+                }}>
+                  <IonIcon icon={bluetooth}></IonIcon>
+                  <IonLabel>Stop updating location</IonLabel>
                 </IonButton>
               </IonCol>
             </IonRow>
-            {currentPostionRef.current ? (
+            {currentPositionRef.current ? (
               <IonList>
                 <IonItem>
-                  <IonLabel>Latitude: {currentPostionRef.current.location.latitude}</IonLabel>
+                  <IonLabel>Latitude: {currentPositionRef.current.location.latitude}</IonLabel>
                 </IonItem>
                 <IonItem>
-                  <IonLabel>Longitude: {currentPostionRef.current.location.longitude}</IonLabel>
+                  <IonLabel>Longitude: {currentPositionRef.current.location.longitude}</IonLabel>
                 </IonItem>
                 <IonItem>
-                  <IonLabel>Floor: {currentPostionRef.current.location.floor}</IonLabel>
+                  <IonLabel>Floor: {currentPositionRef.current.location.floor}</IonLabel>
                 </IonItem>
                 <IonItem>
-                  <IonLabel>Building: {currentPostionRef.current.location.building}</IonLabel>
+                  <IonLabel>Building: {currentPositionRef.current.location.building}</IonLabel>
                 </IonItem>
                 <IonItem>
-                  <IonLabel>Current Step: {currentPostionRef.current.routingStatus?.currentStep}</IonLabel>
+                  <IonLabel>Current Step: {currentPositionRef.current.routingStatus?.currentStep}</IonLabel>
                 </IonItem>
                 <IonItem>
                   <IonLabel>Route ID: {routeId}</IonLabel>
+                </IonItem>
+                <IonItem>
+                  <IonLabel>Routing Status: {currentPositionRef.current.routingStatus?.status}</IonLabel>
                 </IonItem>
               </IonList>
               ) : ''
@@ -748,6 +756,21 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
             </IonRow>
             <IonRow>
               <IonText>Current beacon {currentSimulatedBeacon}</IonText>
+            </IonRow>
+
+
+            <IonRow>
+              <IonButton onClick={addMarker}>
+                <IonIcon icon={location}></IonIcon>
+                <IonText> Indoor</IonText>
+              </IonButton>
+              <IonButton onClick={addOutdoorMarker}>
+                <IonIcon icon={location}></IonIcon>
+                <IonText> Outdoor</IonText>
+              </IonButton>
+              <IonButton onClick={setCamera}>
+                <IonIcon icon={cameraOutline}></IonIcon>
+              </IonButton>
             </IonRow>
           </IonCol>
 
@@ -796,31 +819,20 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
               <IonCol>
                 <IonCardHeader> <IonCardTitle> From: </IonCardTitle></IonCardHeader>
                 <IonList>
-                  <IonRadioGroup id="start_point" value={startPosition} onIonChange={(event) => {
+                  <IonSelect id="start_point" interface="popover" value={startPosition} onIonChange={(event) => {
                     if (event.detail.value === undefined) return;
                     setStartPosition(event.detail.value)
-                  }}>              
-                    <IonItem onClick={() => {setStartPosition(-1)}}>
-                      <IonThumbnail slot="start">
-                        <IonImg src={'https://ionicframework.com/docs/img/demos/thumbnail.svg'} />
-                      </IonThumbnail>
-                      <IonLabel>User Position</IonLabel>
-                      <IonRadio slot="end" value={-1}></IonRadio>
-                    </IonItem>
+                  }} interfaceOptions={{translucent: false, cssClass: 'actionSheet'}}>              
+                  <IonSelectOption value={-1} >User Position</IonSelectOption>
                     {places.map((place, i) => (
-                      <IonItem key={i} onClick={() => {
-                        //setIsOpen(false)
-                        //getRouteAndAddRoute(i)
-                        setStartPosition(i)
-                      }}>
-                        <IonThumbnail slot="start">
-                          <IonImg src={'https://ionicframework.com/docs/img/demos/thumbnail.svg'} />
-                        </IonThumbnail>
-                        <IonLabel>{place.title?.default} - {place.inFloor ? getFloorNameById(place.inFloor[0]) : ''}</IonLabel>
-                        <IonRadio slot="end" value={i}></IonRadio>
-                      </IonItem>
+                      <IonSelectOption value={i}>
+                        <IonLabel class="ion-text-wrap">
+                        {place.title?.default} - {place.inFloor ? getFloorNameById(place.inFloor[0]) : ''}
+                        </IonLabel>
+                        <IonItemDivider/>                   
+                      </IonSelectOption>
                     ))}
-                  </IonRadioGroup>
+                  </IonSelect>
                 </IonList>
               </IonCol>
             </IonRow>
@@ -829,41 +841,28 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
               <IonCol>
                 <IonCardHeader> <IonCardTitle> To: </IonCardTitle></IonCardHeader>
                 <IonList>
-                <IonRadioGroup id="start_point" value={finalPosition} onIonChange={(event) => {
+                  <IonSelect id="final_point" value={finalPosition} interface="popover" onIonChange={(event) => {
                     if (event.detail.value === undefined) return;
                     setFinalPosition(event.detail.value)
-                  }}>
+                  }} interfaceOptions={{translucent: false, cssClass: 'actionSheet'}}>              
+                  <IonSelectOption value={-1} >User Position</IonSelectOption>
                     {places.map((place, i) => (
-                      <IonItem key={i} onClick={() => {
-                        //setIsOpen(false)
-                        //getRouteAndAddRoute(i)
-                        setFinalPosition(i)
-                      }}>
-                        <IonThumbnail slot="start">
-                          <IonImg src={'https://ionicframework.com/docs/img/demos/thumbnail.svg'} />
-                        </IonThumbnail>
-                        <IonLabel>{place.title?.default} - {place.inFloor ? getFloorNameById(place.inFloor[0]) : ''}</IonLabel>
-                        <IonRadio slot="end" value={i}></IonRadio>
-                      </IonItem>
+                      <IonSelectOption value={i}>
+                        {place.title?.default} - {place.inFloor ? getFloorNameById(place.inFloor[0]) : ''}
+                      </IonSelectOption>
                     ))}
-                  </IonRadioGroup>
+                  </IonSelect>
                 </IonList>
               </IonCol>
             </IonRow>
 
             <IonRow>
               <IonCol >
-                <IonCardHeader> <IonCardTitle> Route Accesibility</IonCardTitle></IonCardHeader>
+                <IonCardHeader> <IonCardTitle> Route Accessibility</IonCardTitle></IonCardHeader>
                 <IonList>
-                  <IonRadioGroup id="accesibility" value="0" onIonChange={(event) => {
+                  <IonRadioGroup id="accessibility" value="0" onIonChange={(event) => {
                     console.log("pre cambio de variable", withMobility)
-                    if (event.detail.value === 0) {
-                      withMobility = false
-                    }
-                    else {
-                      withMobility = true
-                    }
-                    console.log("tipo de ruta", withMobility)
+                    withMobility = event.detail.value !== 0
                   }}>
                     <IonItem>
                       <IonLabel>Walking</IonLabel>
@@ -872,7 +871,7 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
                       </IonRadio>
                     </IonItem>
                     <IonItem>
-                      <IonLabel>Accesible</IonLabel>
+                      <IonLabel>Accessible</IonLabel>
                       <IonRadio slot="end" value="1">
 
                       </IonRadio>
@@ -883,13 +882,13 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
               </IonCol>
 
               <IonCol >
-                <IonCardHeader> <IonCardTitle>Unit System</IonCardTitle></IonCardHeader>
+                <IonCardHeader> <IonCardTitle>Announce Format</IonCardTitle></IonCardHeader>
 
                 <IonList>
-                  <IonRadioGroup id='anounce-format' value={anounceSystem} onIonChange={(event) => {
+                  <IonRadioGroup id='anounce-format' value={announceSystem} onIonChange={(event) => {
                     if (event.detail.value === undefined) return;
                     if (isOpen) {
-                      updateAnounceSystem(event.detail.value.toString())
+                      updateAnnounceSystem(event.detail.value.toString())
                     }
                   }}>
                     <IonItem>
@@ -911,12 +910,12 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
                 </IonList>
               </IonCol>
               <IonCol >
-                <IonCardHeader> <IonCardTitle> Anounce System</IonCardTitle></IonCardHeader>
+                <IonCardHeader> <IonCardTitle> Announce Unit System</IonCardTitle></IonCardHeader>
                 <IonList>
                   <IonRadioGroup id='unit-metric' value={unitSystem} onIonChange={(event) => {
                     if (event.detail.value === undefined) return;
                     if (isOpen) {
-                      updateUnitSytem(event.detail.value.toString())
+                      updateUnitSystem(event.detail.value.toString())
                     }
                   }}
                   >
