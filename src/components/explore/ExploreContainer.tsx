@@ -49,13 +49,13 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
 
   const parentPlaceRef = useRef<Place>(
     {  //costanera
-      id: '-NGWyetk5llo1RG_11Ti',
+      id: '',
       lat: 0,
       lng: 0,
-      alias: 'casa-renato',
+      alias: '446564f853914c81d3158b8ad396680b',
       title: {
-        default : 'Casa Renato',
-        es : 'Casa Renato'
+        default : 'Costanera',
+        es : 'Costanera'
       }
     }
   );
