@@ -65,8 +65,8 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
   const [places, setPlaces] = useState<Place[]>([]);
 
   const [present] = useIonToast();
-  const [startPosition, setStartPosition] = useState(0);
-  const [finalPosition, setFinalPosition] = useState(0);
+  const [startPosition, setStartPosition] = useState(-1);
+  const [finalPosition, setFinalPosition] = useState(-1);
   const [mapRef, setMapRef] = useState(useRef<HTMLElement>())
   const [showToast1, setShowToast1] = useState(false);
   const [steps, setSteps] = useState<StepDTO[]>([]);
@@ -795,10 +795,10 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
                   <IonSelect id="start_point" interface="popover" value={startPosition} onIonChange={(event) => {
                     if (event.detail.value === undefined) return;
                     setStartPosition(event.detail.value)
-                  }} interfaceOptions={{translucent: false, cssClass: 'actionSheet'}}  defaultValue={-1}>              
-                  <IonSelectOption value={-1} key="user-loc">User Position</IonSelectOption>
+                  }} interfaceOptions={{translucent: false, cssClass: 'actionSheet'}}>              
+                  <IonSelectOption value={-1}>User Position</IonSelectOption>
                     {places.map((place, i) => (
-                      <IonSelectOption value={i} key={place.id}>
+                      <IonSelectOption value={i}>
                         <IonLabel class="ion-text-wrap">
                         {place.title?.default} - {place.inFloor ? getFloorNameById(place.inFloor[0]) : ''}
                         </IonLabel>
@@ -817,11 +817,11 @@ const ExploreContainer: React.FC<ContainerProps> = () => {
                   <IonSelect id="final_point" value={finalPosition} interface="popover" onIonChange={(event) => {
                     if (event.detail.value === undefined) return;
                     setFinalPosition(event.detail.value)
-                  }} interfaceOptions={{translucent: false, cssClass: 'actionSheet'}} defaultValue={-1}>              
-                  <IonSelectOption value={-1} key="user-loc">User Position</IonSelectOption>
+                  }} interfaceOptions={{translucent: false, cssClass: 'actionSheet'}}>              
+                  <IonSelectOption value={-1}>User Position</IonSelectOption>
                     {places.map((place, i) => (
-                      <IonSelectOption value={i} key={place.id}>
-                        {place.title?.default} - {place.inFloor ? getFloorNameById(place.inFloor[0]) : ''}
+                      <IonSelectOption value={i}>
+                        {place.title?.default} - {place.inFloor ? getFloorNameById(place.inFloor[0]) : ''}                        
                       </IonSelectOption>
                     ))}
                   </IonSelect>
