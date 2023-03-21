@@ -94,8 +94,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
 
     if (!initialized) {
 
-
-      await getParentPlace(parentPlaceRef.id);
+      await getParentPlace(parentPlaceRef.alias ? parentPlaceRef.alias : parentPlaceRef.id);
 
       await getSubPlaces(parentPlaceRef.id);
 
