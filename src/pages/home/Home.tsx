@@ -1,5 +1,5 @@
 import { IonContent, IonHeader, IonIcon, IonPage, IonTitle, IonToolbar } from '@ionic/react';
-import ExploreContainer from '../../components/explore/ExploreContainer';
+import SelectParentPlaceContainer from '../../components/select/SelectParentPlaceContainer';
 import './Home.css';
 import { bagOutline } from 'ionicons/icons';
 
@@ -17,7 +17,7 @@ const Home: React.FC = () => {
             <IonTitle size="large">   Shop</IonTitle>
           </IonToolbar>
         </IonHeader>
-        <ExploreContainer />
+        <SelectParentPlaceContainer />
       </IonContent>
     </IonPage>
   );
