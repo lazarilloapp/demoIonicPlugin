@@ -7,9 +7,11 @@ import { useEffect, useState } from 'react';
 
 import { Place } from '../places/Place';
 
-interface ContainerProps { }
+interface ContainerProps { 
+    handleTitle: (t: string) => void;
+}
 
-const SelectParentPlaceContainer: React.FC<ContainerProps> = () => {
+const SelectParentPlaceContainer: React.FC<ContainerProps> = ({handleTitle}) => {
     const [showExplore, setShowExplore] = useState(false);
     const [parentPlacesList, setParentPlacesList] = useState<Place[]>([]);
     const [parentPlaceSelected, setParentPlace] = useState<Place>();
@@ -39,6 +41,12 @@ const SelectParentPlaceContainer: React.FC<ContainerProps> = () => {
         })
     }
 
+    const handleOnClick = () => {
+        setShowExplore(true);
+        handleTitle(parentPlaceSelected !== undefined ? parentPlaceSelected.title.default : "");
+    }
+    
+
     return (
             showExplore ? <ExploreContainer place={parentPlaceSelected}/> : 
             <IonContent>
@@ -60,8 +68,11 @@ const SelectParentPlaceContainer: React.FC<ContainerProps> = () => {
                                 
                             </IonSelect>
                         </IonRow>
-                        <IonButton
-                        onClick={() => setShowExplore(true)}>Show Map</IonButton>
+                        <IonRow className='button-style'>
+                            <IonButton onClick={handleOnClick}>
+                                Show Map
+                            </IonButton>
+                        </IonRow>
                     </IonCol>
                 </IonGrid>
             </IonContent>
