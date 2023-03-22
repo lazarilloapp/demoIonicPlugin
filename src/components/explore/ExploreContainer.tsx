@@ -2,6 +2,8 @@ import './ExploreContainer.css';
 import { LazarilloMap, LazarilloUtils } from '@lzdevelopers/lazarillo-maps';
 import { useEffect, useRef, useState } from 'react';
 import {
+  IonAccordion,
+  IonAccordionGroup,
   IonButton,
   IonButtons,
   IonCard,
@@ -223,7 +225,10 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
       },
       async (data: RouteReadyCallbackData) => {
         console.log('Route added', data);
+        let routeData = data.data as any
+        let steps = routeData.legs[0].steps as StepDTO[]
         setRouteId(data.routeId);
+        setSteps(steps)
         presentToast('top', 'Route loaded');
       },
     );
@@ -754,27 +759,22 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
         ) : (<IonText></IonText>)
         }
 
-
-
-        {steps.length > 0 ? (
-          <IonRow>
-            <IonCol>
-              <IonTitle>Current Route Instructions:</IonTitle>
-            </IonCol>
-          </IonRow>) : ''}
-
-        {steps.length > 0 ? (
-          <IonRow>
-            <IonCol>
-              <IonList>
+        {steps.length > 0 && (
+          <IonAccordionGroup>
+            <IonAccordion value="first">
+              <IonItem slot="header" color='light'>
+                <IonLabel><h1>Current Route Instructions</h1></IonLabel>
+              </IonItem>
+              <IonList slot="content">
                 {steps.map((step, i) => (
                   <IonItem key={i}>
-                    <IonText>{step.html_instructions}</IonText>
+                    <IonText color={currentPositionState?.routingStatus?.currentStep == i ? 'primary': ''}>{step.html_instructions}</IonText>
                   </IonItem>
                 ))}
               </IonList>
-            </IonCol>
-          </IonRow>) : ''}
+            </IonAccordion>
+          </IonAccordionGroup>
+        )}
 
         <IonModal id="example-modal" isOpen={isOpen} className="ion-padding modal-demo">
           <IonHeader>
