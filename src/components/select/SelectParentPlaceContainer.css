@@ -1,3 +1,7 @@
 .center-row{
-    align-content: center;
+    justify-content: center;
+}
+
+.button-style{
+    justify-content: end;
 }
