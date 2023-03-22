@@ -223,7 +223,10 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
       },
       async (data: RouteReadyCallbackData) => {
         console.log('Route added', data);
+        let routeData = data.data as any
+        let steps = routeData.legs[0].steps as StepDTO[]
         setRouteId(data.routeId);
+        setSteps(steps)
         presentToast('top', 'Route loaded');
       },
     );
