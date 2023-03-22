@@ -20,7 +20,7 @@ const SelectParentPlaceContainer: React.FC<ContainerProps> = () => {
 
     useEffect(() => {
         getParentPlaces()
-    })
+    }, [parentPlacesList])
 
     const showParentPlaceMap = (e: CustomEvent) => {
         const placeId = e.detail.value;
