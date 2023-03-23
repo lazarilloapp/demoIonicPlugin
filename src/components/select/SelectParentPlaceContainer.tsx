@@ -1,7 +1,7 @@
 import './SelectParentPlaceContainer.css'
 
 import { LazarilloUtils } from '@lzdevelopers/lazarillo-maps';
-import { IonButton, IonCol, IonContent, IonGrid, IonRow, IonSelect, IonSelectOption } from "@ionic/react";
+import { IonButton, IonCol, IonContent, IonGrid, IonRow, IonSelect, IonSelectOption, useIonViewWillEnter } from "@ionic/react";
 import ExploreContainer from "../explore/ExploreContainer";
 import { useEffect, useState } from 'react';
 
@@ -18,9 +18,9 @@ const SelectParentPlaceContainer: React.FC<ContainerProps> = () => {
     ? process.env.REACT_APP_YOUR_API_KEY_HERE
     : '';
 
-    useEffect(() => {
+    useIonViewWillEnter(() => {
         getParentPlaces()
-    }, [parentPlacesList])
+    });
 
     const showParentPlaceMap = (e: CustomEvent) => {
         const placeId = e.detail.value;
