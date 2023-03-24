@@ -81,6 +81,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
   const [withMobility, setWithMobility] = useState(false)
   const [announceFormat, setAnnounceFormat] = useState<'RELATIVE'|'CLOCK'|'CARDINAL'>('RELATIVE')
   const [unitSystem, setUnitSystem] = useState<'METRIC'|'IMPERIAL'|'STEPS'>('METRIC')
+  const [instructionsLanguage, setInstructionsLanguage] = useState<string>('system')
 
   const [currentPositionWatching, setCurrentPositionWatching] = useState<GetPositionCallbackData>();
 
@@ -215,6 +216,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
         polylineWidth: 10,
         announceFormat: announceFormat,
         unitSystem: unitSystem,
+        language: instructionsLanguage !== 'system' ? instructionsLanguage : undefined,
       },
       async (data: RouteReadyCallbackData) => {
         console.log('Route added', data);
@@ -834,6 +836,30 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
                     <IonItem>
                       <IonLabel>STEPS</IonLabel>
                       <IonRadio slot="end" value="STEPS"></IonRadio>
+                    </IonItem>
+                  </IonRadioGroup>
+                </IonList>
+              </IonCol>
+              <IonCol >
+                <IonCardHeader> <IonCardTitle> Language</IonCardTitle></IonCardHeader>
+                <IonList>
+                  <IonRadioGroup id='language' value={instructionsLanguage} onIonChange={(event) => {
+                    setInstructionsLanguage(event.detail.value.toString())
+                  }}
+                  >
+                    <IonItem>
+                      <IonLabel>SYSTEM</IonLabel>
+                      <IonRadio slot="end" value='system'/>
+                    </IonItem>
+
+                    <IonItem>
+                      <IonLabel>SPANISH</IonLabel>
+                      <IonRadio slot="end" value="es"/>
+                    </IonItem>
+
+                    <IonItem>
+                      <IonLabel>ENGLISH</IonLabel>
+                      <IonRadio slot="end" value="en"/>
                     </IonItem>
                   </IonRadioGroup>
                 </IonList>
