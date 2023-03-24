@@ -57,8 +57,6 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
       }
     };
 
-
-
   const [places, setPlaces] = useState<Place[]>([]);
 
   const [present] = useIonToast();
@@ -104,12 +102,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
       })
       setInitialized(true);
     }
-
-
   }
-
-
-
 
   const listBeaconsToSimulate = [
     'c2f88d6fc12c645bc443ea3f1837301a',
