@@ -45,11 +45,6 @@ interface ContainerProps {
 
 const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
 
-
-  let unitSystem = "METRIC" //default value
-  let announceSystem = "RELATIVE" //default value
-  let withMobility: boolean = false //default value
-
   let parentPlaceRef = place !== undefined ? place :
     {  //costanera
       id: '',
@@ -84,6 +79,10 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
   const [currentSimulatedBeacon, setSimulatedBeacon] = useState<String>();
   const [routeId, setRouteId] = useState("");
   const [currentBeaconIndex, setCurrentBeaconIndex] = useState(-1);
+
+  const [withMobility, setWithMobility] = useState(false)
+  const [announceFormat, setAnnounceFormat] = useState<'RELATIVE'|'CLOCK'|'CARDINAL'>('RELATIVE')
+  const [unitSystem, setUnitSystem] = useState<'METRIC'|'IMPERIAL'|'STEPS'>('METRIC')
 
   const [currentPositionWatching, setCurrentPositionWatching] = useState<GetPositionCallbackData>();
 
@@ -836,9 +835,9 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
               <IonCol >
                 <IonCardHeader> <IonCardTitle> Route Accessibility</IonCardTitle></IonCardHeader>
                 <IonList>
-                  <IonRadioGroup id="accessibility" value="0" onIonChange={(event) => {
+                  <IonRadioGroup id="accessibility" value={withMobility ? '1' : '0'} onIonChange={(event) => {
                     console.log("pre cambio de variable", withMobility)
-                    withMobility = event.detail.value !== 0
+                    setWithMobility(event.detail.value !== '0')
                   }}>
                     <IonItem>
                       <IonLabel>Walking</IonLabel>
@@ -861,10 +860,10 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
                 <IonCardHeader> <IonCardTitle>Announce Format</IonCardTitle></IonCardHeader>
 
                 <IonList>
-                  <IonRadioGroup id='anounce-format' value={announceSystem} onIonChange={(event) => {
+                  <IonRadioGroup id='anounce-format' value={announceFormat} onIonChange={(event) => {
                     if (event.detail.value === undefined) return;
                     if (isOpen) {
-                      updateAnnounceSystem(event.detail.value.toString())
+                      setAnnounceFormat(event.detail.value.toString())
                     }
                   }}>
                     <IonItem>
@@ -891,7 +890,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
                   <IonRadioGroup id='unit-metric' value={unitSystem} onIonChange={(event) => {
                     if (event.detail.value === undefined) return;
                     if (isOpen) {
-                      updateUnitSystem(event.detail.value.toString())
+                      setUnitSystem(event.detail.value.toString())
                     }
                   }}
                   >
