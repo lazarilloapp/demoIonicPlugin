@@ -45,7 +45,7 @@ interface ContainerProps {
 
 const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
 
-  let parentPlaceRef = place !== undefined ? place :
+  let parentPlaceRef = place ??
     {  //costanera
       id: '',
       lat: 0,
