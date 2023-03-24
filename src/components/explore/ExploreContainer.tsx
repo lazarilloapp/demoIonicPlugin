@@ -697,7 +697,10 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
               <IonList slot="content">
                 {steps.map((step, i) => (
                   <IonItem key={i}>
-                    <IonText color={currentPositionState?.routingStatus?.currentStep == i ? 'primary': ''}>{step.html_instructions}</IonText>
+                    <IonText 
+                      color={currentPositionState?.routingStatus?.currentStep == i ? 'primary': ''}
+                      dangerouslySetInnerHTML={{__html: step.html_instructions ?? ''}}
+                    />
                   </IonItem>
                 ))}
               </IonList>
