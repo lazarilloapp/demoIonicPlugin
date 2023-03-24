@@ -216,10 +216,12 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
         initialFloor: initialPos.floor,
         finalFloor: finalPos.floor,
         place: parentPlaceRef.id,
-        preferAccessibleRoute: false,
+        preferAccessibleRoute: withMobility,
         nextStepsRouteColor: '#0000FF',
         prevStepsRouteColor: '#aaaaaa',
         polylineWidth: 10,
+        announceFormat: announceFormat,
+        unitSystem: unitSystem,
       },
       async (data: RouteReadyCallbackData) => {
         console.log('Route added', data);
