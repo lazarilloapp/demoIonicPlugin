@@ -599,6 +599,26 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
         ) : ''
         }
 
+        {steps.length > 0 && (
+          <IonAccordionGroup>
+            <IonAccordion value="first">
+              <IonItem slot="header" color='light'>
+                <IonLabel><h1>Current Route Instructions</h1></IonLabel>
+              </IonItem>
+              <IonList slot="content">
+                {steps.map((step, i) => (
+                  <IonItem key={i}>
+                    <IonText 
+                      color={currentPositionState?.routingStatus?.currentStep == i ? 'primary': ''}
+                      dangerouslySetInnerHTML={{__html: step.html_instructions ?? ''}}
+                    />
+                  </IonItem>
+                ))}
+              </IonList>
+            </IonAccordion>
+          </IonAccordionGroup>
+        )}
+
         {newMap ? (
           <IonCol>
             <IonCardHeader>
@@ -682,26 +702,6 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
 
         ) : (<IonText></IonText>)
         }
-
-        {steps.length > 0 && (
-          <IonAccordionGroup>
-            <IonAccordion value="first">
-              <IonItem slot="header" color='light'>
-                <IonLabel><h1>Current Route Instructions</h1></IonLabel>
-              </IonItem>
-              <IonList slot="content">
-                {steps.map((step, i) => (
-                  <IonItem key={i}>
-                    <IonText 
-                      color={currentPositionState?.routingStatus?.currentStep == i ? 'primary': ''}
-                      dangerouslySetInnerHTML={{__html: step.html_instructions ?? ''}}
-                    />
-                  </IonItem>
-                ))}
-              </IonList>
-            </IonAccordion>
-          </IonAccordionGroup>
-        )}
 
         <IonModal id="example-modal" isOpen={isOpen} className="ion-padding modal-demo">
           <IonHeader>
