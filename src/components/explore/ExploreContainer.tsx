@@ -349,61 +349,6 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
 
   }
 
-
-  async function getRouteAndAddRoute(targetPlaceKey: number) {
-    const targetPlace = places[targetPlaceKey];
-    let accessibility = withMobility ? 1 : 0
-
-    LazarilloUtils.fetchRoute(
-      apiKey, // api key
-      'WALKING', // travelMode
-      places[0].lat, // fromLat
-      places[0].lng, // fromLng
-      targetPlace.lat, // toLat
-      targetPlace.lng, // toLng
-      accessibility, // withMobility 0 Means a walking route and 1 a wheel chair route
-      announceSystem, // announceFormat
-      undefined, // userBearing
-      places[0].inFloor ? places[0].inFloor[0] : undefined, // fromFloor
-      parentPlaceRef.id, // fromBuilding|
-      targetPlace.inFloor ? targetPlace.inFloor[0] : undefined, // toFloor
-      parentPlaceRef.id, // toBuilding
-      'es', //language of the instructions
-      unitSystem
-    )
-      .then((response) => {
-
-        console.log(response.url)
-        console.log(response.body)
-        return response.json()
-
-      })
-      .then((data) => {
-        console.log("Got route: ", JSON.stringify(data))
-        setSteps(data[0].legs[0].steps)
-
-        newMap?.drawRoute(
-          {
-            mapId: 'my-cool-map',
-            route: data
-          },
-          async (routeData: RouteReadyCallbackData) => {
-            console.log('Route added', routeData);
-            setRouteId(routeData.routeId)
-            //startAndWatchRoutingStatus(routeData.routeId)
-
-            presentToast('top', 'Watching Route');
-          },
-        )
-      })
-      .catch(error => {
-        console.error(error);
-        presentToast("top", "ERROR: Cannot got route")
-      });
-
-
-
-  }
   /**
    * Move the camare angle and location 
    */
@@ -454,22 +399,6 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
   async function disableCurrentLocation() {
     newMap?.enableCurrentLocation(false)
     presentToast('top', 'Current location disabled');
-  }
-
-  async function updateUnitSystem(newUnit: string) {
-    console.log("antes", unitSystem)
-    if (newUnit !== unitSystem) {
-      unitSystem = newUnit
-    }
-    console.log("despues", unitSystem)
-
-  }
-  async function updateAnnounceSystem(newAnnouncer: string) {
-    console.log("antes", announceSystem)
-    if (newAnnouncer !== announceSystem) {
-      announceSystem = newAnnouncer
-    }
-    console.log("despues", announceSystem)
   }
 
   /**
