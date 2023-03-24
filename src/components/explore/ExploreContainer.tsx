@@ -25,7 +25,6 @@ import {
   IonRow,
   IonSelect,
   IonSelectOption,
-  IonSkeletonText,
   IonText,
   IonTitle,
   IonToast,
