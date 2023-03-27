@@ -22,6 +22,7 @@ export interface Step {
     start_inside_place: string;
     end_inside_place: string;
     html_instructions: string;
+    plain_instructions: string;
     polyline: CoordinateLL;
     travel_mode: string;
     start_inside_floor: string;
