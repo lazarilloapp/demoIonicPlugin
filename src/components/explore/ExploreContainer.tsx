@@ -33,7 +33,7 @@ import {
   useIonToast,
 } from '@ionic/react';
 import { mapOutline, location, trashBinOutline, cameraOutline, locateOutline, caretForward, bluetooth, walk } from 'ionicons/icons';
-import { GetPositionCallbackData, LzLocation, RouteReadyCallbackData } from '@lzdevelopers/lazarillo-maps/dist/typings/definitions';
+import { GetPositionCallbackData, LzLocation, RouteReadyCallbackData, SdkStepRoute } from '@lzdevelopers/lazarillo-maps/dist/typings/definitions';
 import { StepDTO } from '../places/Step';
 import { Place } from '../places/Place';
 
@@ -72,7 +72,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
   const [finalPosition, setFinalPosition] = useState(-1);
   const [mapRef, setMapRef] = useState(useRef<HTMLElement>())
   const [showToast1, setShowToast1] = useState(false);
-  const [steps, setSteps] = useState<StepDTO[]>([]);
+  const [steps, setSteps] = useState<SdkStepRoute[]>([]);
 
   const [currentPositionState, setPosition] = useState<GetPositionCallbackData>();
   const currentPositionRef = useRef<GetPositionCallbackData>();
@@ -225,8 +225,8 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
       },
       async (data: RouteReadyCallbackData) => {
         console.log('Route added', data);
-        let routeData = data.data as any
-        let steps = routeData.legs[0].steps as StepDTO[]
+        let routeData = data.data
+        let steps = routeData.legs[0].steps
         setRouteId(data.routeId);
         setSteps(steps)
         presentToast('top', 'Route loaded');
