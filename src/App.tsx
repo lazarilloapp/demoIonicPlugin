@@ -1,4 +1,4 @@
-import { Redirect, Route } from 'react-router-dom';
+import { Redirect, Route, Switch } from 'react-router-dom';
 import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import Home from './pages/home/Home';
@@ -22,6 +22,9 @@ import '@ionic/react/css/display.css';
 /* Theme variables */
 import './theme/variables.css';
 
+import ExploreContainer from './components/explore/ExploreContainer';
+import Explorer from './pages/explorer/Explorer';
+
 setupIonicReact();
 
 const App: React.FC = () => (
@@ -34,6 +37,7 @@ const App: React.FC = () => (
         <Route exact path="/">
           <Redirect to="/home" />
         </Route>
+        <Route path="/place/:alias" component={Explorer}/>
       </IonRouterOutlet>
     </IonReactRouter>
   </IonApp>
