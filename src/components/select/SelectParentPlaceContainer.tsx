@@ -1,28 +1,28 @@
 import './SelectParentPlaceContainer.css'
 
 import { LazarilloUtils } from '@lzdevelopers/lazarillo-maps';
-import { IonButton, IonCol, IonContent, IonGrid, IonRow, IonSelect, IonSelectOption } from "@ionic/react";
-import ExploreContainer from "../explore/ExploreContainer";
+import { IonButton, IonCol, IonContent, IonGrid, IonItem, IonLabel, IonRadio, IonRadioGroup, IonRow, useIonViewWillEnter } from "@ionic/react";
 import { useEffect, useState } from 'react';
-
+import { useHistory } from 'react-router-dom';
 import { Place } from '../places/Place';
 
 interface ContainerProps { 
-    handleTitle: (t: string) => void;
+
 }
 
-const SelectParentPlaceContainer: React.FC<ContainerProps> = ({handleTitle}) => {
-    const [showExplore, setShowExplore] = useState(false);
+const SelectParentPlaceContainer: React.FC<ContainerProps> = () => {
     const [parentPlacesList, setParentPlacesList] = useState<Place[]>([]);
     const [parentPlaceSelected, setParentPlace] = useState<Place>();
+
+    const history = useHistory();
 
     const apiKey = process.env.REACT_APP_YOUR_API_KEY_HERE
     ? process.env.REACT_APP_YOUR_API_KEY_HERE
     : '';
 
-    useEffect(() => {
+    useIonViewWillEnter(() => {
         getParentPlaces()
-    }, [parentPlacesList])
+    });
 
     const showParentPlaceMap = (e: CustomEvent) => {
         const placeId = e.detail.value;
@@ -42,40 +42,42 @@ const SelectParentPlaceContainer: React.FC<ContainerProps> = ({handleTitle}) => 
     }
 
     const handleOnClick = () => {
-        setShowExplore(true);
-        handleTitle(parentPlaceSelected !== undefined ? parentPlaceSelected.title.default : "");
+        console.log(parentPlaceSelected?.alias);
+        if (parentPlaceSelected !== undefined){
+            history.push(`/place/${parentPlaceSelected.alias}`);
+        }
     }
     
 
     return (
-            showExplore ? <ExploreContainer place={parentPlaceSelected}/> : 
-            <IonContent>
-                <IonGrid>
-                    <IonCol>
-                        <IonRow className='center-row'>
-                            Select a parent place to use the map:
-                        </IonRow>
-                        <IonRow className='center-row'>
-                            <IonSelect
-                                interface='popover'
-                                placeholder="Select place"
-                                onIonChange={showParentPlaceMap}>
-                                {
-                                    parentPlacesList.map((place) => {
-                                        return (<IonSelectOption value={place.id}>{place.title.default}</IonSelectOption>)
-                                    })
-                                }
-                                
-                            </IonSelect>
-                        </IonRow>
-                        <IonRow className='button-style'>
-                            <IonButton onClick={handleOnClick}>
-                                Show Map
-                            </IonButton>
-                        </IonRow>
-                    </IonCol>
-                </IonGrid>
-            </IonContent>
+            <IonGrid>
+                <IonCol>
+                    <IonRow className='center-row'>
+                        Select a parent place to use the map:
+                    </IonRow>
+                    <IonRow className='center-row'>
+                        <IonRadioGroup
+                            onIonChange={showParentPlaceMap}>
+                            {
+                                parentPlacesList.map((place) => {
+                                    return (
+                                        <IonItem>
+                                            <IonLabel>{place.title.default}</IonLabel>
+                                            <IonRadio mode="ios" slot="end" value={place.id}></IonRadio>
+                                        </IonItem>
+                                    )
+                                })
+                            }
+                            
+                        </IonRadioGroup>
+                    </IonRow>
+                    <IonRow className='button-style'>
+                        <IonButton onClick={handleOnClick}>
+                            Show Map
+                        </IonButton>
+                    </IonRow>
+                </IonCol>
+            </IonGrid>
     )
 }
 export default SelectParentPlaceContainer;

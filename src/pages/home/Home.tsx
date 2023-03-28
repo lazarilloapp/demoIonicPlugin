@@ -1,29 +1,24 @@
-import { IonContent, IonHeader, IonIcon, IonPage, IonTitle, IonToolbar } from '@ionic/react';
+import { IonBackButton, IonButtons, IonContent, IonHeader, IonIcon, IonPage, IonTitle, IonToolbar } from '@ionic/react';
 import SelectParentPlaceContainer from '../../components/select/SelectParentPlaceContainer';
 import './Home.css';
-import { bagOutline } from 'ionicons/icons';
+import { bagOutline, caretBack } from 'ionicons/icons';
 import { useState } from 'react';
 
 const Home: React.FC = () => {
-  const [title, setTitle] = useState("Home");
-
-  const handleTitle = (t: string) => {setTitle(t)}
-  
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>
-            <IonIcon icon={bagOutline}></IonIcon>{title}</IonTitle>
+          <IonTitle>Home</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
         <IonHeader collapse="condense">
           <IonToolbar>
-            <IonTitle size="large">{title}</IonTitle>
+            <IonTitle size="large">Home</IonTitle>
           </IonToolbar>
         </IonHeader>
-        <SelectParentPlaceContainer handleTitle={handleTitle}/>
+        <SelectParentPlaceContainer/>
       </IonContent>
     </IonPage>
   );
