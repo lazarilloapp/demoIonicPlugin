@@ -10,10 +10,11 @@ def capacitor_pods
   pod 'Capacitor', :path => '../../node_modules/@capacitor/ios'
   pod 'CapacitorCordova', :path => '../../node_modules/@capacitor/ios'
   pod 'CapacitorApp', :path => '../../node_modules/@capacitor/app'
+  pod 'CapacitorDevice', :path => '../../node_modules/@capacitor/device'
   pod 'CapacitorHaptics', :path => '../../node_modules/@capacitor/haptics'
   pod 'CapacitorKeyboard', :path => '../../node_modules/@capacitor/keyboard'
   pod 'CapacitorStatusBar', :path => '../../node_modules/@capacitor/status-bar'
-  pod 'LzdevelopersLzIonicPlugin', :path => '../../node_modules/@lzdevelopers/lz-ionic-plugin'
+  pod 'LzdevelopersLazarilloMaps', :path => '../../node_modules/@lzdevelopers/lazarillo-maps'
 end
 
 target 'App' do
