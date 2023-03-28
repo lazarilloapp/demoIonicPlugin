@@ -1,5 +1,6 @@
 import './ExploreContainer.css';
 import { LazarilloMap, LazarilloUtils } from '@lzdevelopers/lazarillo-maps';
+import { Device } from '@capacitor/device';
 import { useEffect, useRef, useState } from 'react';
 import {
   IonAccordion,
@@ -200,7 +201,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
     console.log(`STARTING ROUTE Initial position ${JSON.stringify(initialPos).toString()}`)
     console.log(`STARTING ROUTE Final position ${JSON.stringify(finalPos).toString()}`)
 
-
+    const language = instructionsLanguage !== 'system' ? instructionsLanguage : (await Device.getLanguageCode()).value
 
     newMap.addRoute(
       {
@@ -216,7 +217,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
         polylineWidth: 10,
         announceFormat: announceFormat,
         unitSystem: unitSystem,
-        language: instructionsLanguage !== 'system' ? instructionsLanguage : undefined,
+        language: language,
       },
       async (data: RouteReadyCallbackData) => {
         console.log('Route added', data);
