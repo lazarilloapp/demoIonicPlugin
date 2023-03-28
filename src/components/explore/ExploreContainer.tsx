@@ -38,11 +38,11 @@ import { Place } from '../places/Place';
 import { InnerFloor } from '../places/InnerFloor';
 
 
-interface ContainerProps {
-  place: Place | undefined
+interface ContainerProps{
+  alias: string
  }
 
-const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
+const ExploreContainer: React.FC<ContainerProps> = ({alias}) => {
 
 
   let unitSystem = "METRIC" //default value
