@@ -11,6 +11,7 @@ interface ContainerProps {
 }
 
 const SelectParentPlaceContainer: React.FC<ContainerProps> = () => {
+    const [isSelected, setIsSelected] = useState(true);
     const [parentPlacesList, setParentPlacesList] = useState<Place[]>([]);
     const [parentPlaceSelected, setParentPlace] = useState<Place>();
 
@@ -30,6 +31,7 @@ const SelectParentPlaceContainer: React.FC<ContainerProps> = () => {
         console.log("selected place id: ", placeId)
         const parentPlace = parentPlacesList.find(p => p.id === placeId)
         setParentPlace(parentPlace);
+        setIsSelected(false);
     }
 
     const getParentPlaces = async () => {
@@ -72,7 +74,7 @@ const SelectParentPlaceContainer: React.FC<ContainerProps> = () => {
                         </IonRadioGroup>
                     </IonRow>
                     <IonRow className='button-style'>
-                        <IonButton onClick={handleOnClick}>
+                        <IonButton disabled={isSelected} onClick={handleOnClick}>
                             Show Map
                         </IonButton>
                     </IonRow>
