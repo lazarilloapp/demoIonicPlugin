@@ -554,88 +554,70 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
           </IonCol>
         </IonRow>
 
-        <IonRow>
-          <IonCardHeader>
-            <IonCardTitle> Location Response</IonCardTitle>
-          </IonCardHeader>
-        </IonRow>
-        <IonRow>
-          <IonCol>
-            <IonButton onClick={getCurrentPosition}>
-              <IonText>Get current position</IonText>
-            </IonButton>
-          </IonCol>
-        </IonRow>
-
-        {currentPositionRef.current ? (
-          <IonList>
-            <IonItem>
-              <IonLabel>Latitude: {currentPositionRef.current.location.latitude}</IonLabel>
+        <IonAccordionGroup multiple>
+          <IonAccordion value="location-response">
+            <IonItem slot="header" color="light">
+              <IonLabel>Location Response</IonLabel>
             </IonItem>
-            <IonItem>
-              <IonLabel>Longitude: {currentPositionRef.current.location.longitude}</IonLabel>
-            </IonItem>
-            <IonItem>
-              <IonLabel>Floor: {
-                innerFloors.find(i => {
-                  return i.key === currentPositionRef?.current?.location.floor;
-                })?.title}</IonLabel>
-            </IonItem>
-            <IonItem>
-              <IonLabel>Building: {currentPositionRef.current.location.building}</IonLabel>
-            </IonItem>
-            <IonItem>
-              <IonLabel>Current Step: {currentPositionRef.current.routingStatus?.currentStep}</IonLabel>
-            </IonItem>
-            <IonItem>
-              <IonLabel>Routing Status: {currentPositionRef.current.routingStatus?.status}</IonLabel>
-            </IonItem>
-            <IonItem>
-              <IonLabel>Building Status: {currentPositionRef.current.insideBuilding}</IonLabel>
-            </IonItem>
-            <IonItem>
-              <IonLabel>Route ID: {routeId}</IonLabel>
-            </IonItem>
-          </IonList>
-        ) : ''
-        }
-
-        {steps.length > 0 && (
-          <IonAccordionGroup>
-            <IonAccordion value="first">
-              <IonItem slot="header" color='light'>
-                <IonLabel><h1>Current Route Instructions</h1></IonLabel>
-              </IonItem>
-              <IonList slot="content">
-                {steps.map((step, i) => (
-                  <IonItem key={i}>
-                    <IonText color={currentPositionState?.routingStatus?.currentStep == i ? 'primary': ''}>{step.plain_instructions}</IonText>
-                  </IonItem>
-                ))}
-              </IonList>
-            </IonAccordion>
-          </IonAccordionGroup>
-        )}
-
-        {newMap ? (
-          <IonCol>
-            <IonCardHeader>
-              <IonCardTitle> Route</IonCardTitle>
-            </IonCardHeader>
-            <IonRow >
-              <IonButton onClick={() => setIsOpen(true)}>
-                <IonText>Make Route</IonText>
+            <div className="ion-padding" slot="content">
+              <IonText>Get the current position of the user</IonText>
+              <IonButton onClick={getCurrentPosition} >
+                <IonText>Get current position</IonText>
               </IonButton>
-            </IonRow>
+              {currentPositionRef.current && (
+                <IonList className="ion-padding" slot="content">
+                  <IonItem>
+                    <IonLabel>Latitude: {currentPositionRef.current.location.latitude}</IonLabel>
+                  </IonItem>
+                  <IonItem>
+                    <IonLabel>Longitude: {currentPositionRef.current.location.longitude}</IonLabel>
+                  </IonItem>
+                  <IonItem>
+                    <IonLabel>Floor: {
+                      innerFloors.find(i => {
+                        return i.key === currentPositionRef?.current?.location.floor;
+                      })?.title}</IonLabel>
+                  </IonItem>
+                  <IonItem>
+                    <IonLabel>Building: {currentPositionRef.current.location.building}</IonLabel>
+                  </IonItem>
+                  <IonItem>
+                    <IonLabel>Current Step: {currentPositionRef.current.routingStatus?.currentStep}</IonLabel>
+                  </IonItem>
+                  <IonItem>
+                    <IonLabel>Routing Status: {currentPositionRef.current.routingStatus?.status}</IonLabel>
+                  </IonItem>
+                  <IonItem>
+                    <IonLabel>Building Status: {currentPositionRef.current.insideBuilding}</IonLabel>
+                  </IonItem>
+                  <IonItem>
+                    <IonLabel>Route ID: {routeId}</IonLabel>
+                  </IonItem>
+                </IonList>
+              )}
+            </div>
+          </IonAccordion>
 
+          {newMap && (
+            <IonAccordion value="route">
+              <IonItem slot="header" color="light">
+                <IonLabel>Route</IonLabel>
+              </IonItem>
+              <div className="ion-padding" slot="content">
+                <IonText>Make a route and display it on the map, also show the instructions of the route.</IonText>
+                <IonButton onClick={() => setIsOpen(true)}>
+                  <IonText>Make Route</IonText>
+                </IonButton>
+              </div>
+            </IonAccordion>
+          )}
 
-            <IonRow>
-              <IonCardHeader>
-                <IonCardTitle> Location features</IonCardTitle>
-              </IonCardHeader>
-            </IonRow>
-            <IonRow>
-              <IonCol>
+          {newMap && (
+            <IonAccordion value="location-features">
+              <IonItem slot="header" color="light">
+                <IonLabel>Location features</IonLabel>
+              </IonItem>
+              <div className="ion-padding" slot="content">
                 <IonButton onClick={enableCurrentLocation}>
                   <IonIcon icon={locateOutline}></IonIcon>
                   <IonLabel>Enable location</IonLabel>
@@ -644,8 +626,6 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
                   <IonIcon icon={locateOutline}></IonIcon>
                   <IonLabel>Disable location</IonLabel>
                 </IonButton>
-              </IonCol>
-              <IonCol>
                 <IonButton onClick={() => {
                   watchPosition(routeId)
                 }}>
@@ -658,48 +638,61 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
                   <IonIcon icon={bluetooth}></IonIcon>
                   <IonLabel>Stop updating location</IonLabel>
                 </IonButton>
-              </IonCol>
-            </IonRow>
-            <IonRow>
-              <IonCardHeader>
-                <IonCardTitle>Beacons simulation</IonCardTitle>
-              </IonCardHeader>
-            </IonRow>
-            <IonRow>
-              <IonCol>
+              </div>
+            </IonAccordion>
+          )}
+
+            <IonAccordion value="beacons-simulation">
+              <IonItem slot="header" color="light">
+                <IonLabel>Beacons simulation</IonLabel>
+              </IonItem>
+              <div className="ion-padding" slot="content">
                 <IonButton onClick={() => setCurrentBeaconIndex(currentBeaconIndex + 1)}>
                   <IonIcon icon={caretForward}></IonIcon>
                   <IonLabel>Simulate Next Beacon</IonLabel>
                 </IonButton>
-              </IonCol>
-            </IonRow>
-            <IonRow>
-              <IonText>Current beacon {currentSimulatedBeacon}</IonText>
-            </IonRow>
+                <p><IonText>Current beacon {currentSimulatedBeacon}</IonText></p>
+              </div>
+            </IonAccordion>
 
+          {newMap && (
+            <IonAccordion value="pin-and-camera">
+              <IonItem slot="header" color="light">
+                <IonLabel>Add pin and change camera angle and zoom</IonLabel>
+              </IonItem>
+              <div className="ion-padding" slot="content">
+                <IonButton onClick={addMarker}>
+                  <IonIcon icon={location}></IonIcon>
+                  <IonText> Indoor</IonText>
+                </IonButton>
+                <IonButton onClick={addOutdoorMarker}>
+                  <IonIcon icon={location}></IonIcon>
+                  <IonText> Outdoor</IonText>
+                </IonButton>
+                <IonButton onClick={setCamera}>
+                  <IonIcon icon={cameraOutline}></IonIcon>
+                </IonButton>
+              </div>
+            </IonAccordion>
+          )}
+        </IonAccordionGroup>
 
-            <IonRow>
-              <IonCardHeader>
-                <IonCardTitle> Add pin and change camera angle and zoom</IonCardTitle>
-              </IonCardHeader>
-            </IonRow>
-            <IonRow>
-              <IonButton onClick={addMarker}>
-                <IonIcon icon={location}></IonIcon>
-                <IonText> Indoor</IonText>
-              </IonButton>
-              <IonButton onClick={addOutdoorMarker}>
-                <IonIcon icon={location}></IonIcon>
-                <IonText> Outdoor</IonText>
-              </IonButton>
-              <IonButton onClick={setCamera}>
-                <IonIcon icon={cameraOutline}></IonIcon>
-              </IonButton>
-            </IonRow>
-          </IonCol>
-
-        ) : (<IonText></IonText>)
-        }
+        {steps.length > 0 && (
+          <IonAccordionGroup>
+            <IonAccordion value="first">
+              <IonItem slot="header" color='light'>
+                <IonLabel>Current Plain Route Instructions</IonLabel>
+              </IonItem>
+              <IonList slot="content">
+                {steps.map((step, i) => (
+                  <IonItem key={i}>
+                    <IonText color={currentPositionState?.routingStatus?.currentStep == i ? 'primary': ''}>{step.html_instructions}</IonText>
+                  </IonItem>
+                ))}
+              </IonList>
+            </IonAccordion>
+          </IonAccordionGroup>
+        )}
 
         <IonModal id="example-modal" isOpen={isOpen} className="ion-padding modal-demo">
           <IonHeader>
