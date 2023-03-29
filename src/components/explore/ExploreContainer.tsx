@@ -567,10 +567,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
               {currentPositionRef.current && (
                 <IonList className="ion-padding" slot="content">
                   <IonItem>
-                    <IonLabel>Latitude: {currentPositionRef.current.location.latitude}</IonLabel>
-                  </IonItem>
-                  <IonItem>
-                    <IonLabel>Longitude: {currentPositionRef.current.location.longitude}</IonLabel>
+                    <IonLabel>Lat & Lng: {currentPositionRef.current.location.latitude?.toFixed(6)} & {currentPositionRef.current.location.longitude?.toFixed(6)}</IonLabel>
                   </IonItem>
                   <IonItem>
                     <IonLabel>Floor: {
