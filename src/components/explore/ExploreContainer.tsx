@@ -1,5 +1,6 @@
 import './ExploreContainer.css';
 import { LazarilloMap, LazarilloUtils } from '@lzdevelopers/lazarillo-maps';
+import { Device } from '@capacitor/device';
 import { useEffect, useRef, useState } from 'react';
 import {
   IonAccordion,
@@ -25,7 +26,6 @@ import {
   IonRow,
   IonSelect,
   IonSelectOption,
-  IonSkeletonText,
   IonText,
   IonTitle,
   IonToast,
@@ -46,12 +46,7 @@ interface ContainerProps {
 
 const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
 
-
-  let unitSystem = "METRIC" //default value
-  let announceSystem = "RELATIVE" //default value
-  let withMobility: boolean = false //default value
-
-  let parentPlaceRef = place !== undefined ? place :
+  let parentPlaceRef = place ??
     {  //costanera
       id: '',
       lat: 0,
@@ -62,8 +57,6 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
         es: 'Costanera'
       }
     };
-
-
 
   const [places, setPlaces] = useState<Place[]>([]);
 
@@ -86,6 +79,11 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
   const [routeId, setRouteId] = useState("");
   const [currentBeaconIndex, setCurrentBeaconIndex] = useState(-1);
 
+  const [withMobility, setWithMobility] = useState(false)
+  const [announceFormat, setAnnounceFormat] = useState<'RELATIVE'|'CLOCK'|'CARDINAL'>('RELATIVE')
+  const [unitSystem, setUnitSystem] = useState<'METRIC'|'IMPERIAL'|'STEPS'>('METRIC')
+  const [instructionsLanguage, setInstructionsLanguage] = useState<string>('system')
+
   const [currentPositionWatching, setCurrentPositionWatching] = useState<GetPositionCallbackData>();
 
   const apiKey = process.env.REACT_APP_YOUR_API_KEY_HERE
@@ -106,12 +104,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
       })
       setInitialized(true);
     }
-
-
   }
-
-
-
 
   const listBeaconsToSimulate = [
     'c2f88d6fc12c645bc443ea3f1837301a',
@@ -208,7 +201,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
     console.log(`STARTING ROUTE Initial position ${JSON.stringify(initialPos).toString()}`)
     console.log(`STARTING ROUTE Final position ${JSON.stringify(finalPos).toString()}`)
 
-
+    const language = instructionsLanguage !== 'system' ? instructionsLanguage : (await Device.getLanguageCode()).value
 
     newMap.addRoute(
       {
@@ -218,10 +211,13 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
         initialFloor: initialPos.floor,
         finalFloor: finalPos.floor,
         place: parentPlaceRef.id,
-        preferAccessibleRoute: false,
+        preferAccessibleRoute: withMobility,
         nextStepsRouteColor: '#0000FF',
         prevStepsRouteColor: '#aaaaaa',
         polylineWidth: 10,
+        announceFormat: announceFormat,
+        unitSystem: unitSystem,
+        language: language,
       },
       async (data: RouteReadyCallbackData) => {
         console.log('Route added', data);
@@ -349,61 +345,6 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
 
   }
 
-
-  async function getRouteAndAddRoute(targetPlaceKey: number) {
-    const targetPlace = places[targetPlaceKey];
-    let accessibility = withMobility ? 1 : 0
-
-    LazarilloUtils.fetchRoute(
-      apiKey, // api key
-      'WALKING', // travelMode
-      places[0].lat, // fromLat
-      places[0].lng, // fromLng
-      targetPlace.lat, // toLat
-      targetPlace.lng, // toLng
-      accessibility, // withMobility 0 Means a walking route and 1 a wheel chair route
-      announceSystem, // announceFormat
-      undefined, // userBearing
-      places[0].inFloor ? places[0].inFloor[0] : undefined, // fromFloor
-      parentPlaceRef.id, // fromBuilding|
-      targetPlace.inFloor ? targetPlace.inFloor[0] : undefined, // toFloor
-      parentPlaceRef.id, // toBuilding
-      'es', //language of the instructions
-      unitSystem
-    )
-      .then((response) => {
-
-        console.log(response.url)
-        console.log(response.body)
-        return response.json()
-
-      })
-      .then((data) => {
-        console.log("Got route: ", JSON.stringify(data))
-        setSteps(data[0].legs[0].steps)
-
-        newMap?.drawRoute(
-          {
-            mapId: 'my-cool-map',
-            route: data
-          },
-          async (routeData: RouteReadyCallbackData) => {
-            console.log('Route added', routeData);
-            setRouteId(routeData.routeId)
-            //startAndWatchRoutingStatus(routeData.routeId)
-
-            presentToast('top', 'Watching Route');
-          },
-        )
-      })
-      .catch(error => {
-        console.error(error);
-        presentToast("top", "ERROR: Cannot got route")
-      });
-
-
-
-  }
   /**
    * Move the camare angle and location 
    */
@@ -454,22 +395,6 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
   async function disableCurrentLocation() {
     newMap?.enableCurrentLocation(false)
     presentToast('top', 'Current location disabled');
-  }
-
-  async function updateUnitSystem(newUnit: string) {
-    console.log("antes", unitSystem)
-    if (newUnit !== unitSystem) {
-      unitSystem = newUnit
-    }
-    console.log("despues", unitSystem)
-
-  }
-  async function updateAnnounceSystem(newAnnouncer: string) {
-    console.log("antes", announceSystem)
-    if (newAnnouncer !== announceSystem) {
-      announceSystem = newAnnouncer
-    }
-    console.log("despues", announceSystem)
   }
 
   /**
@@ -675,6 +600,23 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
         ) : ''
         }
 
+        {steps.length > 0 && (
+          <IonAccordionGroup>
+            <IonAccordion value="first">
+              <IonItem slot="header" color='light'>
+                <IonLabel><h1>Current Route Instructions</h1></IonLabel>
+              </IonItem>
+              <IonList slot="content">
+                {steps.map((step, i) => (
+                  <IonItem key={i}>
+                    <IonText color={currentPositionState?.routingStatus?.currentStep == i ? 'primary': ''}>{step.plain_instructions}</IonText>
+                  </IonItem>
+                ))}
+              </IonList>
+            </IonAccordion>
+          </IonAccordionGroup>
+        )}
+
         {newMap ? (
           <IonCol>
             <IonCardHeader>
@@ -759,23 +701,6 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
         ) : (<IonText></IonText>)
         }
 
-        {steps.length > 0 && (
-          <IonAccordionGroup>
-            <IonAccordion value="first">
-              <IonItem slot="header" color='light'>
-                <IonLabel><h1>Current Route Instructions</h1></IonLabel>
-              </IonItem>
-              <IonList slot="content">
-                {steps.map((step, i) => (
-                  <IonItem key={i}>
-                    <IonText color={currentPositionState?.routingStatus?.currentStep == i ? 'primary': ''}>{step.plain_instructions}</IonText>
-                  </IonItem>
-                ))}
-              </IonList>
-            </IonAccordion>
-          </IonAccordionGroup>
-        )}
-
         <IonModal id="example-modal" isOpen={isOpen} className="ion-padding modal-demo">
           <IonHeader>
             <IonToolbar>
@@ -837,9 +762,9 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
               <IonCol >
                 <IonCardHeader> <IonCardTitle> Route Accessibility</IonCardTitle></IonCardHeader>
                 <IonList>
-                  <IonRadioGroup id="accessibility" value="0" onIonChange={(event) => {
+                  <IonRadioGroup id="accessibility" value={withMobility ? '1' : '0'} onIonChange={(event) => {
                     console.log("pre cambio de variable", withMobility)
-                    withMobility = event.detail.value !== 0
+                    setWithMobility(event.detail.value !== '0')
                   }}>
                     <IonItem>
                       <IonLabel>Walking</IonLabel>
@@ -862,10 +787,10 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
                 <IonCardHeader> <IonCardTitle>Announce Format</IonCardTitle></IonCardHeader>
 
                 <IonList>
-                  <IonRadioGroup id='anounce-format' value={announceSystem} onIonChange={(event) => {
+                  <IonRadioGroup id='anounce-format' value={announceFormat} onIonChange={(event) => {
                     if (event.detail.value === undefined) return;
                     if (isOpen) {
-                      updateAnnounceSystem(event.detail.value.toString())
+                      setAnnounceFormat(event.detail.value.toString())
                     }
                   }}>
                     <IonItem>
@@ -892,7 +817,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
                   <IonRadioGroup id='unit-metric' value={unitSystem} onIonChange={(event) => {
                     if (event.detail.value === undefined) return;
                     if (isOpen) {
-                      updateUnitSystem(event.detail.value.toString())
+                      setUnitSystem(event.detail.value.toString())
                     }
                   }}
                   >
@@ -909,6 +834,30 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
                     <IonItem>
                       <IonLabel>STEPS</IonLabel>
                       <IonRadio slot="end" value="STEPS"></IonRadio>
+                    </IonItem>
+                  </IonRadioGroup>
+                </IonList>
+              </IonCol>
+              <IonCol >
+                <IonCardHeader> <IonCardTitle> Language</IonCardTitle></IonCardHeader>
+                <IonList>
+                  <IonRadioGroup id='language' value={instructionsLanguage} onIonChange={(event) => {
+                    setInstructionsLanguage(event.detail.value.toString())
+                  }}
+                  >
+                    <IonItem>
+                      <IonLabel>SYSTEM</IonLabel>
+                      <IonRadio slot="end" value='system'/>
+                    </IonItem>
+
+                    <IonItem>
+                      <IonLabel>SPANISH</IonLabel>
+                      <IonRadio slot="end" value="es"/>
+                    </IonItem>
+
+                    <IonItem>
+                      <IonLabel>ENGLISH</IonLabel>
+                      <IonRadio slot="end" value="en"/>
                     </IonItem>
                   </IonRadioGroup>
                 </IonList>
