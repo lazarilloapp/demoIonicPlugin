@@ -2,7 +2,7 @@ import './SelectParentPlaceContainer.css'
 
 import { LazarilloUtils } from '@lzdevelopers/lazarillo-maps';
 import { IonButton, IonCol, IonContent, IonGrid, IonItem, IonLabel, IonRadio, IonRadioGroup, IonRow, useIonViewWillEnter } from "@ionic/react";
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Place } from '../places/Place';
 
@@ -28,7 +28,6 @@ const SelectParentPlaceContainer: React.FC<ContainerProps> = () => {
     const showParentPlaceMap = (e: CustomEvent) => {
         const placeId = e.detail.value;
         console.log("num of places", parentPlacesList.length)
-        console.log("selected place id: ", placeId)
         const parentPlace = parentPlacesList.find(p => p.id === placeId)
         setParentPlace(parentPlace);
         setIsSelected(false);

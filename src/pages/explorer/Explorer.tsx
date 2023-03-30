@@ -5,7 +5,6 @@ import { useParams } from 'react-router';
 
 const Explorer: React.FC = () => {
   const {alias} = useParams<{alias: string}>();
-  console.log("explorer alias", alias);
 
   return (
     <IonPage>
