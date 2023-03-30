@@ -18,6 +18,7 @@ import {
   IonIcon,
   IonItem,
   IonItemDivider,
+  IonItemGroup,
   IonLabel,
   IonList,
   IonModal,
@@ -605,6 +606,18 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
                 <IonButton onClick={() => setIsOpen(true)}>
                   <IonText>Make Route</IonText>
                 </IonButton>
+                {steps.length > 0 && (
+                  <IonItemGroup>
+                    <IonItemDivider color='success'>
+                      <IonLabel>Current Route Instructions</IonLabel>
+                    </IonItemDivider>
+                    {steps.map((step, i) => (
+                      <IonItem key={i}>
+                        <IonText color={currentPositionState?.routingStatus?.currentStep == i ? 'primary' : ''}>{step.plain_instructions}</IonText>
+                      </IonItem>
+                    ))}
+                  </IonItemGroup>
+                )}
               </div>
             </IonAccordion>
           )}
@@ -673,23 +686,6 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
             </IonAccordion>
           )}
         </IonAccordionGroup>
-
-        {steps.length > 0 && (
-          <IonAccordionGroup>
-            <IonAccordion value="first">
-              <IonItem slot="header" color='light'>
-                <IonLabel>Current Plain Route Instructions</IonLabel>
-              </IonItem>
-              <IonList slot="content">
-                {steps.map((step, i) => (
-                  <IonItem key={i}>
-                    <IonText color={currentPositionState?.routingStatus?.currentStep == i ? 'primary': ''}>{step.html_instructions}</IonText>
-                  </IonItem>
-                ))}
-              </IonList>
-            </IonAccordion>
-          </IonAccordionGroup>
-        )}
 
         <IonModal id="example-modal" isOpen={isOpen} className="ion-padding modal-demo">
           <IonHeader>
