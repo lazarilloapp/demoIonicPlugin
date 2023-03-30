@@ -4,6 +4,7 @@ import { LazarilloUtils } from '@lzdevelopers/lazarillo-maps';
 import { IonButton, IonCol, IonContent, IonGrid, IonItem, IonLabel, IonRadio, IonRadioGroup, IonRow, useIonViewWillEnter } from "@ionic/react";
 import { useState } from 'react';
 import { useHistory } from 'react-router-dom';
+
 import { Place } from '../places/Place';
 
 interface ContainerProps { 
