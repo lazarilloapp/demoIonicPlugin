@@ -565,7 +565,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
                 <IonText>Get current position</IonText>
               </IonButton>
               {currentPositionRef.current && (
-                <IonList className="ion-padding" slot="content">
+                <IonList>
                   <IonItem>
                     <IonLabel>Lat & Lng: {currentPositionRef.current.location.latitude?.toFixed(6)} & {currentPositionRef.current.location.longitude?.toFixed(6)}</IonLabel>
                   </IonItem>
