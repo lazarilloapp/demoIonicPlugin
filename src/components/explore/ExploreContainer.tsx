@@ -18,7 +18,6 @@ import {
   IonIcon,
   IonItem,
   IonItemDivider,
-  IonItemGroup,
   IonLabel,
   IonList,
   IonModal,
@@ -37,8 +36,8 @@ import {
 import { mapOutline, location, trashBinOutline, cameraOutline, locateOutline, caretForward, bluetooth, walk, information } from 'ionicons/icons';
 import { GetPositionCallbackData, LzLocation, RouteReadyCallbackData, SdkStepRoute } from '@lzdevelopers/lazarillo-maps/dist/typings/definitions';
 import { Place } from '../places/Place';
-
 import { InnerFloor } from '../places/InnerFloor';
+import RouteInstruction from '../routeInstructions/RouteInstructions';
 
 
 interface ContainerProps {
@@ -610,18 +609,10 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
                 <IonPopover trigger="make-route-button" triggerAction="click">
                   <IonContent class="ion-padding">Open a popover to select the paameters to generate a route.</IonContent>
                 </IonPopover>
-                {steps.length > 0 && (
-                  <IonItemGroup>
-                    <IonItemDivider color='success'>
-                      <IonLabel>Current Route Instructions</IonLabel>
-                    </IonItemDivider>
-                    {steps.map((step, i) => (
-                      <IonItem key={i}>
-                        <IonText color={currentPositionState?.routingStatus?.currentStep == i ? 'primary' : ''}>{step.plain_instructions}</IonText>
-                      </IonItem>
-                    ))}
-                  </IonItemGroup>
-                )}
+                <RouteInstruction
+                  steps={steps}
+                  currentStepIndex={currentPositionState?.routingStatus?.currentStep} 
+                />
               </div>
             </IonAccordion>
           )}
