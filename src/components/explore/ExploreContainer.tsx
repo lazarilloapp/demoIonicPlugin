@@ -46,9 +46,6 @@ interface ContainerProps{
 
 const ExploreContainer: React.FC<ContainerProps> = ({alias}) => {
 
-  let unitSystem = "METRIC" //default value
-  let announceSystem = "RELATIVE" //default value
-  let withMobility: boolean = false //default value
 
   const parentPlaceRef = useRef<Place>({
         id: '',
