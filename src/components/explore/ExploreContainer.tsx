@@ -22,6 +22,7 @@ import {
   IonLabel,
   IonList,
   IonModal,
+  IonPopover,
   IonRadio,
   IonRadioGroup,
   IonRow,
@@ -33,7 +34,7 @@ import {
   IonToolbar,
   useIonToast,
 } from '@ionic/react';
-import { mapOutline, location, trashBinOutline, cameraOutline, locateOutline, caretForward, bluetooth, walk } from 'ionicons/icons';
+import { mapOutline, location, trashBinOutline, cameraOutline, locateOutline, caretForward, bluetooth, walk, information } from 'ionicons/icons';
 import { GetPositionCallbackData, LzLocation, RouteReadyCallbackData } from '@lzdevelopers/lazarillo-maps/dist/typings/definitions';
 import { StepDTO } from '../places/Step';
 import { Place } from '../places/Place';
@@ -606,6 +607,10 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
                 <IonButton onClick={() => setIsOpen(true)}>
                   <IonText>Make Route</IonText>
                 </IonButton>
+                <IonButton id='make-route-button' color="warning"><IonIcon slot='icon-only' icon={information} /></IonButton>
+                <IonPopover trigger="make-route-button" triggerAction="click">
+                  <IonContent class="ion-padding">Open a popover to select the paameters to generate a route.</IonContent>
+                </IonPopover>
                 {steps.length > 0 && (
                   <IonItemGroup>
                     <IonItemDivider color='success'>
