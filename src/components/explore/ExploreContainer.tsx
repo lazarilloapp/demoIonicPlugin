@@ -303,7 +303,9 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
 
   useEffect(() => {
     updateFloorMap()
-    simulateNextBeacon()
+    if (currentBeaconIndex !== -1) {
+      simulateNextBeacon()
+    }
   }, [currentFloorKey, currentBeaconIndex])
 
 
