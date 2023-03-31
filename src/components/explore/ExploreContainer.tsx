@@ -53,6 +53,18 @@ import RouteInstruction from '../routeInstructions/RouteInstructions';
 interface ContainerProps {
   place: Place | undefined
  }
+ 
+ const behindColors: string[] = [
+  '#aaaaaa',
+  '#e3c594',
+  '#94bf8e',
+ ]
+
+ const aheadColors: string[] = [
+  '#0000FF',
+  '#f29805',
+  '#2be813',
+ ]
 
 const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
 
