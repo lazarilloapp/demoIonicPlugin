@@ -84,9 +84,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
   const [unitSystem, setUnitSystem] = useState<'METRIC'|'IMPERIAL'|'STEPS'>('METRIC')
   const [instructionsLanguage, setInstructionsLanguage] = useState<string>('system')
 
-  const apiKey = process.env.REACT_APP_YOUR_API_KEY_HERE
-    ? process.env.REACT_APP_YOUR_API_KEY_HERE
-    : '';
+  const apiKey = process.env.REACT_APP_YOUR_API_KEY_HERE ?? '';
 
   async function initPlugin() {
 
