@@ -105,6 +105,8 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
   const [announceFormat, setAnnounceFormat] = useState<'RELATIVE'|'CLOCK'|'CARDINAL'>('RELATIVE')
   const [unitSystem, setUnitSystem] = useState<'METRIC'|'IMPERIAL'|'STEPS'>('METRIC')
   const [instructionsLanguage, setInstructionsLanguage] = useState<string>('system')
+  const [behindColor, setBehindColor] = useState('#aaaaaa')
+  const [aheadColor, setAheadColor] = useState('#0000FF')
 
   const apiKey = process.env.REACT_APP_YOUR_API_KEY_HERE ?? '';
 
@@ -230,8 +232,8 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
         finalFloor: finalPos.floor,
         place: parentPlaceRef.id,
         preferAccessibleRoute: withMobility,
-        nextStepsRouteColor: '#0000FF',
-        prevStepsRouteColor: '#aaaaaa',
+        nextStepsRouteColor: aheadColor,
+        prevStepsRouteColor: behindColor,
         polylineWidth: 10,
         announceFormat: announceFormat,
         unitSystem: unitSystem,
@@ -944,6 +946,28 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
                     </IonItem>
                   </IonRadioGroup>
                 </IonList>
+              </IonCol>
+              <IonCol>
+                <IonCardHeader><IonCardTitle>Behind Color</IonCardTitle></IonCardHeader>
+                <IonRadioGroup id='behind-color' value={behindColor} onIonChange={e => setBehindColor(e.detail.value)}>
+                  {behindColors.map((color) => (
+                    <IonItem>
+                      <IonLabel style={{ background: color, color: 'white' }}>{color}</IonLabel>
+                      <IonRadio slot="end" value={color}></IonRadio>
+                    </IonItem>
+                  ))}
+                </IonRadioGroup>
+              </IonCol>
+              <IonCol>
+                <IonCardHeader><IonCardTitle>Ahead Color</IonCardTitle></IonCardHeader>
+                <IonRadioGroup id='ahead-color' value={aheadColor} onIonChange={e => setAheadColor(e.detail.value)}>
+                  {aheadColors.map((color) => (
+                    <IonItem>
+                      <IonLabel style={{ background: color, color: 'white' }}>{color}</IonLabel>
+                      <IonRadio slot="end" value={color}></IonRadio>
+                    </IonItem>
+                  ))}
+                </IonRadioGroup>
               </IonCol>
             </IonRow>
           </IonContent>
