@@ -33,7 +33,17 @@ import {
   IonToolbar,
   useIonToast,
 } from '@ionic/react';
-import { mapOutline, location, trashBinOutline, cameraOutline, locateOutline, caretForward, bluetooth, walk, information } from 'ionicons/icons';
+import {
+  mapOutline,
+  location,
+  trashBinOutline,
+  cameraOutline,
+  locateOutline,
+  caretForward,
+  bluetooth,
+  walk,
+  informationCircle,
+} from 'ionicons/icons';
 import { GetPositionCallbackData, LzLocation, RouteReadyCallbackData, SdkStepRoute } from '@lzdevelopers/lazarillo-maps/dist/typings/definitions';
 import { Place } from '../places/Place';
 import { InnerFloor } from '../places/InnerFloor';
@@ -558,10 +568,21 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
               <IonLabel>Location Response</IonLabel>
             </IonItem>
             <div className="ion-padding" slot="content">
-              <IonText>Get the current position of the user</IonText>
-              <IonButton onClick={getCurrentPosition} >
-                <IonText>Get current position</IonText>
-              </IonButton>
+              <div>
+                <IonText>Get the current position of the user, also show this information.</IonText>
+              </div>
+              <div>
+                <IonButton onClick={getCurrentPosition} >
+                  <IonText>Get current position</IonText>
+                </IonButton>
+                <IonButton id='get-position-button-information' fill="clear" className='information-button'>
+                  <IonIcon slot='icon-only' icon={informationCircle} color='warning' size='large' />
+                </IonButton>
+                <IonPopover trigger='get-position-button-information' triggerAction='click'>
+                  <IonContent class='ion-padding'>Get the current position of the user.</IonContent>
+                </IonPopover>
+              </div>
+              
               {currentPositionRef.current && (
                 <IonList>
                   <IonItem>
@@ -598,15 +619,19 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
               <IonItem slot="header" color="light">
                 <IonLabel>Route</IonLabel>
               </IonItem>
-              <div className="ion-padding" slot="content">
-                <IonText>Make a route and display it on the map, also show the instructions of the route.</IonText>
-                <IonButton onClick={() => setIsOpen(true)}>
-                  <IonText>Make Route</IonText>
-                </IonButton>
-                <IonButton id='make-route-button' color="warning"><IonIcon slot='icon-only' icon={information} /></IonButton>
-                <IonPopover trigger="make-route-button" triggerAction="click">
-                  <IonContent class="ion-padding">Open a popover to select the paameters to generate a route.</IonContent>
-                </IonPopover>
+              <div slot='content' className='ion-padding'>
+                <div><IonText>Make a route and display it on the map, also show the instructions of the route.</IonText></div>
+                <div>
+                  <IonButton onClick={() => setIsOpen(true)}>
+                    <IonText>Make Route</IonText>
+                  </IonButton>
+                  <IonButton id='make-route-button-information' fill="clear" className='information-button'>
+                    <IonIcon slot='icon-only' icon={informationCircle} color='warning' size='large'/>
+                  </IonButton>
+                  <IonPopover trigger='make-route-button-information' triggerAction='click'>
+                    <IonContent class='ion-padding'>Open a popover to select the parameters to generate a route.</IonContent>
+                  </IonPopover>
+                </div>
                 <RouteInstruction
                   steps={steps}
                   currentStepIndex={currentPositionState?.routingStatus?.currentStep} 
@@ -621,60 +646,127 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
                 <IonLabel>Location features</IonLabel>
               </IonItem>
               <div className="ion-padding" slot="content">
-                <IonButton onClick={enableCurrentLocation}>
-                  <IonIcon icon={locateOutline}></IonIcon>
-                  <IonLabel>Enable location</IonLabel>
-                </IonButton>
-                <IonButton onClick={disableCurrentLocation}>
-                  <IonIcon icon={locateOutline}></IonIcon>
-                  <IonLabel>Disable location</IonLabel>
-                </IonButton>
-                <IonButton onClick={() => {
-                  watchPosition(routeId)
-                }}>
-                  <IonIcon icon={bluetooth}></IonIcon>
-                  <IonLabel>Start updating location</IonLabel>
-                </IonButton>
-                <IonButton onClick={() => {
-                  stopWatchPosition(routeId)
-                }}>
-                  <IonIcon icon={bluetooth}></IonIcon>
-                  <IonLabel>Stop updating location</IonLabel>
-                </IonButton>
+                <div><IonText>Features related to the user location showed on the map.</IonText></div>
+                <div>
+                  <IonButton onClick={enableCurrentLocation}>
+                    <IonIcon icon={locateOutline}></IonIcon>
+                    <IonLabel>Enable location</IonLabel>
+                  </IonButton>
+                  <IonButton id='enable-location-button-information' fill="clear" className='information-button'>
+                    <IonIcon slot='icon-only' icon={informationCircle} color='warning' size='large' />
+                  </IonButton>
+                  <IonPopover trigger='enable-location-button-information' triggerAction='click'>
+                    <IonContent class='ion-padding'>Enable the user location feature to start showing the current location on the map.</IonContent>
+                  </IonPopover>
+                </div>
+                <div>
+                  <IonButton onClick={disableCurrentLocation}>
+                    <IonIcon icon={locateOutline}></IonIcon>
+                    <IonLabel>Disable location</IonLabel>
+                  </IonButton>
+                  <IonButton id='disable-location-button-information' fill="clear" className='information-button'>
+                    <IonIcon slot='icon-only' icon={informationCircle} color='warning' size='large' />
+                  </IonButton>
+                  <IonPopover trigger='disable-location-button-information' triggerAction='click'>
+                    <IonContent class='ion-padding'>Disable the user location feature.</IonContent>
+                  </IonPopover>
+                </div>
+                <div>
+                  <IonButton onClick={() => {
+                    watchPosition(routeId)
+                  }}>
+                    <IonIcon icon={bluetooth}></IonIcon>
+                    <IonLabel>Start updating location</IonLabel>
+                  </IonButton>
+                  <IonButton id='start-updating-location-button-information' fill="clear" className='information-button'>
+                    <IonIcon slot='icon-only' icon={informationCircle} color='warning' size='large' />
+                  </IonButton>
+                  <IonPopover trigger='start-updating-location-button-information' triggerAction='click'>
+                    <IonContent class='ion-padding'>Start proyecting the user location on the route currently showed on the map. This need that a route has already been created.</IonContent>
+                  </IonPopover>
+                </div>
+                <div>
+                  <IonButton onClick={() => {
+                    stopWatchPosition(routeId)
+                  }}>
+                    <IonIcon icon={bluetooth}></IonIcon>
+                    <IonLabel>Stop updating location</IonLabel>
+                  </IonButton>
+                  <IonButton id='stop-updating-location-button-information' fill="clear" className='information-button'>
+                    <IonIcon slot='icon-only' icon={informationCircle} color='warning' size='large' />
+                  </IonButton>
+                  <IonPopover trigger='stop-updating-location-button-information' triggerAction='click'>
+                    <IonContent class='ion-padding'>Stop proyecting the user location on the route currently showed on the map.</IonContent>
+                  </IonPopover>
+                </div>
               </div>
             </IonAccordion>
           )}
 
-            <IonAccordion value="beacons-simulation">
-              <IonItem slot="header" color="light">
-                <IonLabel>Beacons simulation</IonLabel>
-              </IonItem>
-              <div className="ion-padding" slot="content">
+          <IonAccordion value="beacons-simulation">
+            <IonItem slot="header" color="light">
+              <IonLabel>Beacons simulation</IonLabel>
+            </IonItem>
+            <div className="ion-padding" slot="content">
+              <div><IonText>Change the beacon to simulate, also show the current beacont simulated. The list of beacons to simulate is hardcored on the app.</IonText></div>
+              <div>
                 <IonButton onClick={() => setCurrentBeaconIndex(currentBeaconIndex + 1)}>
                   <IonIcon icon={caretForward}></IonIcon>
                   <IonLabel>Simulate Next Beacon</IonLabel>
                 </IonButton>
-                <p><IonText>Current beacon {currentSimulatedBeacon}</IonText></p>
+                <IonButton id='simulate-beacon-button-information' fill="clear" className='information-button'>
+                  <IonIcon slot='icon-only' icon={informationCircle} color='warning' size='large' />
+                </IonButton>
+                <IonPopover trigger='simulate-beacon-button-information' triggerAction='click'>
+                  <IonContent class='ion-padding'>Change to next beacon to simulate. If has not simulated, start to simulate the first beacon.</IonContent>
+                </IonPopover>
               </div>
-            </IonAccordion>
+              <div><IonText>Current beacon {currentSimulatedBeacon}</IonText></div>
+            </div>
+          </IonAccordion>
 
           {newMap && (
             <IonAccordion value="pin-and-camera">
               <IonItem slot="header" color="light">
-                <IonLabel>Add pin and change camera angle and zoom</IonLabel>
+                <IonLabel>Markers and Camera</IonLabel>
               </IonItem>
               <div className="ion-padding" slot="content">
-                <IonButton onClick={addMarker}>
-                  <IonIcon icon={location}></IonIcon>
-                  <IonText> Indoor</IonText>
-                </IonButton>
-                <IonButton onClick={addOutdoorMarker}>
-                  <IonIcon icon={location}></IonIcon>
-                  <IonText> Outdoor</IonText>
-                </IonButton>
-                <IonButton onClick={setCamera}>
-                  <IonIcon icon={cameraOutline}></IonIcon>
-                </IonButton>
+                <div><IonText>Add pin and change camera angle and zoom.</IonText></div>
+                <div>
+                  <IonButton onClick={addMarker}>
+                    <IonIcon icon={location}></IonIcon>
+                    <IonText>Indoor</IonText>
+                  </IonButton>
+                  <IonButton id='indoor-pin-button-information' fill="clear" className='information-button'>
+                    <IonIcon slot='icon-only' icon={informationCircle} color='warning' size='large' />
+                  </IonButton>
+                  <IonPopover trigger='indoor-pin-button-information' triggerAction='click'>
+                    <IonContent class='ion-padding'>WIP</IonContent>
+                  </IonPopover>
+                </div>
+                <div>
+                  <IonButton onClick={addOutdoorMarker}>
+                    <IonIcon icon={location}></IonIcon>
+                    <IonText> Outdoor</IonText>
+                  </IonButton>
+                  <IonButton id='outdoor-pin-button-information' fill="clear" className='information-button'>
+                    <IonIcon slot='icon-only' icon={informationCircle} color='warning' size='large' />
+                  </IonButton>
+                  <IonPopover trigger='outdoor-pin-button-information' triggerAction='click'>
+                    <IonContent class='ion-padding'>WIP</IonContent>
+                  </IonPopover>
+                </div>
+                <div>
+                  <IonButton onClick={setCamera}>
+                    <IonIcon icon={cameraOutline}></IonIcon>
+                  </IonButton>
+                  <IonButton id='camera-button-information' fill="clear" className='information-button'>
+                    <IonIcon slot='icon-only' icon={informationCircle} color='warning' size='large' />
+                  </IonButton>
+                  <IonPopover trigger='camera-button-information' triggerAction='click'>
+                    <IonContent class='ion-padding'>WIP</IonContent>
+                  </IonPopover>
+                </div>
               </div>
             </IonAccordion>
           )}
