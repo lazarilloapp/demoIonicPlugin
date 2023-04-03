@@ -101,7 +101,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({alias}) => {
 
       await LazarilloMap.initializeLazarilloPlugin({
         apiKey: apiKey,
-        place: alias
+        place: parentPlaceRef.current.id
       })
       setInitialized(true);
     }
