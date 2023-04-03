@@ -22,6 +22,8 @@ import '@ionic/react/css/display.css';
 /* Theme variables */
 import './theme/variables.css';
 
+import Explorer from './pages/explorer/Explorer';
+
 setupIonicReact();
 
 const App: React.FC = () => (
@@ -34,6 +36,7 @@ const App: React.FC = () => (
         <Route exact path="/">
           <Redirect to="/home" />
         </Route>
+        <Route path="/place/:alias" component={Explorer}/>
       </IonRouterOutlet>
     </IonReactRouter>
   </IonApp>
