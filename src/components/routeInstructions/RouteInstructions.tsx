@@ -1,10 +1,10 @@
 import {
+  IonCheckbox,
   IonItem,
   IonItemDivider,
   IonItemGroup,
   IonLabel,
   IonText,
-  IonToggle
 } from '@ionic/react'
 import { SdkStepRoute } from '@lzdevelopers/lazarillo-maps/dist/typings/definitions'
 import { useState } from 'react'
@@ -26,7 +26,9 @@ const RouteInstruction: React.FC<RouteInstructionProps> = ({ steps, currentStepI
       </IonItemDivider>
       <IonItem color='medium'>
         <IonLabel>Use HTML</IonLabel>
-        <IonToggle slot='end' checked={useHTML} onIonChange={e => setUseHTML(e.detail.value)} />
+        <IonCheckbox slot='end' checked={useHTML} onIonChange={e => {
+          setUseHTML(e.detail.checked)
+        }} />
       </IonItem>
       {steps.map((step, i) => (
         <IonItem key={i}>
