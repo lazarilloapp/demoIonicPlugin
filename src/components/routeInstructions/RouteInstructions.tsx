@@ -33,7 +33,7 @@ const RouteInstruction: React.FC<RouteInstructionProps> = ({ steps, currentStepI
       {steps.map((step, i) => (
         <IonItem key={i}>
           {useHTML ?
-            <IonText color={currentStepIndex == i ? 'primary' : ''} dangerouslySetInnerHTML={{__html: step.html_instructions}}/>
+            <IonText color={currentStepIndex == i ? 'primary' : 'medium'} dangerouslySetInnerHTML={{__html: step.html_instructions}}/>
             :  
             <IonText color={currentStepIndex == i ? 'primary' : ''}>{step.plain_instructions}</IonText>
           }          
