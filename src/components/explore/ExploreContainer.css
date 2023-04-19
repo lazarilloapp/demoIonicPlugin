@@ -28,3 +28,8 @@ ion-popover ion-content {
   --background: rgb(255, 255, 255);
 
 }
+
+ion-button.information-button {
+  --padding-start: 0;
+  --padding-end: 0
+}

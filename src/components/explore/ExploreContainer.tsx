@@ -21,6 +21,7 @@ import {
   IonLabel,
   IonList,
   IonModal,
+  IonPopover,
   IonRadio,
   IonRadioGroup,
   IonRow,
@@ -32,17 +33,38 @@ import {
   IonToolbar,
   useIonToast,
 } from '@ionic/react';
-import { mapOutline, location, trashBinOutline, cameraOutline, locateOutline, caretForward, bluetooth, walk } from 'ionicons/icons';
-import { GetPositionCallbackData, LzLocation, RouteReadyCallbackData } from '@lzdevelopers/lazarillo-maps/dist/typings/definitions';
-import { StepDTO } from '../places/Step';
+import {
+  mapOutline,
+  location,
+  trashBinOutline,
+  cameraOutline,
+  locateOutline,
+  caretForward,
+  bluetooth,
+  walk,
+  informationCircle,
+} from 'ionicons/icons';
+import { GetPositionCallbackData, LzLocation, RouteReadyCallbackData, SdkStepRoute } from '@lzdevelopers/lazarillo-maps/dist/typings/definitions';
 import { Place } from '../places/Place';
-
 import { InnerFloor } from '../places/InnerFloor';
+import RouteInstruction from '../routeInstructions/RouteInstructions';
 
 
 interface ContainerProps {
   place: Place | undefined
  }
+ 
+ const behindColors: string[] = [
+  '#aaaaaa',
+  '#e3c594',
+  '#94bf8e',
+ ]
+
+ const aheadColors: string[] = [
+  '#0000FF',
+  '#f29805',
+  '#2be813',
+ ]
 
 const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
 
@@ -65,7 +87,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
   const [finalPosition, setFinalPosition] = useState(-1);
   const [mapRef, setMapRef] = useState(useRef<HTMLElement>())
   const [showToast1, setShowToast1] = useState(false);
-  const [steps, setSteps] = useState<StepDTO[]>([]);
+  const [steps, setSteps] = useState<SdkStepRoute[]>([]);
 
   const [currentPositionState, setPosition] = useState<GetPositionCallbackData>();
   const currentPositionRef = useRef<GetPositionCallbackData>();
@@ -83,12 +105,10 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
   const [announceFormat, setAnnounceFormat] = useState<'RELATIVE'|'CLOCK'|'CARDINAL'>('RELATIVE')
   const [unitSystem, setUnitSystem] = useState<'METRIC'|'IMPERIAL'|'STEPS'>('METRIC')
   const [instructionsLanguage, setInstructionsLanguage] = useState<string>('system')
+  const [behindColor, setBehindColor] = useState('#aaaaaa')
+  const [aheadColor, setAheadColor] = useState('#0000FF')
 
-  const [currentPositionWatching, setCurrentPositionWatching] = useState<GetPositionCallbackData>();
-
-  const apiKey = process.env.REACT_APP_YOUR_API_KEY_HERE
-    ? process.env.REACT_APP_YOUR_API_KEY_HERE
-    : '';
+  const apiKey = process.env.REACT_APP_YOUR_API_KEY_HERE ?? '';
 
   async function initPlugin() {
 
@@ -212,8 +232,8 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
         finalFloor: finalPos.floor,
         place: parentPlaceRef.id,
         preferAccessibleRoute: withMobility,
-        nextStepsRouteColor: '#0000FF',
-        prevStepsRouteColor: '#aaaaaa',
+        nextStepsRouteColor: aheadColor,
+        prevStepsRouteColor: behindColor,
         polylineWidth: 10,
         announceFormat: announceFormat,
         unitSystem: unitSystem,
@@ -221,8 +241,8 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
       },
       async (data: RouteReadyCallbackData) => {
         console.log('Route added', data);
-        let routeData = data.data as any
-        let steps = routeData.legs[0].steps as StepDTO[]
+        let routeData = data.data
+        let steps = routeData.legs[0].steps
         setRouteId(data.routeId);
         setSteps(steps)
         presentToast('top', 'Route loaded');
@@ -307,7 +327,9 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
 
   useEffect(() => {
     updateFloorMap()
-    simulateNextBeacon()
+    if (currentBeaconIndex !== -1) {
+      simulateNextBeacon()
+    }
   }, [currentFloorKey, currentBeaconIndex])
 
 
@@ -554,152 +576,215 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
           </IonCol>
         </IonRow>
 
-        <IonRow>
-          <IonCardHeader>
-            <IonCardTitle> Location Response</IonCardTitle>
-          </IonCardHeader>
-        </IonRow>
-        <IonRow>
-          <IonCol>
-            <IonButton onClick={getCurrentPosition}>
-              <IonText>Get current position</IonText>
-            </IonButton>
-          </IonCol>
-        </IonRow>
-
-        {currentPositionRef.current ? (
-          <IonList>
-            <IonItem>
-              <IonLabel>Latitude: {currentPositionRef.current.location.latitude}</IonLabel>
+        <IonAccordionGroup multiple>
+          <IonAccordion value="location-response">
+            <IonItem slot="header" color="light">
+              <IonLabel>Location Response</IonLabel>
             </IonItem>
-            <IonItem>
-              <IonLabel>Longitude: {currentPositionRef.current.location.longitude}</IonLabel>
-            </IonItem>
-            <IonItem>
-              <IonLabel>Floor: {
-                innerFloors.find(i => {
-                  return i.key === currentPositionRef?.current?.location.floor;
-                })?.title}</IonLabel>
-            </IonItem>
-            <IonItem>
-              <IonLabel>Building: {currentPositionRef.current.location.building}</IonLabel>
-            </IonItem>
-            <IonItem>
-              <IonLabel>Current Step: {currentPositionRef.current.routingStatus?.currentStep}</IonLabel>
-            </IonItem>
-            <IonItem>
-              <IonLabel>Routing Status: {currentPositionRef.current.routingStatus?.status}</IonLabel>
-            </IonItem>
-            <IonItem>
-              <IonLabel>Building Status: {currentPositionRef.current.insideBuilding}</IonLabel>
-            </IonItem>
-            <IonItem>
-              <IonLabel>Route ID: {routeId}</IonLabel>
-            </IonItem>
-          </IonList>
-        ) : ''
-        }
-
-        {steps.length > 0 && (
-          <IonAccordionGroup>
-            <IonAccordion value="first">
-              <IonItem slot="header" color='light'>
-                <IonLabel><h1>Current Route Instructions</h1></IonLabel>
-              </IonItem>
-              <IonList slot="content">
-                {steps.map((step, i) => (
-                  <IonItem key={i}>
-                    <IonText color={currentPositionState?.routingStatus?.currentStep == i ? 'primary': ''}>{step.plain_instructions}</IonText>
+            <div className="ion-padding" slot="content">
+              <div>
+                <IonText>Get the current position of the user, also show this information.</IonText>
+              </div>
+              <div>
+                <IonButton onClick={getCurrentPosition} >
+                  <IonText>Get current position</IonText>
+                </IonButton>
+                <IonButton id='get-position-button-information' fill="clear" className='information-button'>
+                  <IonIcon slot='icon-only' icon={informationCircle} color='warning' size='large' />
+                </IonButton>
+                <IonPopover trigger='get-position-button-information' triggerAction='click'>
+                  <IonContent class='ion-padding'>Get the current position of the user.</IonContent>
+                </IonPopover>
+              </div>
+              
+              {currentPositionRef.current && (
+                <IonList>
+                  <IonItem>
+                    <IonLabel>Lat & Lng: {currentPositionRef.current.location.latitude?.toFixed(6)} & {currentPositionRef.current.location.longitude?.toFixed(6)}</IonLabel>
                   </IonItem>
-                ))}
-              </IonList>
+                  <IonItem>
+                    <IonLabel>Floor: {
+                      innerFloors.find(i => {
+                        return i.key === currentPositionRef?.current?.location.floor;
+                      })?.title}</IonLabel>
+                  </IonItem>
+                  <IonItem>
+                    <IonLabel>Building: {currentPositionRef.current.location.building}</IonLabel>
+                  </IonItem>
+                  <IonItem>
+                    <IonLabel>Current Step: {currentPositionRef.current.routingStatus?.currentStep}</IonLabel>
+                  </IonItem>
+                  <IonItem>
+                    <IonLabel>Routing Status: {currentPositionRef.current.routingStatus?.status}</IonLabel>
+                  </IonItem>
+                  <IonItem>
+                    <IonLabel>Building Status: {currentPositionRef.current.insideBuilding}</IonLabel>
+                  </IonItem>
+                  <IonItem>
+                    <IonLabel>Route ID: {routeId}</IonLabel>
+                  </IonItem>
+                </IonList>
+              )}
+            </div>
+          </IonAccordion>
+
+          {newMap && (
+            <IonAccordion value="route">
+              <IonItem slot="header" color="light">
+                <IonLabel>Route</IonLabel>
+              </IonItem>
+              <div slot='content' className='ion-padding'>
+                <div><IonText>Make a route and display it on the map, also show the instructions of the route.</IonText></div>
+                <div>
+                  <IonButton onClick={() => setIsOpen(true)}>
+                    <IonText>Make Route</IonText>
+                  </IonButton>
+                  <IonButton id='make-route-button-information' fill="clear" className='information-button'>
+                    <IonIcon slot='icon-only' icon={informationCircle} color='warning' size='large'/>
+                  </IonButton>
+                  <IonPopover trigger='make-route-button-information' triggerAction='click'>
+                    <IonContent class='ion-padding'>Open a popover to select the parameters to generate a route.</IonContent>
+                  </IonPopover>
+                </div>
+                <RouteInstruction
+                  steps={steps}
+                  currentStepIndex={currentPositionState?.routingStatus?.currentStep} 
+                />
+              </div>
             </IonAccordion>
-          </IonAccordionGroup>
-        )}
+          )}
 
-        {newMap ? (
-          <IonCol>
-            <IonCardHeader>
-              <IonCardTitle> Route</IonCardTitle>
-            </IonCardHeader>
-            <IonRow >
-              <IonButton onClick={() => setIsOpen(true)}>
-                <IonText>Make Route</IonText>
-              </IonButton>
-            </IonRow>
+          {newMap && (
+            <IonAccordion value="location-features">
+              <IonItem slot="header" color="light">
+                <IonLabel>Location features</IonLabel>
+              </IonItem>
+              <div className="ion-padding" slot="content">
+                <div><IonText>Features related to the user location showed on the map.</IonText></div>
+                <div>
+                  <IonButton onClick={enableCurrentLocation}>
+                    <IonIcon icon={locateOutline}></IonIcon>
+                    <IonLabel>Enable location</IonLabel>
+                  </IonButton>
+                  <IonButton id='enable-location-button-information' fill="clear" className='information-button'>
+                    <IonIcon slot='icon-only' icon={informationCircle} color='warning' size='large' />
+                  </IonButton>
+                  <IonPopover trigger='enable-location-button-information' triggerAction='click'>
+                    <IonContent class='ion-padding'>Enable the user location feature to start showing the current location on the map.</IonContent>
+                  </IonPopover>
+                </div>
+                <div>
+                  <IonButton onClick={disableCurrentLocation}>
+                    <IonIcon icon={locateOutline}></IonIcon>
+                    <IonLabel>Disable location</IonLabel>
+                  </IonButton>
+                  <IonButton id='disable-location-button-information' fill="clear" className='information-button'>
+                    <IonIcon slot='icon-only' icon={informationCircle} color='warning' size='large' />
+                  </IonButton>
+                  <IonPopover trigger='disable-location-button-information' triggerAction='click'>
+                    <IonContent class='ion-padding'>Disable the user location feature.</IonContent>
+                  </IonPopover>
+                </div>
+                <div>
+                  <IonButton onClick={() => {
+                    watchPosition(routeId)
+                  }}>
+                    <IonIcon icon={bluetooth}></IonIcon>
+                    <IonLabel>Start updating location</IonLabel>
+                  </IonButton>
+                  <IonButton id='start-updating-location-button-information' fill="clear" className='information-button'>
+                    <IonIcon slot='icon-only' icon={informationCircle} color='warning' size='large' />
+                  </IonButton>
+                  <IonPopover trigger='start-updating-location-button-information' triggerAction='click'>
+                    <IonContent class='ion-padding'>Start proyecting the user location on the route currently showed on the map. This need that a route has already been created.</IonContent>
+                  </IonPopover>
+                </div>
+                <div>
+                  <IonButton onClick={() => {
+                    stopWatchPosition(routeId)
+                  }}>
+                    <IonIcon icon={bluetooth}></IonIcon>
+                    <IonLabel>Stop updating location</IonLabel>
+                  </IonButton>
+                  <IonButton id='stop-updating-location-button-information' fill="clear" className='information-button'>
+                    <IonIcon slot='icon-only' icon={informationCircle} color='warning' size='large' />
+                  </IonButton>
+                  <IonPopover trigger='stop-updating-location-button-information' triggerAction='click'>
+                    <IonContent class='ion-padding'>Stop proyecting the user location on the route currently showed on the map.</IonContent>
+                  </IonPopover>
+                </div>
+              </div>
+            </IonAccordion>
+          )}
 
-
-            <IonRow>
-              <IonCardHeader>
-                <IonCardTitle> Location features</IonCardTitle>
-              </IonCardHeader>
-            </IonRow>
-            <IonRow>
-              <IonCol>
-                <IonButton onClick={enableCurrentLocation}>
-                  <IonIcon icon={locateOutline}></IonIcon>
-                  <IonLabel>Enable location</IonLabel>
-                </IonButton>
-                <IonButton onClick={disableCurrentLocation}>
-                  <IonIcon icon={locateOutline}></IonIcon>
-                  <IonLabel>Disable location</IonLabel>
-                </IonButton>
-              </IonCol>
-              <IonCol>
-                <IonButton onClick={() => {
-                  watchPosition(routeId)
-                }}>
-                  <IonIcon icon={bluetooth}></IonIcon>
-                  <IonLabel>Start updating location</IonLabel>
-                </IonButton>
-                <IonButton onClick={() => {
-                  stopWatchPosition(routeId)
-                }}>
-                  <IonIcon icon={bluetooth}></IonIcon>
-                  <IonLabel>Stop updating location</IonLabel>
-                </IonButton>
-              </IonCol>
-            </IonRow>
-            <IonRow>
-              <IonCardHeader>
-                <IonCardTitle>Beacons simulation</IonCardTitle>
-              </IonCardHeader>
-            </IonRow>
-            <IonRow>
-              <IonCol>
+          <IonAccordion value="beacons-simulation">
+            <IonItem slot="header" color="light">
+              <IonLabel>Beacons simulation</IonLabel>
+            </IonItem>
+            <div className="ion-padding" slot="content">
+              <div><IonText>Change the beacon to simulate, also show the current beacont simulated. The list of beacons to simulate is hardcored on the app.</IonText></div>
+              <div>
                 <IonButton onClick={() => setCurrentBeaconIndex(currentBeaconIndex + 1)}>
                   <IonIcon icon={caretForward}></IonIcon>
                   <IonLabel>Simulate Next Beacon</IonLabel>
                 </IonButton>
-              </IonCol>
-            </IonRow>
-            <IonRow>
-              <IonText>Current beacon {currentSimulatedBeacon}</IonText>
-            </IonRow>
+                <IonButton id='simulate-beacon-button-information' fill="clear" className='information-button'>
+                  <IonIcon slot='icon-only' icon={informationCircle} color='warning' size='large' />
+                </IonButton>
+                <IonPopover trigger='simulate-beacon-button-information' triggerAction='click'>
+                  <IonContent class='ion-padding'>Change to next beacon to simulate. If has not simulated, start to simulate the first beacon.</IonContent>
+                </IonPopover>
+              </div>
+              <div><IonText>Current beacon {currentSimulatedBeacon}</IonText></div>
+            </div>
+          </IonAccordion>
 
-
-            <IonRow>
-              <IonCardHeader>
-                <IonCardTitle> Add pin and change camera angle and zoom</IonCardTitle>
-              </IonCardHeader>
-            </IonRow>
-            <IonRow>
-              <IonButton onClick={addMarker}>
-                <IonIcon icon={location}></IonIcon>
-                <IonText> Indoor</IonText>
-              </IonButton>
-              <IonButton onClick={addOutdoorMarker}>
-                <IonIcon icon={location}></IonIcon>
-                <IonText> Outdoor</IonText>
-              </IonButton>
-              <IonButton onClick={setCamera}>
-                <IonIcon icon={cameraOutline}></IonIcon>
-              </IonButton>
-            </IonRow>
-          </IonCol>
-
-        ) : (<IonText></IonText>)
-        }
+          {newMap && (
+            <IonAccordion value="pin-and-camera">
+              <IonItem slot="header" color="light">
+                <IonLabel>Markers and Camera</IonLabel>
+              </IonItem>
+              <div className="ion-padding" slot="content">
+                <div><IonText>Add pin and change camera angle and zoom.</IonText></div>
+                <div>
+                  <IonButton onClick={addMarker}>
+                    <IonIcon icon={location}></IonIcon>
+                    <IonText>Indoor</IonText>
+                  </IonButton>
+                  <IonButton id='indoor-pin-button-information' fill="clear" className='information-button'>
+                    <IonIcon slot='icon-only' icon={informationCircle} color='warning' size='large' />
+                  </IonButton>
+                  <IonPopover trigger='indoor-pin-button-information' triggerAction='click'>
+                    <IonContent class='ion-padding'>WIP</IonContent>
+                  </IonPopover>
+                </div>
+                <div>
+                  <IonButton onClick={addOutdoorMarker}>
+                    <IonIcon icon={location}></IonIcon>
+                    <IonText> Outdoor</IonText>
+                  </IonButton>
+                  <IonButton id='outdoor-pin-button-information' fill="clear" className='information-button'>
+                    <IonIcon slot='icon-only' icon={informationCircle} color='warning' size='large' />
+                  </IonButton>
+                  <IonPopover trigger='outdoor-pin-button-information' triggerAction='click'>
+                    <IonContent class='ion-padding'>WIP</IonContent>
+                  </IonPopover>
+                </div>
+                <div>
+                  <IonButton onClick={setCamera}>
+                    <IonIcon icon={cameraOutline}></IonIcon>
+                  </IonButton>
+                  <IonButton id='camera-button-information' fill="clear" className='information-button'>
+                    <IonIcon slot='icon-only' icon={informationCircle} color='warning' size='large' />
+                  </IonButton>
+                  <IonPopover trigger='camera-button-information' triggerAction='click'>
+                    <IonContent class='ion-padding'>WIP</IonContent>
+                  </IonPopover>
+                </div>
+              </div>
+            </IonAccordion>
+          )}
+        </IonAccordionGroup>
 
         <IonModal id="example-modal" isOpen={isOpen} className="ion-padding modal-demo">
           <IonHeader>
@@ -861,6 +946,28 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
                     </IonItem>
                   </IonRadioGroup>
                 </IonList>
+              </IonCol>
+              <IonCol>
+                <IonCardHeader><IonCardTitle>Behind Color</IonCardTitle></IonCardHeader>
+                <IonRadioGroup id='behind-color' value={behindColor} onIonChange={e => setBehindColor(e.detail.value)}>
+                  {behindColors.map((color) => (
+                    <IonItem>
+                      <IonLabel style={{ background: color, color: 'white' }}>{color}</IonLabel>
+                      <IonRadio slot="end" value={color}></IonRadio>
+                    </IonItem>
+                  ))}
+                </IonRadioGroup>
+              </IonCol>
+              <IonCol>
+                <IonCardHeader><IonCardTitle>Ahead Color</IonCardTitle></IonCardHeader>
+                <IonRadioGroup id='ahead-color' value={aheadColor} onIonChange={e => setAheadColor(e.detail.value)}>
+                  {aheadColors.map((color) => (
+                    <IonItem>
+                      <IonLabel style={{ background: color, color: 'white' }}>{color}</IonLabel>
+                      <IonRadio slot="end" value={color}></IonRadio>
+                    </IonItem>
+                  ))}
+                </IonRadioGroup>
               </IonCol>
             </IonRow>
           </IonContent>
