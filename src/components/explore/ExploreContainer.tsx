@@ -44,7 +44,7 @@ import {
   walk,
   informationCircle,
 } from 'ionicons/icons';
-import { GetPositionCallbackData, LzLocation, RouteReadyCallbackData, SdkStepRoute } from '@lzdevelopers/lazarillo-maps/dist/typings/definitions';
+import { GetPositionCallbackData, GradientStyle, LzLocation, RouteReadyCallbackData, SdkStepRoute } from '@lzdevelopers/lazarillo-maps/dist/typings/definitions';
 import { Place } from '../places/Place';
 import { InnerFloor } from '../places/InnerFloor';
 import RouteInstruction from '../routeInstructions/RouteInstructions';
@@ -223,6 +223,32 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
 
     const language = instructionsLanguage !== 'system' ? instructionsLanguage : (await Device.getLanguageCode()).value
 
+    const nextStepsRouteStyle : GradientStyle = {
+      type: "GRADIENT",
+      width: 10,
+      colors: [
+        "#FF0000",
+        "#00FF00",
+        "#0000FF"
+      ],
+      positions: [
+        0,
+        0.5,
+        1
+      ]
+    }
+
+    const prevStepsRouteStyle : GradientStyle = {
+      type: "GRADIENT",
+      width: 10,
+      colors: [
+        "#FF0000",
+        "#00FF00",
+        "#0000FF"
+      ],
+    }
+
+
     newMap.addRoute(
       {
         mapId: 'my-cool-map',
@@ -232,9 +258,8 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
         finalFloor: finalPos.floor,
         place: parentPlaceRef.id,
         preferAccessibleRoute: withMobility,
-        nextStepsRouteColor: aheadColor,
-        prevStepsRouteColor: behindColor,
-        polylineWidth: 10,
+        nextStepsRouteStyle : nextStepsRouteStyle,
+        prevStepsRouteStyle: prevStepsRouteStyle,
         announceFormat: announceFormat,
         unitSystem: unitSystem,
         language: language,
@@ -987,4 +1012,5 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
   );
 };
 export default ExploreContainer;
+
 
