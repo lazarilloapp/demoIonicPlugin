@@ -246,6 +246,11 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
         "#00FF00",
         "#0000FF"
       ],
+      positions : [
+        0,
+        0.9,
+        1
+      ]
     }
 
 
@@ -644,6 +649,9 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
                   </IonItem>
                   <IonItem>
                     <IonLabel>Building Status: {currentPositionRef.current.insideBuilding}</IonLabel>
+                  </IonItem>
+                  <IonItem>
+                    <IonLabel>Heading {currentPositionRef.current.location.heading}</IonLabel>
                   </IonItem>
                   <IonItem>
                     <IonLabel>Route ID: {routeId}</IonLabel>
