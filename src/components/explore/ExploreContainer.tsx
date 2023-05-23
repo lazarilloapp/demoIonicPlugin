@@ -85,7 +85,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
   const [present] = useIonToast();
   const [startPosition, setStartPosition] = useState(-1);
   const [finalPosition, setFinalPosition] = useState(-1);
-  const [mapRef, setMapRef] = useState(useRef<HTMLElement>())
+  const mapRef = useRef<HTMLElement>();
   const [showToast1, setShowToast1] = useState(false);
   const [steps, setSteps] = useState<SdkStepRoute[]>([]);
 
