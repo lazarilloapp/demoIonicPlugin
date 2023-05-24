@@ -863,7 +863,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
                     triggerAction='click'
                   >
                     <IonContent class='ion-padding'>
-                      Start proyecting the user location on the route currently
+                      Start projecting the user location on the route currently
                       showed on the map. This need that a route has already been
                       created.
                     </IonContent>
@@ -895,7 +895,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
                     triggerAction='click'
                   >
                     <IonContent class='ion-padding'>
-                      Stop proyecting the user location on the route currently
+                      Stop projecting the user location on the route currently
                       showed on the map.
                     </IonContent>
                   </IonPopover>
