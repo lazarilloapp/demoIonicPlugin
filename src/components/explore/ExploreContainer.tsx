@@ -108,6 +108,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
     useState<string>('system')
   const [behindColor, setBehindColor] = useState('#aaaaaa')
   const [aheadColor, setAheadColor] = useState('#0000FF')
+  const [locationIconOption, setLocationIconOption] = useState('')
 
   const apiKey = process.env.REACT_APP_YOUR_API_KEY_HERE ?? ''
 
@@ -136,6 +137,31 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
     '6bcb004299eaff5da7deda7f42004217',
   ]
 
+  const getMapConfig = (): LazarilloMapConfig => {
+    var mapConfig: LazarilloMapConfig = {
+      center: {
+        lat: parentPlaceRef.lat,
+        lng: parentPlaceRef.lng,
+      },
+      zoom: 17,
+      parentPlaceId: parentPlaceRef.id,
+    }
+    switch (locationIconOption) {
+      case 'URL':
+        mapConfig.locationForegroundIcon =
+          'https://upload.wikimedia.org/wikipedia/commons/7/74/Location_icon_from_Noun_Project.png'
+        break
+      case 'LOCAL':
+        mapConfig.locationForegroundIcon = '/assets/icon/location.png'
+        break
+      case 'NAME':
+        mapConfig.locationForegroundIcon = 'user'
+        break
+      default:
+        break
+    }
+    return mapConfig
+  }
 
   async function createMap() {
     await initPlugin()
@@ -147,26 +173,22 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
     if (floors.length > 0) {
       setCurrentFloorKey(floors[0] || '')
     }
-    setNewMap(await LazarilloMap.create(
-      {
-        id: 'my-cool-map',
-        element: mapRef.current,
-        apiKey: apiKey,
-        config: {
-          center: {
-            lat: parentPlaceRef.lat,
-            lng: parentPlaceRef.lng,
-          },
-          zoom: 17,
-          parentPlaceId: parentPlaceRef.id,
+    const config = getMapConfig()
+    console.log('Map config is :', config)
+    setNewMap(
+      await LazarilloMap.create(
+        {
+          id: 'my-cool-map',
+          element: mapRef.current,
+          apiKey: apiKey,
+          config: config,
         },
-      },
-      async () => {
-        console.log('Map loaded');
-        presentToast('top');
-      },
-    ));
-
+        async () => {
+          console.log('Map loaded')
+          presentToast('top')
+        }
+      )
+    )
   }
   //if you only want to show the route on the map
   //if startLocationIndex is -1, it starts from user location
@@ -572,17 +594,40 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
                   </IonButton>
                 </IonCardContent>
               </IonCard>
-            ) : (<IonCard>
-              <IonCardHeader>
-                <IonCardTitle>Create a map to begin</IonCardTitle>
-              </IonCardHeader>
-              <IonCardContent>
-                <IonButton onClick={createMap}>
-                  <IonIcon icon={mapOutline}></IonIcon>
-                  <IonText>Create Map</IonText>
-                </IonButton>
-              </IonCardContent>
-            </IonCard>)}
+            ) : (
+              <IonCard>
+                <IonCardHeader>
+                  <IonCardTitle>Create a map to begin</IonCardTitle>
+                </IonCardHeader>
+                <IonCardContent>
+                  <IonItem>
+                    <IonLabel position='stacked'>
+                      Select location icon mode
+                    </IonLabel>
+                    <IonSelect
+                      interface='popover'
+                      onIonChange={(e) => setLocationIconOption(e.detail.value)}
+                      value={locationIconOption}
+                    >
+                      <IonSelectOption value=''>Default</IonSelectOption>
+                      <IonSelectOption value='URL'>
+                        Icon available on url
+                      </IonSelectOption>
+                      <IonSelectOption value='NAME'>
+                        Name of preloaded icon
+                      </IonSelectOption>
+                      <IonSelectOption value='LOCAL'>
+                        Local Icon file
+                      </IonSelectOption>
+                    </IonSelect>
+                  </IonItem>
+                  <IonButton onClick={createMap}>
+                    <IonIcon icon={mapOutline}></IonIcon>
+                    <IonText>Create Map</IonText>
+                  </IonButton>
+                </IonCardContent>
+              </IonCard>
+            )}
           </IonCol>
         </IonRow>
 
@@ -1262,7 +1307,10 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
           </IonCol>
         </IonRow>
       </IonGrid>
-      <img src='/assets/icon/location.png' alt='icono de ubicación' />
+      {
+        // <img src='/assets/icon/location.png' alt='icono de ubicación' />
+        // Para chequear que esta bien colocada la imagen
+      }
     </IonContent>
   )
 }
