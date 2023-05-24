@@ -1,5 +1,5 @@
 {
-  "name": "demoLZSDK",
+  "name": "@lzdevelopers/demo-sdk",
   "version": "1.0.5",
   "private": true,
   "dependencies": {
