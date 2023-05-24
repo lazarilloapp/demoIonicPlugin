@@ -1,7 +1,4 @@
-import './ExploreContainer.css';
-import { LazarilloMap, LazarilloUtils } from '@lzdevelopers/lazarillo-maps';
-import { Device } from '@capacitor/device';
-import { useEffect, useRef, useState } from 'react';
+import { Device } from '@capacitor/device'
 import {
   IonAccordion,
   IonAccordionGroup,
@@ -32,24 +29,31 @@ import {
   IonToast,
   IonToolbar,
   useIonToast,
-} from '@ionic/react';
+} from '@ionic/react'
+import { LazarilloMap, LazarilloUtils } from '@lzdevelopers/lazarillo-maps'
 import {
-  mapOutline,
-  location,
-  trashBinOutline,
-  cameraOutline,
-  locateOutline,
-  caretForward,
+  GetPositionCallbackData,
+  LazarilloMapConfig,
+  LzLocation,
+  RouteReadyCallbackData,
+  SdkStepRoute,
+} from '@lzdevelopers/lazarillo-maps/dist/typings/definitions'
+import {
   bluetooth,
-  walk,
+  cameraOutline,
+  caretForward,
   informationCircle,
-} from 'ionicons/icons';
-import { GetPositionCallbackData, LzLocation, RouteReadyCallbackData, SdkStepRoute } from '@lzdevelopers/lazarillo-maps/dist/typings/definitions';
-import { Place } from '../places/Place';
-import { InnerFloor } from '../places/InnerFloor';
-import RouteInstruction from '../routeInstructions/RouteInstructions';
-
-
+  locateOutline,
+  location,
+  mapOutline,
+  trashBinOutline,
+  walk,
+} from 'ionicons/icons'
+import { useEffect, useRef, useState } from 'react'
+import { InnerFloor } from '../places/InnerFloor'
+import { Place } from '../places/Place'
+import RouteInstruction from '../routeInstructions/RouteInstructions'
+import './ExploreContainer.css'
 interface ContainerProps {
   place: Place | undefined
  }
