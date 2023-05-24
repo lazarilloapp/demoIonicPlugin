@@ -142,8 +142,8 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
 
     if (!mapRef.current || !parentPlaceRef) return
 
-    console.log("asdada: "+ floors.length);
     const floors = Object.keys(parentPlaceRef.innerFloors ?? {})
+    console.log('Number of floors: ' + floors.length)
     if (floors.length > 0) {
       setCurrentFloorKey(floors[0] || '')
     }
