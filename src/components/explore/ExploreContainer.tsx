@@ -407,40 +407,43 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
    * Move the camera angle and location
    */
   async function setCamera() {
-    const randomNumber = Math.floor(Math.random() * places.length)
-
-    const place = places[randomNumber]
-    newMap?.setCamera({
-      coordinate: {
-        lat: place.lat,
-        lng: place.lng,
-      },
-      zoom: 21,
-      /**
-       * Bearing of the camera, in degrees clockwise from true north.
-       *
-       * @default 0
-       */
-      bearing: Math.round(Math.random() * 90),
-      /**
-       * The angle, in degrees, of the camera from the nadir (directly facing the Earth).
-       *
-       * The only allowed values are 0 and 45.
-       *
-       * @default 0
-       */
-      angle: Math.round(Math.random() * 45),
-      /**
-       * Animate the transition to the new Camera properties.
-       *
-       * @default false
-       */
-      animate: true,
-      /**
-       *
-       */
-      animationDuration: 8000,
-    })
+    const position = await LazarilloMap.getCurrentPosition()
+    if (
+      position.location.latitude !== undefined &&
+      position.location.longitude !== undefined
+    ) {
+      newMap?.setCamera({
+        coordinate: {
+          lat: position.location.latitude,
+          lng: position.location.longitude,
+        },
+        zoom: 21,
+        /**
+         * Bearing of the camera, in degrees clockwise from true north.
+         *
+         * @default 0
+         */
+        bearing: Math.round(Math.random() * 90),
+        /**
+         * The angle, in degrees, of the camera from the nadir (directly facing the Earth).
+         *
+         * The only allowed values are 0 and 45.
+         *
+         * @default 0
+         */
+        angle: Math.round(Math.random() * 45),
+        /**
+         * Animate the transition to the new Camera properties.
+         *
+         * @default false
+         */
+        animate: true,
+        /**
+         *
+         */
+        animationDuration: 8000,
+      })
+    }
   }
 
   async function enableCurrentLocation() {
