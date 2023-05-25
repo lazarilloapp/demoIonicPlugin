@@ -1,4 +1,5 @@
-platform :ios, '12.0'
+platform :ios, '13.0'
+DEPLOYMENT_TARGET_IOS = '13.0'
 use_frameworks!
 
 # workaround to avoid Xcode caching of Pods that requires
@@ -20,4 +21,20 @@ end
 target 'App' do
   capacitor_pods
   # Add your Pods here
+end
+
+post_install do |installer|
+  desired_ios = Gem::Version.new(DEPLOYMENT_TARGET_IOS)
+  installer.generated_projects.each do |project|
+    project.targets.each do |target|
+      target.build_configurations.each do |config|
+        config.build_settings["DEVELOPMENT_TEAM"] = "825SSA448L"
+        settings = config.build_settings
+        current = Gem::Version.new(settings['IPHONEOS_DEPLOYMENT_TARGET'])
+        if current < desired_ios
+          settings['IPHONEOS_DEPLOYMENT_TARGET'] = DEPLOYMENT_TARGET_IOS
+        end
+      end
+    end
+  end
 end
