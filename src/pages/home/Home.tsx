@@ -1,7 +1,14 @@
-import { IonContent, IonHeader, IonIcon, IonPage, IonTitle, IonToolbar } from '@ionic/react';
-import SelectParentPlaceContainer from '../../components/select/SelectParentPlaceContainer';
-import './Home.css';
-import { bagOutline } from 'ionicons/icons';
+import {
+  IonContent,
+  IonHeader,
+  IonIcon,
+  IonPage,
+  IonTitle,
+  IonToolbar,
+} from '@ionic/react'
+import { bagOutline } from 'ionicons/icons'
+import SelectParentPlaceContainer from '../../components/select/SelectParentPlaceContainer'
+import './Home.css'
 
 const Home: React.FC = () => {
   return (
