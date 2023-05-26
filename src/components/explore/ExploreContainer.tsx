@@ -561,7 +561,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
   }
 
   return (
-    <IonContent>
+    <>
       <IonGrid>
         <IonRow>
           <IonCol>
@@ -1314,7 +1314,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
         // <img src='/assets/icon/location.png' alt='icono de ubicación' />
         // Para chequear que esta bien colocada la imagen
       }
-    </IonContent>
+    </>
   )
 }
 export default ExploreContainer
