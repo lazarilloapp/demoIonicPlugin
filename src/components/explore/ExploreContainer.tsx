@@ -109,6 +109,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
   const [behindColor, setBehindColor] = useState('#aaaaaa')
   const [aheadColor, setAheadColor] = useState('#0000FF')
   const [locationIconOption, setLocationIconOption] = useState('')
+  const [compassIconOption, setCompassIconOption] = useState('')
 
   const apiKey = process.env.REACT_APP_YOUR_API_KEY_HERE ?? ''
 
@@ -145,6 +146,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
       },
       zoom: 17,
       parentPlaceId: parentPlaceRef.id,
+      hideUserIconWithCompass: true,
     }
     switch (locationIconOption) {
       case 'URL':
@@ -156,6 +158,20 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
         break
       case 'NAME':
         mapConfig.locationForegroundIcon = 'user'
+        break
+      default:
+        break
+    }
+    switch (compassIconOption) {
+      case 'URL':
+        mapConfig.locationBearingIcon =
+          'https://user-images.githubusercontent.com/27645593/241321987-6e19d8c8-958c-4fd3-bc38-5748fca5c863.png'
+        break
+      case 'LOCAL':
+        mapConfig.locationBearingIcon = '/assets/icon/compass.png'
+        break
+      case 'NAME':
+        mapConfig.locationBearingIcon = 'user'
         break
       default:
         break
@@ -603,7 +619,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
                   <IonCardTitle>Create a map to begin</IonCardTitle>
                 </IonCardHeader>
                 <IonCardContent>
-                  <IonItem>
+                  <IonItem key={'location-options'}>
                     <IonLabel position='stacked'>
                       Select location icon mode
                     </IonLabel>
@@ -611,6 +627,27 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
                       interface='popover'
                       onIonChange={(e) => setLocationIconOption(e.detail.value)}
                       value={locationIconOption}
+                    >
+                      <IonSelectOption value=''>Default</IonSelectOption>
+                      <IonSelectOption value='URL'>
+                        Icon available on url
+                      </IonSelectOption>
+                      <IonSelectOption value='NAME'>
+                        Name of preloaded icon
+                      </IonSelectOption>
+                      <IonSelectOption value='LOCAL'>
+                        Local Icon file
+                      </IonSelectOption>
+                    </IonSelect>
+                  </IonItem>
+                  <IonItem key={'compass-options'}>
+                    <IonLabel position='stacked'>
+                      Select compass icon mode
+                    </IonLabel>
+                    <IonSelect
+                      interface='popover'
+                      onIonChange={(e) => setCompassIconOption(e.detail.value)}
+                      value={compassIconOption}
                     >
                       <IonSelectOption value=''>Default</IonSelectOption>
                       <IonSelectOption value='URL'>
