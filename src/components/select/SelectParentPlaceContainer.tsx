@@ -1,11 +1,19 @@
 import './SelectParentPlaceContainer.css'
 
-import { LazarilloUtils } from '@lzdevelopers/lazarillo-maps';
-import { IonButton, IonCol, IonContent, IonGrid, IonRow, IonSelect, IonSelectOption, useIonViewWillEnter } from "@ionic/react";
-import ExploreContainer from "../explore/ExploreContainer";
-import { useEffect, useState } from 'react';
+import {
+  IonButton,
+  IonCol,
+  IonGrid,
+  IonRow,
+  IonSelect,
+  IonSelectOption,
+  useIonViewWillEnter,
+} from '@ionic/react'
+import { LazarilloUtils } from '@lzdevelopers/lazarillo-maps'
+import { useState } from 'react'
+import ExploreContainer from '../explore/ExploreContainer'
 
-import { Place } from '../places/Place';
+import { Place } from '../places/Place'
 
 interface ContainerProps { }
 
