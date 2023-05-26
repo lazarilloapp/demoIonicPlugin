@@ -15,19 +15,17 @@ const Home: React.FC = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle><IonIcon icon={bagOutline}></IonIcon>  Shop</IonTitle>
+          <IonTitle>
+            <IonIcon icon={bagOutline} />
+            Shop
+          </IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
-        <IonHeader collapse="condense">
-          <IonToolbar>
-            <IonTitle size="large">   Shop</IonTitle>
-          </IonToolbar>
-        </IonHeader>
         <SelectParentPlaceContainer />
       </IonContent>
     </IonPage>
-  );
-};
+  )
+}
 
-export default Home;
+export default Home
