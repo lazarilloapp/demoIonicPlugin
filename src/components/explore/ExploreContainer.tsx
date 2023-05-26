@@ -232,10 +232,10 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
         ).toString()}`
       )
       if (
-        currentPositionRef.current?.location.building != undefined &&
-        currentPositionRef.current.location.floor != undefined &&
-        currentPositionRef.current.location.latitude != undefined &&
-        currentPositionRef.current.location.longitude != undefined
+        currentPositionRef.current?.location?.building &&
+        currentPositionRef.current?.location?.floor &&
+        currentPositionRef.current?.location?.latitude &&
+        currentPositionRef.current?.location?.longitude
       ) {
         console.log(
           `STARTING ROUTE Using current user position ${JSON.stringify(
