@@ -576,6 +576,33 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
     }
   }
 
+  const getBeaconsFromPlace = () => {
+    const test = async () => {
+      await initPlugin()
+      await LazarilloMap.getBeaconsFrom({ placeId: place?.id ?? '' }).then(
+        (data) => {
+          console.log('Get beacons from place response is ', data)
+        }
+      )
+    }
+    test().catch(console.error)
+  }
+
+  const startDetectingBeacons = () => {
+    const test = async () => {
+      await initPlugin()
+      await LazarilloMap.startDetectingBeacons((data) => {
+        console.log('Respuesta es ', data)
+      })
+    }
+    test().catch(console.error)
+  }
+
+  const stopDetectingBeacons = () => {
+    initPlugin()
+    LazarilloMap.stopDetectingBeacons().catch(console.error)
+  }
+
   return (
     <>
       <IonGrid>
@@ -585,6 +612,17 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
           </IonCol>
         </IonRow>
       </IonGrid>
+      <IonButton onClick={getBeaconsFromPlace}>
+        Get Beacons From Place
+      </IonButton>
+
+      <IonButton onClick={startDetectingBeacons}>
+        Start Detecting Beacons
+      </IonButton>
+
+      <IonButton onClick={stopDetectingBeacons}>
+        Stop Detecting Beacons
+      </IonButton>
       <IonGrid class='grid-2'>
         <IonRow>
           <IonCol>
