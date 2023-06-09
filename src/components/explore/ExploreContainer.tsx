@@ -159,6 +159,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
           zoom: 17,
           parentPlaceId: parentPlaceRef.id,
           locationIconWithBearing : 'https://cdn-icons-png.flaticon.com/512/68/68804.png',
+          locationIcon : 'https://cdn-icons-png.flaticon.com/512/666/666201.png',
           compassIcon: 'https://cdn-icons-png.flaticon.com/512/16/16797.png'
         },
       },
