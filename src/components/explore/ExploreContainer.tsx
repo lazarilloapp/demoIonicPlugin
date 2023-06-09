@@ -158,6 +158,8 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
           },
           zoom: 17,
           parentPlaceId: parentPlaceRef.id,
+          locationIconWithBearing : 'https://cdn-icons-png.flaticon.com/512/68/68804.png',
+          compassIcon: 'https://cdn-icons-png.flaticon.com/512/16/16797.png'
         },
       },
       async () => {
