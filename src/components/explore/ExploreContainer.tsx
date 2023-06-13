@@ -44,7 +44,7 @@ import {
   walk,
   informationCircle,
 } from 'ionicons/icons';
-import { GetPositionCallbackData, GradientStyle, LzLocation, RouteReadyCallbackData, SdkStepRoute } from '@lzdevelopers/lazarillo-maps/dist/typings/definitions';
+import { GetPositionCallbackData, GradientStyle, SolidStyle, LzLocation, RouteReadyCallbackData, SdkStepRoute } from '@lzdevelopers/lazarillo-maps/dist/typings/definitions';
 import { Place } from '../places/Place';
 import { InnerFloor } from '../places/InnerFloor';
 import RouteInstruction from '../routeInstructions/RouteInstructions';
@@ -54,16 +54,57 @@ interface ContainerProps {
   place: Place | undefined
  }
  
- const behindColors: string[] = [
-  '#aaaaaa',
-  '#e3c594',
-  '#94bf8e',
+ const nextStepsRouteStyleGradientOption : GradientStyle = {
+  type: "GRADIENT",
+  width: 10,
+  colors: [
+    "#4CA768",
+    "#4CA1A7",
+    "#1CC1CE"
+  ],
+  positions: [
+    0,
+    0.5,
+    1
+  ]
+}
+
+const nextStepsRouteStylePlainOption : SolidStyle = {
+  type: "SOLID",
+  width: 10,
+  color: "#1CC1CE"
+}
+
+
+const prevStepsRouteStyleGradientOption : GradientStyle = {
+  type: "GRADIENT",
+  width: 10,
+  colors: [
+    "#BD7C12",
+    "#C7BC4E",
+    "#909C94"
+  ],
+  positions : [
+    0,
+    0.9,
+    1
+  ]
+}
+
+const prevStepsRouteStylePlainOption : SolidStyle = {
+  type: "SOLID",
+  width: 10,
+  color: "#9B9B9B"
+}
+ 
+ const aheadStyleOptions: (GradientStyle | SolidStyle)[] = [
+  nextStepsRouteStyleGradientOption,
+  nextStepsRouteStylePlainOption,
  ]
 
- const aheadColors: string[] = [
-  '#0000FF',
-  '#f29805',
-  '#2be813',
+ const behindStyleOptions: (GradientStyle | SolidStyle)[] = [
+  prevStepsRouteStyleGradientOption,
+  prevStepsRouteStylePlainOption,
  ]
 
 const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
@@ -105,8 +146,8 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
   const [announceFormat, setAnnounceFormat] = useState<'RELATIVE'|'CLOCK'|'CARDINAL'>('RELATIVE')
   const [unitSystem, setUnitSystem] = useState<'METRIC'|'IMPERIAL'|'STEPS'>('METRIC')
   const [instructionsLanguage, setInstructionsLanguage] = useState<string>('system')
-  const [behindColor, setBehindColor] = useState('#aaaaaa')
-  const [aheadColor, setAheadColor] = useState('#0000FF')
+  const [aheadStyle, setAheadStyle] = useState<GradientStyle | SolidStyle>(aheadStyleOptions[0])
+  const [behindStyle, setBehindStyle] = useState<GradientStyle | SolidStyle>(behindStyleOptions[1])
 
   const apiKey = process.env.REACT_APP_YOUR_API_KEY_HERE ?? '';
 
@@ -226,35 +267,6 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
 
     const language = instructionsLanguage !== 'system' ? instructionsLanguage : (await Device.getLanguageCode()).value
 
-    const nextStepsRouteStyle : GradientStyle = {
-      type: "GRADIENT",
-      width: 10,
-      colors: [
-        "#FF0000",
-        "#00FF00",
-        "#0000FF"
-      ],
-      positions: [
-        0,
-        0.5,
-        1
-      ]
-    }
-
-    const prevStepsRouteStyle : GradientStyle = {
-      type: "GRADIENT",
-      width: 10,
-      colors: [
-        "#FF0000",
-        "#00FF00",
-        "#0000FF"
-      ],
-      positions : [
-        0,
-        0.9,
-        1
-      ]
-    }
 
 
     newMap.addRoute(
@@ -266,8 +278,8 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
         finalFloor: finalPos.floor,
         place: parentPlaceRef.id,
         preferAccessibleRoute: withMobility,
-        nextStepsRouteStyle : nextStepsRouteStyle,
-        prevStepsRouteStyle: prevStepsRouteStyle,
+        nextStepsRouteStyle : aheadStyle,
+        prevStepsRouteStyle: behindStyle,
         announceFormat: announceFormat,
         unitSystem: unitSystem,
         language: language,
@@ -984,23 +996,23 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
                 </IonList>
               </IonCol>
               <IonCol>
-                <IonCardHeader><IonCardTitle>Behind Color</IonCardTitle></IonCardHeader>
-                <IonRadioGroup id='behind-color' value={behindColor} onIonChange={e => setBehindColor(e.detail.value)}>
-                  {behindColors.map((color) => (
+                <IonCardHeader><IonCardTitle>Behind Style</IonCardTitle></IonCardHeader>
+                <IonRadioGroup id='behind-color' value={behindStyle} onIonChange={e => setBehindStyle(e.detail.value)}>
+                  {behindStyleOptions.map((option) => (
                     <IonItem>
-                      <IonLabel style={{ background: color, color: 'white' }}>{color}</IonLabel>
-                      <IonRadio slot="end" value={color}></IonRadio>
+                      <IonLabel>{option.type}</IonLabel>
+                      <IonRadio slot="end" value={option}></IonRadio>
                     </IonItem>
                   ))}
                 </IonRadioGroup>
               </IonCol>
               <IonCol>
                 <IonCardHeader><IonCardTitle>Ahead Color</IonCardTitle></IonCardHeader>
-                <IonRadioGroup id='ahead-color' value={aheadColor} onIonChange={e => setAheadColor(e.detail.value)}>
-                  {aheadColors.map((color) => (
+                <IonRadioGroup id='ahead-color' value={aheadStyle} onIonChange={e => setAheadStyle(e.detail.value)}>
+                  {aheadStyleOptions.map((option) => (
                     <IonItem>
-                      <IonLabel style={{ background: color, color: 'white' }}>{color}</IonLabel>
-                      <IonRadio slot="end" value={color}></IonRadio>
+                      <IonLabel>{option.type}</IonLabel>
+                      <IonRadio slot="end" value={option}></IonRadio>
                     </IonItem>
                   ))}
                 </IonRadioGroup>
