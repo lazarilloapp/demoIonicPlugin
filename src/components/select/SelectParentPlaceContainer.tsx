@@ -49,7 +49,6 @@ const SelectParentPlaceContainer: React.FC<ContainerProps> = () => {
                         </IonRow>
                         <IonRow className='center-row'>
                             <IonSelect
-                                interface='popover'
                                 placeholder="Select place"
                                 onIonChange={showParentPlaceMap}>
                                 {
