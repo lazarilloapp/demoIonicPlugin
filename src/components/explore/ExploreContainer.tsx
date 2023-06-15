@@ -244,7 +244,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
         };
       }
     } else {
-      console.log(`STARTING ROUTE Dont using current user position ${JSON.stringify(currentPositionRef.current).toString()}`)
+      console.log(`STARTING ROUTE Dont using current user position`)
       let initialPlace = places[startLocationIndex];
       initialPos = {
         building: parentPlaceRef.id,
