@@ -199,8 +199,8 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
           },
           zoom: 17,
           parentPlaceId: parentPlaceRef.id,
-          locationIconWithBearing : 'https://cdn-icons-png.flaticon.com/512/68/68804.png',
-          locationIcon : 'https://cdn-icons-png.flaticon.com/512/666/666201.png',
+          locationIconWithBearing : 'https://github-production-user-asset-6210df.s3.amazonaws.com/35740463/245535569-54b83510-c79b-4ae3-ba56-1dfe3d51e9fe.svg',
+          locationIcon : 'https://github-production-user-asset-6210df.s3.amazonaws.com/35740463/245540139-895193f9-524d-45e1-8e54-6f5945cca6b1.png',
           compassIcon: 'https://cdn-icons-png.flaticon.com/512/16/16797.png'
         },
       },
