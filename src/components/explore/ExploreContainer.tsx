@@ -623,7 +623,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
 
         <IonAccordionGroup multiple>
           <IonAccordion value="location-response">
-            <IonItem slot="header" color="light">
+            <IonItem slot="header" color="light" key="Location">
               <IonLabel>Location Response</IonLabel>
             </IonItem>
             <div className="ion-padding" slot="content">
@@ -644,31 +644,31 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
               
               {currentPositionRef.current && (
                 <IonList>
-                  <IonItem>
+                  <IonItem key="lat&lng">
                     <IonLabel>Lat & Lng: {currentPositionRef.current.location.latitude?.toFixed(6)} & {currentPositionRef.current.location.longitude?.toFixed(6)}</IonLabel>
                   </IonItem>
-                  <IonItem>
+                  <IonItem key="floor">
                     <IonLabel>Floor: {
                       innerFloors.find(i => {
                         return i.key === currentPositionRef?.current?.location.floor;
                       })?.title}</IonLabel>
                   </IonItem>
-                  <IonItem>
+                  <IonItem key="building">
                     <IonLabel>Building: {currentPositionRef.current.location.building}</IonLabel>
                   </IonItem>
-                  <IonItem>
+                  <IonItem key="currentStep">
                     <IonLabel>Current Step: {currentPositionRef.current.routingStatus?.currentStep}</IonLabel>
                   </IonItem>
-                  <IonItem>
+                  <IonItem key="routingStatus">
                     <IonLabel>Routing Status: {currentPositionRef.current.routingStatus?.status}</IonLabel>
                   </IonItem>
-                  <IonItem>
+                  <IonItem key="buildingStatus">
                     <IonLabel>Building Status: {currentPositionRef.current.insideBuilding}</IonLabel>
                   </IonItem>
-                  <IonItem>
+                  <IonItem key="heading">
                     <IonLabel>Heading {currentPositionRef.current.location.heading}</IonLabel>
                   </IonItem>
-                  <IonItem>
+                  <IonItem key="routeId">
                     <IonLabel>Route ID: {routeId}</IonLabel>
                   </IonItem>
                 </IonList>
@@ -678,7 +678,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
 
           {newMap && (
             <IonAccordion value="route">
-              <IonItem slot="header" color="light">
+              <IonItem slot="header" color="light" key="routeHeader">
                 <IonLabel>Route</IonLabel>
               </IonItem>
               <div slot='content' className='ion-padding'>
@@ -704,7 +704,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
 
           {newMap && (
             <IonAccordion value="location-features">
-              <IonItem slot="header" color="light">
+              <IonItem slot="header" color="light" key="LocationFeature">
                 <IonLabel>Location features</IonLabel>
               </IonItem>
               <div className="ion-padding" slot="content">
@@ -766,7 +766,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
           )}
 
           <IonAccordion value="beacons-simulation">
-            <IonItem slot="header" color="light">
+            <IonItem slot="header" color="light" key="beaconSimulation">
               <IonLabel>Beacons simulation</IonLabel>
             </IonItem>
             <div className="ion-padding" slot="content">
@@ -789,7 +789,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
 
           {newMap && (
             <IonAccordion value="pin-and-camera">
-              <IonItem slot="header" color="light">
+              <IonItem slot="header" color="light" key="markers">
                 <IonLabel>Markers and Camera</IonLabel>
               </IonItem>
               <div className="ion-padding" slot="content">
@@ -899,13 +899,13 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
                     console.log("pre cambio de variable", withMobility)
                     setWithMobility(event.detail.value !== '0')
                   }}>
-                    <IonItem>
+                    <IonItem key="walking">
                       <IonLabel>Walking</IonLabel>
                       <IonRadio slot="end" value="0">
 
                       </IonRadio>
                     </IonItem>
-                    <IonItem>
+                    <IonItem key="accessible">
                       <IonLabel>Accessible</IonLabel>
                       <IonRadio slot="end" value="1">
 
@@ -926,17 +926,17 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
                       setAnnounceFormat(event.detail.value.toString())
                     }
                   }}>
-                    <IonItem>
+                    <IonItem key="relative">
                       <IonLabel>RELATIVE</IonLabel>
                       <IonRadio slot="end" value="RELATIVE"></IonRadio>
                     </IonItem>
 
-                    <IonItem>
+                    <IonItem key="cardinal">
                       <IonLabel>CARDINAL</IonLabel>
                       <IonRadio slot="end" value="CARDINAL"></IonRadio>
                     </IonItem>
 
-                    <IonItem>
+                    <IonItem key="clock">
                       <IonLabel>CLOCK</IonLabel>
                       <IonRadio slot="end" value="CLOCK"></IonRadio>
                     </IonItem>
@@ -954,17 +954,17 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
                     }
                   }}
                   >
-                    <IonItem>
+                    <IonItem key="metric">
                       <IonLabel>METRIC</IonLabel>
                       <IonRadio slot="end" value="METRIC"></IonRadio>
                     </IonItem>
 
-                    <IonItem>
+                    <IonItem key="imperial">
                       <IonLabel>IMPERIAL</IonLabel>
                       <IonRadio slot="end" value="IMPERIAL"></IonRadio>
                     </IonItem>
 
-                    <IonItem>
+                    <IonItem key="steps">
                       <IonLabel>STEPS</IonLabel>
                       <IonRadio slot="end" value="STEPS"></IonRadio>
                     </IonItem>
@@ -978,17 +978,17 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
                     setInstructionsLanguage(event.detail.value.toString())
                   }}
                   >
-                    <IonItem>
+                    <IonItem key="langDefault">
                       <IonLabel>SYSTEM</IonLabel>
                       <IonRadio slot="end" value='system'/>
                     </IonItem>
 
-                    <IonItem>
+                    <IonItem key="langES">
                       <IonLabel>SPANISH</IonLabel>
                       <IonRadio slot="end" value="es"/>
                     </IonItem>
 
-                    <IonItem>
+                    <IonItem key="langEN">
                       <IonLabel>ENGLISH</IonLabel>
                       <IonRadio slot="end" value="en"/>
                     </IonItem>
@@ -999,8 +999,8 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
                 <IonCardHeader><IonCardTitle>Behind Style</IonCardTitle></IonCardHeader>
                 <IonRadioGroup id='behind-color' value={behindStyle} onIonChange={e => setBehindStyle(e.detail.value)}>
                   {behindStyleOptions.map((option) => (
-                    <IonItem>
-                      <IonLabel>{option.type}</IonLabel>
+                    <IonItem key={"behind-" + option}>
+                      <IonLabel>{option}</IonLabel>
                       <IonRadio slot="end" value={option}></IonRadio>
                     </IonItem>
                   ))}
@@ -1010,8 +1010,8 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
                 <IonCardHeader><IonCardTitle>Ahead Color</IonCardTitle></IonCardHeader>
                 <IonRadioGroup id='ahead-color' value={aheadStyle} onIonChange={e => setAheadStyle(e.detail.value)}>
                   {aheadStyleOptions.map((option) => (
-                    <IonItem>
-                      <IonLabel>{option.type}</IonLabel>
+                    <IonItem key={"ahead-" + option}>
+                      <IonLabel>{option}</IonLabel>
                       <IonRadio slot="end" value={option}></IonRadio>
                     </IonItem>
                   ))}
