@@ -588,7 +588,6 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
               <IonCard>
                 <IonCardTitle>
                   <IonSelect
-                    interface="popover"
                     onIonChange={changeFloor}
                     value={currentFloorKey}
                     defaultValue={currentFloorKey}
@@ -854,7 +853,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
               <IonCol>
                 <IonCardHeader> <IonCardTitle> From: </IonCardTitle></IonCardHeader>
                 <IonList>
-                  <IonSelect id="start_point" interface="popover" value={startPosition} onIonChange={(event) => {
+                  <IonSelect id="start_point" value={startPosition} onIonChange={(event) => {
                     if (event.detail.value === undefined) return;
                     setStartPosition(event.detail.value)
                   }} interfaceOptions={{translucent: false, cssClass: 'actionSheet'}}>              
@@ -876,7 +875,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
               <IonCol>
                 <IonCardHeader> <IonCardTitle> To: </IonCardTitle></IonCardHeader>
                 <IonList>
-                  <IonSelect id="final_point" value={finalPosition} interface="popover" onIonChange={(event) => {
+                  <IonSelect id="final_point" value={finalPosition}  onIonChange={(event) => {
                     if (event.detail.value === undefined) return;
                     setFinalPosition(event.detail.value)
                   }} interfaceOptions={{translucent: false, cssClass: 'actionSheet'}}>              
