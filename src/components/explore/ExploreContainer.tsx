@@ -97,15 +97,15 @@ const prevStepsRouteStylePlainOption : SolidStyle = {
   color: "#9B9B9B"
 }
  
- const aheadStyleOptions: (GradientStyle | SolidStyle)[] = [
+ const aheadStyleOptions: string[] = [
   nextStepsRouteStyleGradientOption,
   nextStepsRouteStylePlainOption,
- ]
+ ].map(style => style.type)
 
- const behindStyleOptions: (GradientStyle | SolidStyle)[] = [
+ const behindStyleOptions: string[] = [
   prevStepsRouteStyleGradientOption,
   prevStepsRouteStylePlainOption,
- ]
+ ].map(style => style.type)
 
 const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
 
@@ -146,8 +146,8 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
   const [announceFormat, setAnnounceFormat] = useState<'RELATIVE'|'CLOCK'|'CARDINAL'>('RELATIVE')
   const [unitSystem, setUnitSystem] = useState<'METRIC'|'IMPERIAL'|'STEPS'>('METRIC')
   const [instructionsLanguage, setInstructionsLanguage] = useState<string>('system')
-  const [aheadStyle, setAheadStyle] = useState<GradientStyle | SolidStyle>(aheadStyleOptions[0])
-  const [behindStyle, setBehindStyle] = useState<GradientStyle | SolidStyle>(behindStyleOptions[1])
+  const [aheadStyle, setAheadStyle] = useState<string>(aheadStyleOptions[0])
+  const [behindStyle, setBehindStyle] = useState<string>(behindStyleOptions[1])
 
   const apiKey = process.env.REACT_APP_YOUR_API_KEY_HERE ?? '';
 
@@ -227,13 +227,13 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
       longitude: undefined
     }
     // Using user location as initial position
-    if (startLocationIndex == -1) {
+    if (startLocationIndex === -1) {
       await getCurrentPosition();
       console.log(`STARTING ROUTE Current position ${JSON.stringify(currentPositionRef.current).toString()}`)
-      if (currentPositionRef.current?.location.building != undefined &&
-        currentPositionRef.current.location.floor != undefined &&
-        currentPositionRef.current.location.latitude != undefined &&
-        currentPositionRef.current.location.longitude != undefined) {
+      if (currentPositionRef.current?.location.building !== undefined &&
+        currentPositionRef.current.location.floor !== undefined &&
+        currentPositionRef.current.location.latitude !== undefined &&
+        currentPositionRef.current.location.longitude !== undefined) {
         console.log(`STARTING ROUTE Using current user position ${JSON.stringify(currentPositionRef.current).toString()}`)
         initialPos = {
           building: currentPositionRef.current.location.building,
@@ -278,8 +278,8 @@ const ExploreContainer: React.FC<ContainerProps> = ({place}) => {
         finalFloor: finalPos.floor,
         place: parentPlaceRef.id,
         preferAccessibleRoute: withMobility,
-        nextStepsRouteStyle : aheadStyle,
-        prevStepsRouteStyle: behindStyle,
+        nextStepsRouteStyle : aheadStyle === 'SOLID' ? nextStepsRouteStylePlainOption : nextStepsRouteStyleGradientOption,
+        prevStepsRouteStyle: behindStyle === 'SOLID' ? prevStepsRouteStylePlainOption : prevStepsRouteStyleGradientOption,
         announceFormat: announceFormat,
         unitSystem: unitSystem,
         language: language,
