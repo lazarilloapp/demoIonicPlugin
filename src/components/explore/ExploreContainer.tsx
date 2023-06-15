@@ -109,6 +109,8 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
   const [behindColor, setBehindColor] = useState('#aaaaaa')
   const [aheadColor, setAheadColor] = useState('#0000FF')
   const [locationIconOption, setLocationIconOption] = useState('')
+  const [locationIconWithBearingOption, setLocationIconWithBearingOption] =
+    useState('')
   const [compassIconOption, setCompassIconOption] = useState('')
 
   const apiKey = process.env.REACT_APP_YOUR_API_KEY_HERE ?? ''
@@ -146,32 +148,24 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
       },
       zoom: 17,
       parentPlaceId: parentPlaceRef.id,
-      hideUserIconWithCompass: true,
     }
     switch (locationIconOption) {
       case 'URL':
-        mapConfig.locationForegroundIcon =
-          'https://upload.wikimedia.org/wikipedia/commons/7/74/Location_icon_from_Noun_Project.png'
-        break
-      case 'LOCAL':
-        mapConfig.locationForegroundIcon = '/assets/icon/location.png'
-        break
-      case 'NAME':
-        mapConfig.locationForegroundIcon = 'user'
+        mapConfig.locationIcon =
+          'https://cdn-icons-png.flaticon.com/512/666/666201.png'
         break
       default:
         break
     }
+    switch (locationIconWithBearingOption) {
+      case 'URL':
+        mapConfig.locationIconWithBearing =
+          'https://github-production-user-asset-6210df.s3.amazonaws.com/35740463/245535569-54b83510-c79b-4ae3-ba56-1dfe3d51e9fe.svg'
+    }
     switch (compassIconOption) {
       case 'URL':
-        mapConfig.locationBearingIcon =
-          'https://user-images.githubusercontent.com/27645593/241321987-6e19d8c8-958c-4fd3-bc38-5748fca5c863.png'
-        break
-      case 'LOCAL':
-        mapConfig.locationBearingIcon = '/assets/icon/compass.png'
-        break
-      case 'NAME':
-        mapConfig.locationBearingIcon = 'user'
+        mapConfig.compassIcon =
+          'https://cdn-icons-png.flaticon.com/512/16/16797.png'
         break
       default:
         break
@@ -624,7 +618,6 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
                       Select location icon mode
                     </IonLabel>
                     <IonSelect
-                      interface='popover'
                       onIonChange={(e) => setLocationIconOption(e.detail.value)}
                       value={locationIconOption}
                     >
@@ -632,11 +625,21 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
                       <IonSelectOption value='URL'>
                         Icon available on url
                       </IonSelectOption>
-                      <IonSelectOption value='NAME'>
-                        Name of preloaded icon
-                      </IonSelectOption>
-                      <IonSelectOption value='LOCAL'>
-                        Local Icon file
+                    </IonSelect>
+                  </IonItem>
+                  <IonItem key={'location-with-bearing-options'}>
+                    <IonLabel position='stacked'>
+                      Select location with bearing icon mode
+                    </IonLabel>
+                    <IonSelect
+                      onIonChange={(e) =>
+                        setLocationIconWithBearingOption(e.detail.value)
+                      }
+                      value={locationIconWithBearingOption}
+                    >
+                      <IonSelectOption value=''>Default</IonSelectOption>
+                      <IonSelectOption value='URL'>
+                        Icon available on url
                       </IonSelectOption>
                     </IonSelect>
                   </IonItem>
@@ -645,19 +648,12 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
                       Select compass icon mode
                     </IonLabel>
                     <IonSelect
-                      interface='popover'
                       onIonChange={(e) => setCompassIconOption(e.detail.value)}
                       value={compassIconOption}
                     >
                       <IonSelectOption value=''>Default</IonSelectOption>
                       <IonSelectOption value='URL'>
                         Icon available on url
-                      </IonSelectOption>
-                      <IonSelectOption value='NAME'>
-                        Name of preloaded icon
-                      </IonSelectOption>
-                      <IonSelectOption value='LOCAL'>
-                        Local Icon file
                       </IonSelectOption>
                     </IonSelect>
                   </IonItem>
