@@ -160,7 +160,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
     switch (locationIconWithBearingOption) {
       case 'URL':
         mapConfig.locationIconWithBearing =
-          'https://github-production-user-asset-6210df.s3.amazonaws.com/35740463/245535569-54b83510-c79b-4ae3-ba56-1dfe3d51e9fe.svg'
+          'https://cdn-icons-png.flaticon.com/512/5142/5142952.png'
     }
     switch (compassIconOption) {
       case 'URL':
