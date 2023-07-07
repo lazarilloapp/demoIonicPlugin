@@ -28,6 +28,7 @@ import {
   IonTitle,
   IonToast,
   IonToolbar,
+  isPlatform,
   useIonToast,
 } from '@ionic/react'
 import { LazarilloMap, LazarilloUtils } from '@lzdevelopers/lazarillo-maps'
@@ -109,6 +110,9 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
   const [behindColor, setBehindColor] = useState('#aaaaaa')
   const [aheadColor, setAheadColor] = useState('#0000FF')
   const [locationIconOption, setLocationIconOption] = useState('')
+  const [locationIconWithBearingOption, setLocationIconWithBearingOption] =
+    useState('')
+  const [compassIconOption, setCompassIconOption] = useState('')
 
   const apiKey = process.env.REACT_APP_YOUR_API_KEY_HERE ?? ''
 
@@ -148,14 +152,21 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
     }
     switch (locationIconOption) {
       case 'URL':
-        mapConfig.locationForegroundIcon =
-          'https://upload.wikimedia.org/wikipedia/commons/7/74/Location_icon_from_Noun_Project.png'
+        mapConfig.locationIcon =
+          'https://cdn-icons-png.flaticon.com/512/666/666201.png'
         break
-      case 'LOCAL':
-        mapConfig.locationForegroundIcon = '/assets/icon/location.png'
+      default:
         break
-      case 'NAME':
-        mapConfig.locationForegroundIcon = 'user'
+    }
+    switch (locationIconWithBearingOption) {
+      case 'URL':
+        mapConfig.locationIconWithBearing =
+          'https://cdn-icons-png.flaticon.com/512/5142/5142952.png'
+    }
+    switch (compassIconOption) {
+      case 'URL':
+        mapConfig.compassIcon =
+          'https://cdn-icons-png.flaticon.com/512/16/16797.png'
         break
       default:
         break
@@ -216,10 +227,10 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
         ).toString()}`
       )
       if (
-        currentPositionRef.current?.location.building != undefined &&
-        currentPositionRef.current.location.floor != undefined &&
-        currentPositionRef.current.location.latitude != undefined &&
-        currentPositionRef.current.location.longitude != undefined
+        currentPositionRef.current?.location?.building &&
+        currentPositionRef.current?.location?.floor &&
+        currentPositionRef.current?.location?.latitude &&
+        currentPositionRef.current?.location?.longitude
       ) {
         console.log(
           `STARTING ROUTE Using current user position ${JSON.stringify(
@@ -561,7 +572,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
   }
 
   return (
-    <IonContent>
+    <>
       <IonGrid>
         <IonRow>
           <IonCol>
@@ -576,7 +587,6 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
               <IonCard>
                 <IonCardTitle>
                   <IonSelect
-                    interface='popover'
                     onIonChange={changeFloor}
                     value={currentFloorKey}
                     defaultValue={currentFloorKey}
@@ -603,24 +613,51 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
                   <IonCardTitle>Create a map to begin</IonCardTitle>
                 </IonCardHeader>
                 <IonCardContent>
-                  <IonItem>
+                  {isPlatform('android') && (
+                    <IonItem key={'location-options'}>
+                      <IonLabel position='stacked'>
+                        Select location icon mode
+                      </IonLabel>
+                      <IonSelect
+                        onIonChange={(e) =>
+                          setLocationIconOption(e.detail.value)
+                        }
+                        value={locationIconOption}
+                      >
+                        <IonSelectOption value=''>Default</IonSelectOption>
+                        <IonSelectOption value='URL'>
+                          Icon available on url
+                        </IonSelectOption>
+                      </IonSelect>
+                    </IonItem>
+                  )}
+                  <IonItem key={'location-with-bearing-options'}>
                     <IonLabel position='stacked'>
-                      Select location icon mode
+                      Select location with bearing icon mode
                     </IonLabel>
                     <IonSelect
-                      interface='popover'
-                      onIonChange={(e) => setLocationIconOption(e.detail.value)}
-                      value={locationIconOption}
+                      onIonChange={(e) =>
+                        setLocationIconWithBearingOption(e.detail.value)
+                      }
+                      value={locationIconWithBearingOption}
                     >
                       <IonSelectOption value=''>Default</IonSelectOption>
                       <IonSelectOption value='URL'>
                         Icon available on url
                       </IonSelectOption>
-                      <IonSelectOption value='NAME'>
-                        Name of preloaded icon
-                      </IonSelectOption>
-                      <IonSelectOption value='LOCAL'>
-                        Local Icon file
+                    </IonSelect>
+                  </IonItem>
+                  <IonItem key={'compass-options'}>
+                    <IonLabel position='stacked'>
+                      Select compass icon mode
+                    </IonLabel>
+                    <IonSelect
+                      onIonChange={(e) => setCompassIconOption(e.detail.value)}
+                      value={compassIconOption}
+                    >
+                      <IonSelectOption value=''>Default</IonSelectOption>
+                      <IonSelectOption value='URL'>
+                        Icon available on url
                       </IonSelectOption>
                     </IonSelect>
                   </IonItem>
@@ -1314,7 +1351,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
         // <img src='/assets/icon/location.png' alt='icono de ubicación' />
         // Para chequear que esta bien colocada la imagen
       }
-    </IonContent>
+    </>
   )
 }
 export default ExploreContainer
