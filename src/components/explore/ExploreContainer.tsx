@@ -586,7 +586,6 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
               <IonCard>
                 <IonCardTitle>
                   <IonSelect
-                    interface='popover'
                     onIonChange={changeFloor}
                     value={currentFloorKey}
                     defaultValue={currentFloorKey}
