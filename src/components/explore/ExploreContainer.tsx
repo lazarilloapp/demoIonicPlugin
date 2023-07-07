@@ -28,6 +28,7 @@ import {
   IonTitle,
   IonToast,
   IonToolbar,
+  isPlatform,
   useIonToast,
 } from '@ionic/react'
 import { LazarilloMap, LazarilloUtils } from '@lzdevelopers/lazarillo-maps'
@@ -612,20 +613,24 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
                   <IonCardTitle>Create a map to begin</IonCardTitle>
                 </IonCardHeader>
                 <IonCardContent>
-                  <IonItem key={'location-options'}>
-                    <IonLabel position='stacked'>
-                      Select location icon mode
-                    </IonLabel>
-                    <IonSelect
-                      onIonChange={(e) => setLocationIconOption(e.detail.value)}
-                      value={locationIconOption}
-                    >
-                      <IonSelectOption value=''>Default</IonSelectOption>
-                      <IonSelectOption value='URL'>
-                        Icon available on url
-                      </IonSelectOption>
-                    </IonSelect>
-                  </IonItem>
+                  {isPlatform('android') && (
+                    <IonItem key={'location-options'}>
+                      <IonLabel position='stacked'>
+                        Select location icon mode
+                      </IonLabel>
+                      <IonSelect
+                        onIonChange={(e) =>
+                          setLocationIconOption(e.detail.value)
+                        }
+                        value={locationIconOption}
+                      >
+                        <IonSelectOption value=''>Default</IonSelectOption>
+                        <IonSelectOption value='URL'>
+                          Icon available on url
+                        </IonSelectOption>
+                      </IonSelect>
+                    </IonItem>
+                  )}
                   <IonItem key={'location-with-bearing-options'}>
                     <IonLabel position='stacked'>
                       Select location with bearing icon mode
