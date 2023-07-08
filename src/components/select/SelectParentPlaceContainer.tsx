@@ -61,7 +61,7 @@ const SelectParentPlaceContainer: React.FC<ContainerProps> = () => {
           >
             {parentPlacesList.map((place) => {
               return (
-                <IonSelectOption value={place.id}>
+                <IonSelectOption key={place.id} value={place.id}>
                   {place.title.default}
                 </IonSelectOption>
               )
