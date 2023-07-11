@@ -332,8 +332,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
         announceFormat: announceFormat,
         unitSystem: unitSystem,
         language: language,
-      },
-      async (data: RouteReadyCallbackData) => {
+      }).then((data: RouteReadyCallbackData) => {
         console.log('Route added', data)
         let routeData = data.data
         let steps = routeData.legs[0].steps
