@@ -34,15 +34,15 @@
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>To allow more precise location on indoor spaces enabled by Lazarillo</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
-	<string>To allow more precise location on places enabled with Lazarillo</string>
+	<string>To allow more precise location on indoor spaces enabled by Lazarillo</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>We use your location for guide you</string>
+	<string>We use your location for guide you on spaces enabled by Lazarillo</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>We use your location for guide you</string>
+	<string>We use your location for guide you on spaces enabled by Lazarillo</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>We use your location for guide you</string>
+	<string>We use your location for guide you on spaces enabled by Lazarillo</string>
 	<key>NSMotionUsageDescription</key>
-	<string>We are using motion usage in order to track your step count</string>
+	<string>We are using motion usage in order to track your step count and give you a better location when try to guide on indoor spaces enabled by Lazarillo</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
