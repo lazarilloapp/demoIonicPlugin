@@ -28,15 +28,18 @@ import {
   IonTitle,
   IonToast,
   IonToolbar,
+  isPlatform,
   useIonToast,
 } from '@ionic/react'
 import { LazarilloMap, LazarilloUtils } from '@lzdevelopers/lazarillo-maps'
 import {
   GetPositionCallbackData,
+  GradientStyle,
   LazarilloMapConfig,
   LzLocation,
   RouteReadyCallbackData,
   SdkStepRoute,
+  SolidStyle,
 } from '@lzdevelopers/lazarillo-maps/dist/typings/definitions'
 import {
   bluetooth,
@@ -54,13 +57,43 @@ import { InnerFloor } from '../places/InnerFloor'
 import { Place } from '../places/Place'
 import RouteInstruction from '../routeInstructions/RouteInstructions'
 import './ExploreContainer.css'
+
 interface ContainerProps {
   place: Place | undefined
 }
 
-const behindColors: string[] = ['#aaaaaa', '#e3c594', '#94bf8e']
+const nextStepsRouteStyleGradientOption: GradientStyle = {
+  type: 'GRADIENT',
+  width: 10,
+  colors: ['#4CA768', '#4CA1A7', '#1CC1CE'],
+  positions: [0, 0.5, 1],
+}
+const nextStepsRouteStylePlainOption: SolidStyle = {
+  type: 'SOLID',
+  width: 10,
+  color: '#1CC1CE',
+}
+const prevStepsRouteStyleGradientOption: GradientStyle = {
+  type: 'GRADIENT',
+  width: 10,
+  colors: ['#BD7C12', '#C7BC4E', '#909C94'],
+  positions: [0, 0.9, 1],
+}
+const prevStepsRouteStylePlainOption: SolidStyle = {
+  type: 'SOLID',
+  width: 10,
+  color: '#9B9B9B',
+}
 
-const aheadColors: string[] = ['#0000FF', '#f29805', '#2be813']
+const aheadStyleOptions: string[] = [
+  nextStepsRouteStyleGradientOption,
+  nextStepsRouteStylePlainOption,
+].map((style) => style.type)
+
+const behindStyleOptions: string[] = [
+  prevStepsRouteStyleGradientOption,
+  prevStepsRouteStylePlainOption,
+].map((style) => style.type)
 
 const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
   let parentPlaceRef = place ?? {
@@ -106,9 +139,12 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
   )
   const [instructionsLanguage, setInstructionsLanguage] =
     useState<string>('system')
-  const [behindColor, setBehindColor] = useState('#aaaaaa')
-  const [aheadColor, setAheadColor] = useState('#0000FF')
   const [locationIconOption, setLocationIconOption] = useState('')
+  const [locationIconWithBearingOption, setLocationIconWithBearingOption] =
+    useState('')
+  const [compassIconOption, setCompassIconOption] = useState('')
+  const [aheadStyle, setAheadStyle] = useState<string>(aheadStyleOptions[0])
+  const [behindStyle, setBehindStyle] = useState<string>(behindStyleOptions[1])
 
   const apiKey = process.env.REACT_APP_YOUR_API_KEY_HERE ?? ''
 
@@ -148,14 +184,21 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
     }
     switch (locationIconOption) {
       case 'URL':
-        mapConfig.locationForegroundIcon =
-          'https://upload.wikimedia.org/wikipedia/commons/7/74/Location_icon_from_Noun_Project.png'
+        mapConfig.locationIcon =
+          'https://cdn-icons-png.flaticon.com/512/666/666201.png'
         break
-      case 'LOCAL':
-        mapConfig.locationForegroundIcon = '/assets/icon/location.png'
+      default:
         break
-      case 'NAME':
-        mapConfig.locationForegroundIcon = 'user'
+    }
+    switch (locationIconWithBearingOption) {
+      case 'URL':
+        mapConfig.locationIconWithBearing =
+          'https://cdn-icons-png.flaticon.com/512/5142/5142952.png'
+    }
+    switch (compassIconOption) {
+      case 'URL':
+        mapConfig.compassIcon =
+          'https://cdn-icons-png.flaticon.com/512/16/16797.png'
         break
       default:
         break
@@ -216,10 +259,10 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
         ).toString()}`
       )
       if (
-        currentPositionRef.current?.location.building != undefined &&
-        currentPositionRef.current.location.floor != undefined &&
-        currentPositionRef.current.location.latitude != undefined &&
-        currentPositionRef.current.location.longitude != undefined
+        currentPositionRef.current?.location?.building &&
+        currentPositionRef.current?.location?.floor &&
+        currentPositionRef.current?.location?.latitude &&
+        currentPositionRef.current?.location?.longitude
       ) {
         console.log(
           `STARTING ROUTE Using current user position ${JSON.stringify(
@@ -278,9 +321,14 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
         finalFloor: finalPos.floor,
         place: parentPlaceRef.id,
         preferAccessibleRoute: withMobility,
-        nextStepsRouteColor: aheadColor,
-        prevStepsRouteColor: behindColor,
-        polylineWidth: 10,
+        nextStepsRouteStyle:
+          aheadStyle === 'SOLID'
+            ? nextStepsRouteStylePlainOption
+            : nextStepsRouteStyleGradientOption,
+        prevStepsRouteStyle:
+          behindStyle === 'SOLID'
+            ? prevStepsRouteStylePlainOption
+            : prevStepsRouteStyleGradientOption,
         announceFormat: announceFormat,
         unitSystem: unitSystem,
         language: language,
@@ -561,7 +609,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
   }
 
   return (
-    <IonContent>
+    <>
       <IonGrid>
         <IonRow>
           <IonCol>
@@ -576,7 +624,6 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
               <IonCard>
                 <IonCardTitle>
                   <IonSelect
-                    interface='popover'
                     onIonChange={changeFloor}
                     value={currentFloorKey}
                     defaultValue={currentFloorKey}
@@ -603,24 +650,51 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
                   <IonCardTitle>Create a map to begin</IonCardTitle>
                 </IonCardHeader>
                 <IonCardContent>
-                  <IonItem>
+                  {isPlatform('android') && (
+                    <IonItem key={'location-options'}>
+                      <IonLabel position='stacked'>
+                        Select location icon mode
+                      </IonLabel>
+                      <IonSelect
+                        onIonChange={(e) =>
+                          setLocationIconOption(e.detail.value)
+                        }
+                        value={locationIconOption}
+                      >
+                        <IonSelectOption value=''>Default</IonSelectOption>
+                        <IonSelectOption value='URL'>
+                          Icon available on url
+                        </IonSelectOption>
+                      </IonSelect>
+                    </IonItem>
+                  )}
+                  <IonItem key={'location-with-bearing-options'}>
                     <IonLabel position='stacked'>
-                      Select location icon mode
+                      Select location with bearing icon mode
                     </IonLabel>
                     <IonSelect
-                      interface='popover'
-                      onIonChange={(e) => setLocationIconOption(e.detail.value)}
-                      value={locationIconOption}
+                      onIonChange={(e) =>
+                        setLocationIconWithBearingOption(e.detail.value)
+                      }
+                      value={locationIconWithBearingOption}
                     >
                       <IonSelectOption value=''>Default</IonSelectOption>
                       <IonSelectOption value='URL'>
                         Icon available on url
                       </IonSelectOption>
-                      <IonSelectOption value='NAME'>
-                        Name of preloaded icon
-                      </IonSelectOption>
-                      <IonSelectOption value='LOCAL'>
-                        Local Icon file
+                    </IonSelect>
+                  </IonItem>
+                  <IonItem key={'compass-options'}>
+                    <IonLabel position='stacked'>
+                      Select compass icon mode
+                    </IonLabel>
+                    <IonSelect
+                      onIonChange={(e) => setCompassIconOption(e.detail.value)}
+                      value={compassIconOption}
+                    >
+                      <IonSelectOption value=''>Default</IonSelectOption>
+                      <IonSelectOption value='URL'>
+                        Icon available on url
                       </IonSelectOption>
                     </IonSelect>
                   </IonItem>
@@ -636,7 +710,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
 
         <IonAccordionGroup multiple>
           <IonAccordion value='location-response'>
-            <IonItem slot='header' color='light'>
+            <IonItem slot='header' color='light' key='Location'>
               <IonLabel>Location Response</IonLabel>
             </IonItem>
             <div className='ion-padding' slot='content'>
@@ -674,7 +748,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
 
               {currentPositionRef.current && (
                 <IonList>
-                  <IonItem>
+                  <IonItem key='lat&lng'>
                     <IonLabel>
                       Lat & Lng:{' '}
                       {currentPositionRef.current.location.latitude?.toFixed(6)}{' '}
@@ -685,7 +759,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
                     </IonLabel>
                   </IonItem>
                   <IonItem>
-                    <IonLabel>
+                    <IonLabel key='floor'>
                       Floor:{' '}
                       {
                         innerFloors.find((i) => {
@@ -697,30 +771,35 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
                       }
                     </IonLabel>
                   </IonItem>
-                  <IonItem>
+                  <IonItem key='building'>
                     <IonLabel>
                       Building: {currentPositionRef.current.location.building}
                     </IonLabel>
                   </IonItem>
-                  <IonItem>
+                  <IonItem key='currentStep'>
                     <IonLabel>
                       Current Step:{' '}
                       {currentPositionRef.current.routingStatus?.currentStep}
                     </IonLabel>
                   </IonItem>
-                  <IonItem>
+                  <IonItem key='routingStatus'>
                     <IonLabel>
                       Routing Status:{' '}
                       {currentPositionRef.current.routingStatus?.status}
                     </IonLabel>
                   </IonItem>
-                  <IonItem>
+                  <IonItem key='buildingStatus'>
                     <IonLabel>
                       Building Status:{' '}
                       {currentPositionRef.current.insideBuilding}
                     </IonLabel>
                   </IonItem>
-                  <IonItem>
+                  <IonItem key='heading'>
+                    <IonLabel>
+                      Heading {currentPositionRef.current.location.heading}
+                    </IonLabel>
+                  </IonItem>
+                  <IonItem key='routeId'>
                     <IonLabel>Route ID: {routeId}</IonLabel>
                   </IonItem>
                 </IonList>
@@ -730,7 +809,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
 
           {newMap && (
             <IonAccordion value='route'>
-              <IonItem slot='header' color='light'>
+              <IonItem slot='header' color='light' key='routeHeader'>
                 <IonLabel>Route</IonLabel>
               </IonItem>
               <div slot='content' className='ion-padding'>
@@ -778,7 +857,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
 
           {newMap && (
             <IonAccordion value='location-features'>
-              <IonItem slot='header' color='light'>
+              <IonItem slot='header' color='light' key='LocationFeature'>
                 <IonLabel>Location features</IonLabel>
               </IonItem>
               <div className='ion-padding' slot='content'>
@@ -908,7 +987,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
           )}
 
           <IonAccordion value='beacons-simulation'>
-            <IonItem slot='header' color='light'>
+            <IonItem slot='header' color='light' key='beaconsSimulation'>
               <IonLabel>Beacons simulation</IonLabel>
             </IonItem>
             <div className='ion-padding' slot='content'>
@@ -956,7 +1035,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
 
           {newMap && (
             <IonAccordion value='pin-and-camera'>
-              <IonItem slot='header' color='light'>
+              <IonItem slot='header' color='light' key='markers'>
                 <IonLabel>Markers and Camera</IonLabel>
               </IonItem>
               <div className='ion-padding' slot='content'>
@@ -1072,7 +1151,6 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
                 <IonList>
                   <IonSelect
                     id='start_point'
-                    interface='popover'
                     value={startPosition}
                     onIonChange={(event) => {
                       if (event.detail.value === undefined) return
@@ -1110,7 +1188,6 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
                   <IonSelect
                     id='final_point'
                     value={finalPosition}
-                    interface='popover'
                     onIonChange={(event) => {
                       if (event.detail.value === undefined) return
                       setFinalPosition(event.detail.value)
@@ -1153,7 +1230,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
                       <IonLabel>Walking</IonLabel>
                       <IonRadio slot='end' value='0'></IonRadio>
                     </IonItem>
-                    <IonItem>
+                    <IonItem key='accessible'>
                       <IonLabel>Accessible</IonLabel>
                       <IonRadio slot='end' value='1'></IonRadio>
                     </IonItem>
@@ -1183,12 +1260,12 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
                       <IonRadio slot='end' value='RELATIVE'></IonRadio>
                     </IonItem>
 
-                    <IonItem>
+                    <IonItem key='cardinal'>
                       <IonLabel>CARDINAL</IonLabel>
                       <IonRadio slot='end' value='CARDINAL'></IonRadio>
                     </IonItem>
 
-                    <IonItem>
+                    <IonItem key='clock'>
                       <IonLabel>CLOCK</IonLabel>
                       <IonRadio slot='end' value='CLOCK'></IonRadio>
                     </IonItem>
@@ -1211,17 +1288,17 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
                       }
                     }}
                   >
-                    <IonItem>
+                    <IonItem key='metric'>
                       <IonLabel>METRIC</IonLabel>
                       <IonRadio slot='end' value='METRIC'></IonRadio>
                     </IonItem>
 
-                    <IonItem>
+                    <IonItem key='imperial'>
                       <IonLabel>IMPERIAL</IonLabel>
                       <IonRadio slot='end' value='IMPERIAL'></IonRadio>
                     </IonItem>
 
-                    <IonItem>
+                    <IonItem key='steps'>
                       <IonLabel>STEPS</IonLabel>
                       <IonRadio slot='end' value='STEPS'></IonRadio>
                     </IonItem>
@@ -1241,17 +1318,17 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
                       setInstructionsLanguage(event.detail.value.toString())
                     }}
                   >
-                    <IonItem>
+                    <IonItem key='langDefault'>
                       <IonLabel>SYSTEM</IonLabel>
                       <IonRadio slot='end' value='system' />
                     </IonItem>
 
-                    <IonItem>
+                    <IonItem key='langES'>
                       <IonLabel>SPANISH</IonLabel>
                       <IonRadio slot='end' value='es' />
                     </IonItem>
 
-                    <IonItem>
+                    <IonItem key='langEN'>
                       <IonLabel>ENGLISH</IonLabel>
                       <IonRadio slot='end' value='en' />
                     </IonItem>
@@ -1260,19 +1337,17 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
               </IonCol>
               <IonCol>
                 <IonCardHeader>
-                  <IonCardTitle>Behind Color</IonCardTitle>
+                  <IonCardTitle>Behind Style</IonCardTitle>
                 </IonCardHeader>
                 <IonRadioGroup
                   id='behind-color'
-                  value={behindColor}
-                  onIonChange={(e) => setBehindColor(e.detail.value)}
+                  value={behindStyle}
+                  onIonChange={(e) => setBehindStyle(e.detail.value)}
                 >
-                  {behindColors.map((color) => (
-                    <IonItem>
-                      <IonLabel style={{ background: color, color: 'white' }}>
-                        {color}
-                      </IonLabel>
-                      <IonRadio slot='end' value={color}></IonRadio>
+                  {behindStyleOptions.map((option) => (
+                    <IonItem key={'behind-' + option}>
+                      <IonLabel>{option}</IonLabel>
+                      <IonRadio slot='end' value={option}></IonRadio>
                     </IonItem>
                   ))}
                 </IonRadioGroup>
@@ -1283,15 +1358,13 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
                 </IonCardHeader>
                 <IonRadioGroup
                   id='ahead-color'
-                  value={aheadColor}
-                  onIonChange={(e) => setAheadColor(e.detail.value)}
+                  value={aheadStyle}
+                  onIonChange={(e) => setAheadStyle(e.detail.value)}
                 >
-                  {aheadColors.map((color) => (
-                    <IonItem>
-                      <IonLabel style={{ background: color, color: 'white' }}>
-                        {color}
-                      </IonLabel>
-                      <IonRadio slot='end' value={color}></IonRadio>
+                  {aheadStyleOptions.map((option) => (
+                    <IonItem key={'ahead-' + option}>
+                      <IonLabel>{option}</IonLabel>
+                      <IonRadio slot='end' value={option}></IonRadio>
                     </IonItem>
                   ))}
                 </IonRadioGroup>
@@ -1314,7 +1387,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
         // <img src='/assets/icon/location.png' alt='icono de ubicación' />
         // Para chequear que esta bien colocada la imagen
       }
-    </IonContent>
+    </>
   )
 }
 export default ExploreContainer
