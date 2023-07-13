@@ -278,11 +278,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
         }
       }
     } else {
-      console.log(
-        `STARTING ROUTE Don't using current user position ${JSON.stringify(
-          currentPositionRef.current
-        ).toString()}`
-      )
+      console.log('LZRouting Start not user location')
       let initialPlace = places[startLocationIndex]
       initialPos = {
         building: parentPlaceRef.id,
