@@ -8,6 +8,7 @@ import {
   IonCardContent,
   IonCardHeader,
   IonCardTitle,
+  IonCheckbox,
   IonCol,
   IonContent,
   IonGrid,
@@ -145,6 +146,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
   const [compassIconOption, setCompassIconOption] = useState('')
   const [aheadStyle, setAheadStyle] = useState<string>(aheadStyleOptions[0])
   const [behindStyle, setBehindStyle] = useState<string>(behindStyleOptions[1])
+  const [useIds, setUseIds] = useState(false)
 
   const apiKey = process.env.REACT_APP_YOUR_API_KEY_HERE ?? ''
 
@@ -1137,6 +1139,16 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
             </IonToolbar>
           </IonHeader>
           <IonContent className='ion-padding'>
+            <IonRow>
+              <IonItem>
+                <IonCheckbox
+                  slot='end'
+                  value={useIds}
+                  onIonChange={(e) => setUseIds(e.detail.checked)}
+                />
+                <IonLabel>Use IDs for Places</IonLabel>
+              </IonItem>
+            </IonRow>
             <IonRow>
               <IonCol>
                 <IonCardHeader>
