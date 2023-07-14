@@ -113,7 +113,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
 
   const [present] = useIonToast()
   const [startPosition, setStartPosition] = useState(-1)
-  const [finalPosition, setFinalPosition] = useState(-1)
+  const [finalPosition, setFinalPosition] = useState(0)
   const mapRef = useRef<HTMLElement>()
   const [showToast1, setShowToast1] = useState(false)
   const [steps, setSteps] = useState<SdkStepRoute[]>([])
@@ -1204,7 +1204,6 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
                       cssClass: 'actionSheet',
                     }}
                   >
-                    <IonSelectOption value={-1}>User Position</IonSelectOption>
                     {places.map((place, i) => (
                       <IonSelectOption value={i} key={place.id}>
                         {place.title?.default} -{' '}
