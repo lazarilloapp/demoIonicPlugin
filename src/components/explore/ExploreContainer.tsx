@@ -1140,14 +1140,19 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
           </IonHeader>
           <IonContent className='ion-padding'>
             <IonRow>
-              <IonItem>
-                <IonCheckbox
-                  slot='end'
-                  value={useIds}
-                  onIonChange={(e) => setUseIds(e.detail.checked)}
-                />
-                <IonLabel>Use IDs for Places</IonLabel>
-              </IonItem>
+              <IonCol>
+                <IonCardHeader>
+                  <IonCardTitle>Locations Mode</IonCardTitle>
+                </IonCardHeader>
+                <IonItem lines='none'>
+                  <IonCheckbox
+                    slot='end'
+                    checked={useIds}
+                    onIonChange={(e) => setUseIds(e.detail.checked)}
+                  />
+                  <IonLabel>Use IDs for Places</IonLabel>
+                </IonItem>
+              </IonCol>
             </IonRow>
             <IonRow>
               <IonCol>
