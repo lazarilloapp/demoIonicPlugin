@@ -148,6 +148,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
   const [aheadStyle, setAheadStyle] = useState<string>(aheadStyleOptions[0])
   const [behindStyle, setBehindStyle] = useState<string>(behindStyleOptions[1])
   const [useIds, setUseIds] = useState(false)
+  const [markers, setMarkers] = useState<string[]>([])
 
   const apiKey = process.env.REACT_APP_YOUR_API_KEY_HERE ?? ''
 
@@ -435,23 +436,44 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
   }
 
   async function addMarker() {
-    newMap?.addMarker({
-      coordinate: {
-        lat: -33.417556917537524,
-        lng: -70.60716507932558,
-      },
-      floorId: 'outlined_person',
-    })
+    if (
+      currentPositionState?.location.latitude &&
+      currentPositionState.location.longitude &&
+      currentPositionState.location.floor
+    ) {
+      try {
+        const id = await newMap?.addMarker({
+          coordinate: {
+            lat: currentPositionState.location.latitude,
+            lng: currentPositionState.location.longitude,
+          },
+          floorId: currentPositionState.location.floor,
+          icon: 'outlined_person',
+        })
+        if (id) {
+          console.log(`Created marker with id ${id}`)
+          setMarkers((markers) => [...markers, id])
+        }
+      } catch (error) {
+        console.error(error)
+      }
+    } else {
+      console.log('Pide una  ubicación primero')
+    }
   }
 
   async function addOutdoorMarker() {
-    newMap?.addMarker({
+    const id = await newMap?.addMarker({
       coordinate: {
         lat: -33.417556917537524,
         lng: -70.60716507932558,
       },
       icon: 'outlined_pin',
     })
+    if (id) {
+      console.log(`Created marker with id ${id}`)
+      setMarkers((markers) => [...markers, id])
+    }
   }
 
   async function destroyMap() {
@@ -1073,7 +1095,10 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
                     trigger='indoor-pin-button-information'
                     triggerAction='click'
                   >
-                    <IonContent class='ion-padding'>WIP</IonContent>
+                    <IonContent class='ion-padding'>
+                      Add a marker on the user current location, if it not
+                      available, it fail silently
+                    </IonContent>
                   </IonPopover>
                 </div>
                 <div>
