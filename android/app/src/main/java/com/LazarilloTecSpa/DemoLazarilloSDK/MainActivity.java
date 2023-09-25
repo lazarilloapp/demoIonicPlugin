@@ -1,4 +1,4 @@
-package io.ionic.starter;
+package com.LazarilloTecSpa.DemoLazarilloSDK;
 
 import com.getcapacitor.BridgeActivity;
 

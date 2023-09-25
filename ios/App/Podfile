@@ -18,7 +18,7 @@ def capacitor_pods
   pod 'LzdevelopersLazarilloMaps', :path => '../../node_modules/@lzdevelopers/lazarillo-maps'
 end
 
-target 'App' do
+target 'Demo Lazarillo SDK' do
   capacitor_pods
   # Add your Pods here
 end

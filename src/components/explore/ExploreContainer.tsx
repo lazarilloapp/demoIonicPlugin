@@ -8,6 +8,7 @@ import {
   IonCardContent,
   IonCardHeader,
   IonCardTitle,
+  IonCheckbox,
   IonCol,
   IonContent,
   IonGrid,
@@ -35,8 +36,9 @@ import { LazarilloMap, LazarilloUtils } from '@lzdevelopers/lazarillo-maps'
 import {
   GetPositionCallbackData,
   GradientStyle,
+  IdRoutePlace,
   LazarilloMapConfig,
-  LzLocation,
+  LocationRoutePlace,
   RouteReadyCallbackData,
   SdkStepRoute,
   SolidStyle,
@@ -112,7 +114,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
 
   const [present] = useIonToast()
   const [startPosition, setStartPosition] = useState(-1)
-  const [finalPosition, setFinalPosition] = useState(-1)
+  const [finalPosition, setFinalPosition] = useState(0)
   const mapRef = useRef<HTMLElement>()
   const [showToast1, setShowToast1] = useState(false)
   const [steps, setSteps] = useState<SdkStepRoute[]>([])
@@ -244,14 +246,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
     const targetPlace = places[targetPlaceKey]
 
     if (!newMap) return
-
-    let initialPos: LzLocation = {
-      building: undefined,
-      floor: undefined,
-      polygons: undefined,
-      latitude: undefined,
-      longitude: undefined,
-    }
+    let initialPos: LocationRoutePlace | IdRoutePlace
     // Using user location as initial position
     if (startLocationIndex === -1) {
       await getCurrentPosition()
@@ -272,56 +267,70 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
           ).toString()}`
         )
         initialPos = {
+          type: 'LOCATION',
           building: currentPositionRef.current.location.building,
           floor: currentPositionRef.current.location.floor,
           polygons: undefined,
           latitude: currentPositionRef.current.location.latitude,
           longitude: currentPositionRef.current.location.longitude,
         }
+      } else {
+        console.error('LZ Something failed when getting location')
+        return
       }
     } else {
-      console.log(
-        `STARTING ROUTE Don't using current user position ${JSON.stringify(
-          currentPositionRef.current
-        ).toString()}`
-      )
+      console.log('LZRouting Start not user location')
       let initialPlace = places[startLocationIndex]
-      initialPos = {
-        building: parentPlaceRef.id,
-        floor: initialPlace.inFloor ? initialPlace.inFloor[0] : undefined,
-        polygons: undefined,
-        latitude: initialPlace.lat,
-        longitude: initialPlace.lng,
+      if (useIds) {
+        let initialLocation: IdRoutePlace = {
+          type: 'ID',
+          id: initialPlace.alias ?? initialPlace.id,
+        }
+        initialPos = initialLocation
+      } else {
+        let initialLocation: LocationRoutePlace = {
+          type: 'LOCATION',
+          building: parentPlaceRef.id,
+          floor: initialPlace.inFloor ? initialPlace.inFloor[0] : undefined,
+          polygons: undefined,
+          latitude: initialPlace.lat,
+          longitude: initialPlace.lng,
+        }
+        initialPos = initialLocation
       }
     }
-    let finalPos = {
-      building: parentPlaceRef.id,
-      floor: targetPlace.inFloor ? targetPlace.inFloor[0] : undefined,
-      polygons: undefined,
-      latitude: targetPlace.lat,
-      longitude: targetPlace.lng,
+    let finalPos: LocationRoutePlace | IdRoutePlace
+    if (useIds) {
+      let location: IdRoutePlace = {
+        type: 'ID',
+        id: targetPlace.alias ?? targetPlace.id,
+      }
+      finalPos = location
+    } else {
+      let location: LocationRoutePlace = {
+        building: parentPlaceRef.id,
+        floor: targetPlace.inFloor ? targetPlace.inFloor[0] : undefined,
+        polygons: undefined,
+        latitude: targetPlace.lat,
+        longitude: targetPlace.lng,
+        type: 'LOCATION',
+      }
+      finalPos = location
     }
-
-    console.log(
-      `STARTING ROUTE Initial position ${JSON.stringify(initialPos).toString()}`
-    )
-    console.log(
-      `STARTING ROUTE Final position ${JSON.stringify(finalPos).toString()}`
-    )
 
     const language =
       instructionsLanguage !== 'system'
         ? instructionsLanguage
         : (await Device.getLanguageCode()).value
 
-    newMap.addRoute(
-      {
+    console.log(`STARTING ROUTE Initial position ${JSON.stringify(initialPos)}`)
+    console.log(`STARTING ROUTE Final position ${JSON.stringify(finalPos)}`)
+
+    newMap
+      .addRoute({
         mapId: 'my-cool-map',
-        initialPos: initialPos,
-        finalPos: finalPos,
-        initialFloor: initialPos.floor,
-        finalFloor: finalPos.floor,
-        place: parentPlaceRef.id,
+        initialLocation: initialPos,
+        finalLocation: finalPos,
         preferAccessibleRoute: withMobility,
         nextStepsRouteStyle:
           aheadStyle === 'SOLID'
@@ -334,16 +343,16 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
         announceFormat: announceFormat,
         unitSystem: unitSystem,
         language: language,
-      },
-      async (data: RouteReadyCallbackData) => {
+      })
+      .then((data: RouteReadyCallbackData) => {
         console.log('Route added', data)
         let routeData = data.data
         let steps = routeData.legs[0].steps
         setRouteId(data.routeId)
         setSteps(steps)
         presentToast('top', 'Route loaded')
-      }
-    )
+      })
+      .catch((e) => console.error('LZ addRoute failed ', e))
   }
 
   /**
@@ -1170,6 +1179,21 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
             <IonRow>
               <IonCol>
                 <IonCardHeader>
+                  <IonCardTitle>Locations Mode</IonCardTitle>
+                </IonCardHeader>
+                <IonItem lines='none'>
+                  <IonCheckbox
+                    slot='end'
+                    checked={useIds}
+                    onIonChange={(e) => setUseIds(e.detail.checked)}
+                  />
+                  <IonLabel>Use IDs for Places</IonLabel>
+                </IonItem>
+              </IonCol>
+            </IonRow>
+            <IonRow>
+              <IonCol>
+                <IonCardHeader>
                   {' '}
                   <IonCardTitle> From: </IonCardTitle>
                 </IonCardHeader>
@@ -1222,7 +1246,6 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
                       cssClass: 'actionSheet',
                     }}
                   >
-                    <IonSelectOption value={-1}>User Position</IonSelectOption>
                     {places.map((place, i) => (
                       <IonSelectOption value={i} key={place.id}>
                         {place.title?.default} -{' '}
