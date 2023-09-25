@@ -145,6 +145,8 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
   const [compassIconOption, setCompassIconOption] = useState('')
   const [aheadStyle, setAheadStyle] = useState<string>(aheadStyleOptions[0])
   const [behindStyle, setBehindStyle] = useState<string>(behindStyleOptions[1])
+  const [useIds, setUseIds] = useState(false)
+  const [canTapPlaceOnMap, setTapPlaceOnMap] = useState(false);
 
   const apiKey = process.env.REACT_APP_YOUR_API_KEY_HERE ?? ''
 
@@ -451,6 +453,21 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
     setSteps([])
   }
 
+  async function placeTap() {    
+    if (canTapPlaceOnMap) {
+      newMap?.stopUpdatingTappedPlace()
+    } else {
+      let callback = (placeId: string | undefined) => {
+        console.log(`Tap on map: PlaceId ${placeId}`)
+      }
+      newMap?.startUpdatingTappedPlace(callback)
+    }
+    setTapPlaceOnMap(!canTapPlaceOnMap)
+  }
+  async function clearTappedPlace() {
+    newMap?.clearSelectedPlace()
+  }
+
   /**
    * Move the camera angle and location
    */
@@ -642,6 +659,14 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
                     <IonIcon icon={trashBinOutline}></IonIcon>
                     <IonText>Destroy Map</IonText>
                   </IonButton>
+                  <IonButton onClick={placeTap}>
+                    <IonIcon icon={trashBinOutline}></IonIcon>
+                    <IonText>Enable Place tap on map</IonText>
+                  </IonButton>
+                  {canTapPlaceOnMap ? <IonButton onClick={clearTappedPlace}>
+                    <IonIcon icon={trashBinOutline}></IonIcon>
+                    <IonText>Clear selected place on map</IonText>
+                  </IonButton> : null}
                 </IonCardContent>
               </IonCard>
             ) : (
