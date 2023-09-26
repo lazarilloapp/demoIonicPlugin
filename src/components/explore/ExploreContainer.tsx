@@ -441,6 +441,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
         lat: -33.417556917537524,
         lng: -70.60716507932558,
       },
+      text: 'Estás aquí',
       floorId: 'outlined_person',
     })
   }
