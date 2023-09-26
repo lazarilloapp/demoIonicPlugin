@@ -466,8 +466,8 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
     if (canTapPlaceOnMap) {
       newMap?.stopUpdatingTappedPlace()
     } else {
-      let callback = (placeId: string | undefined) => {
-        console.log(`Tap on map: PlaceId ${placeId}`)
+      let callback = (data: any) => {
+        console.log(`Tap on map: PlaceId ${data.placeId}`)
       }
       newMap?.startUpdatingTappedPlace(callback)
     }
