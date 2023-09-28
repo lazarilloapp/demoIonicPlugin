@@ -149,6 +149,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
   const [behindStyle, setBehindStyle] = useState<string>(behindStyleOptions[1])
   const [useIds, setUseIds] = useState(false)
   const [canTapPlaceOnMap, setTapPlaceOnMap] = useState(false);
+  const [markerId, setMarkerId] = useState<string>("")
 
   const apiKey = process.env.REACT_APP_YOUR_API_KEY_HERE ?? ''
 
@@ -436,23 +437,37 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
   }
 
   async function addMarker() {
-    newMap?.addMarker({
+    removeMarker()
+    const id = await newMap?.addMarker({
       coordinate: {
-        lat: -33.417556917537524,
-        lng: -70.60716507932558,
+        lat: parentPlaceRef.lat,
+        lng: parentPlaceRef.lng,
       },
-      floorId: 'outlined_person',
+      floorId: currentFloorKey,
+      icon: 'outlined_pin'
     })
+    if (id) {
+      setMarkerId(id);
+    }
+  }
+  async function removeMarker() {
+    if (markerId !== ""){
+      await newMap?.removeMarker(markerId);
+    }
   }
 
   async function addOutdoorMarker() {
-    newMap?.addMarker({
+    removeMarker()
+    const id = await newMap?.addMarker({
       coordinate: {
-        lat: -33.417556917537524,
-        lng: -70.60716507932558,
+        lat: parentPlaceRef.lat,
+        lng: parentPlaceRef.lng,
       },
       icon: 'outlined_pin',
     })
+    if (id) {
+      setMarkerId(id);
+    }
   }
 
   async function destroyMap() {
@@ -1124,6 +1139,10 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
                     <IonContent class='ion-padding'>WIP</IonContent>
                   </IonPopover>
                 </div>
+                { markerId != "" ? <IonButton onClick={removeMarker}>
+                    <IonIcon icon={location}></IonIcon>
+                    <IonText>Remove marker</IonText>
+                  </IonButton> : null}
                 <div>
                   <IonButton onClick={setCamera}>
                     <IonIcon icon={cameraOutline}></IonIcon>
