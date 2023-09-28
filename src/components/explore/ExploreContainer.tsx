@@ -1140,7 +1140,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
                     <IonContent class='ion-padding'>WIP</IonContent>
                   </IonPopover>
                 </div>
-                { markerId != "" ? <IonButton onClick={removeMarker}>
+                { markerId !== "" ? <IonButton onClick={removeMarker}>
                     <IonIcon icon={location}></IonIcon>
                     <IonText>Remove marker</IonText>
                   </IonButton> : null}
