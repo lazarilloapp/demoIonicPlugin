@@ -1,5 +1,5 @@
 {
-	"appId": "io.ionic.starter",
+	"appId": "com.LazarilloTecSpa.DemoLazarilloSDK",
 	"appName": "Demo Lazarillo SDK",
 	"webDir": "build",
 	"bundledWebRuntime": false

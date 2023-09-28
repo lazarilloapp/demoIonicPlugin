@@ -443,8 +443,9 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
         lat: parentPlaceRef.lat,
         lng: parentPlaceRef.lng,
       },
+      text: 'Estás aquí',
       floorId: currentFloorKey,
-      icon: 'outlined_pin'
+      icon: 'outlined_person'
     })
     if (id) {
       setMarkerId(id);
