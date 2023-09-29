@@ -248,6 +248,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
 
     if (!newMap) return
     let initialPos: LocationRoutePlace | IdRoutePlace
+    let placeIds: string[] = [];
     // Using user location as initial position
     if (startLocationIndex === -1) {
       await getCurrentPosition()
@@ -287,6 +288,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
           type: 'ID',
           id: initialPlace.alias ?? initialPlace.id,
         }
+        placeIds.push(initialLocation.id)
         initialPos = initialLocation
       } else {
         let initialLocation: LocationRoutePlace = {
@@ -306,6 +308,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
         type: 'ID',
         id: targetPlace.alias ?? targetPlace.id,
       }
+      placeIds.push(location.id)
       finalPos = location
     } else {
       let location: LocationRoutePlace = {
@@ -351,6 +354,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
         let steps = routeData.legs[0].steps
         setRouteId(data.routeId)
         setSteps(steps)
+        newMap.colorPlaces(placeIds)
         presentToast('top', 'Route loaded')
       })
       .catch((e) => console.error('LZ addRoute failed ', e))
@@ -645,8 +649,10 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
   }
 
   async function destroyRoute() {
-    if (newMap !== undefined) {
+    if (newMap !== undefined && routeId !== "") {
+      newMap.colorPlaces([])
       newMap.destroyRouting({ routeId: routeId })
+      setRouteId('')
     }
   }
 
@@ -869,7 +875,9 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
                     instructions of the route.
                   </IonText>
                 </div>
-                <div>
+                {
+                  routeId === "" ?
+                  <div>
                   <IonButton onClick={() => setIsOpen(true)}>
                     <IonText>Make Route</IonText>
                   </IonButton>
@@ -894,7 +902,15 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
                       route.
                     </IonContent>
                   </IonPopover>
+                </div> : <div>
+                  <IonButton color="danger" onClick={() => destroyRoute()}>
+                    <IonText>Destroy Route</IonText>
+                  </IonButton>
+
                 </div>
+                }
+                
+
                 <RouteInstruction
                   steps={steps}
                   currentStepIndex={
