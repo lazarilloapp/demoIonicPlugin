@@ -1,6 +1,5 @@
 {
 	"appId": "com.LazarilloTecSpa.DemoLazarilloSDK",
 	"appName": "Demo Lazarillo SDK",
-	"webDir": "build",
-	"bundledWebRuntime": false
+	"webDir": "build"
 }
