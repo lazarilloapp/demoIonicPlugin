@@ -50,6 +50,7 @@ import {
   informationCircle,
   locateOutline,
   location,
+  map,
   mapOutline,
   trashBinOutline,
   walk,
@@ -150,6 +151,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
   const [useIds, setUseIds] = useState(false)
   const [canTapPlaceOnMap, setTapPlaceOnMap] = useState(false);
   const [markerId, setMarkerId] = useState<string>("")
+  const [animate, setAnimate] = useState(true)
 
   const apiKey = process.env.REACT_APP_YOUR_API_KEY_HERE ?? ''
 
@@ -238,15 +240,10 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
       )
     )
   }
-  //if you only want to show the route on the map
-  //if startLocationIndex is -1, it starts from user location
-  async function startRoute(
-    startLocationIndex: number,
-    targetPlaceKey: number
-  ) {
+  async function getRouteArgs(startLocationIndex: number, targetPlaceKey: number){
     const targetPlace = places[targetPlaceKey]
 
-    if (!newMap) return
+    if (!newMap) return {placeIds: [], undefined}
     let initialPos: LocationRoutePlace | IdRoutePlace
     let placeIds: string[] = [];
     // Using user location as initial position
@@ -278,7 +275,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
         }
       } else {
         console.error('LZ Something failed when getting location')
-        return
+        return {placeIds: [], undefined}
       }
     } else {
       console.log('LZRouting Start not user location')
@@ -329,32 +326,64 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
 
     console.log(`STARTING ROUTE Initial position ${JSON.stringify(initialPos)}`)
     console.log(`STARTING ROUTE Final position ${JSON.stringify(finalPos)}`)
+    
+    const routeArgs = {
+      mapId: 'my-cool-map',
+      initialLocation: initialPos,
+      finalLocation: finalPos,
+      preferAccessibleRoute: withMobility,
+      nextStepsRouteStyle:
+        aheadStyle === 'SOLID'
+          ? nextStepsRouteStylePlainOption
+          : nextStepsRouteStyleGradientOption,
+      prevStepsRouteStyle:
+        behindStyle === 'SOLID'
+          ? prevStepsRouteStylePlainOption
+          : prevStepsRouteStyleGradientOption,
+      announceFormat: announceFormat,
+      unitSystem: unitSystem,
+      language: language,
+    };
 
-    newMap
-      .addRoute({
-        mapId: 'my-cool-map',
-        initialLocation: initialPos,
-        finalLocation: finalPos,
-        preferAccessibleRoute: withMobility,
-        nextStepsRouteStyle:
-          aheadStyle === 'SOLID'
-            ? nextStepsRouteStylePlainOption
-            : nextStepsRouteStyleGradientOption,
-        prevStepsRouteStyle:
-          behindStyle === 'SOLID'
-            ? prevStepsRouteStylePlainOption
-            : prevStepsRouteStyleGradientOption,
-        announceFormat: announceFormat,
-        unitSystem: unitSystem,
-        language: language,
-      })
-      .then((data: RouteReadyCallbackData) => {
-        console.log('Route added', data)
-        let routeData = data.data
+    return {placeIds, routeArgs};
+  }
+
+  //if you only want to show the route on the map
+  //if startLocationIndex is -1, it starts from user location
+  async function startRoute(
+    startLocationIndex: number,
+    targetPlaceKey: number
+  ) {
+    const {placeIds, routeArgs} = await getRouteArgs(startLocationIndex, targetPlaceKey)!;
+    if (routeArgs === undefined) return
+    newMap!.addRoute(routeArgs!)
+      .then((routeResponse: RouteReadyCallbackData) => {
+        console.log('Route added', routeResponse)
+        let routeData = routeResponse.data
         let steps = routeData.legs[0].steps
-        setRouteId(data.routeId)
+        setRouteId(routeResponse.routeId)
         setSteps(steps)
-        newMap.colorPlaces(placeIds)
+        newMap?.colorPlaces(placeIds)
+        presentToast('top', 'Route loaded')
+      })
+      .catch((e) => console.error('LZ addRoute failed ', e))
+  }
+
+  async function startRouteAnimated(
+    startLocationIndex: number,
+    targetPlaceKey: number) {
+
+    const {placeIds, routeArgs} = await getRouteArgs(startLocationIndex, targetPlaceKey)!;
+    if (routeArgs === undefined) return
+    newMap!.getRoute(routeArgs!)
+      .then((routeResponse: RouteReadyCallbackData) => {
+        console.log('Route added', routeResponse)
+        let routeData = routeResponse.data
+        let steps = routeData.legs[0].steps
+        setRouteId(routeResponse.routeId)
+        setSteps(steps)
+        newMap?.colorPlaces(placeIds)
+        newMap?.animateRoute(routeResponse.routeId)
         presentToast('top', 'Route loaded')
       })
       .catch((e) => console.error('LZ addRoute failed ', e))
@@ -401,6 +430,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
     console.log('LZ routeId', routeId)
 
     newMap.destroyRouting({ routeId })
+    newMap.stopAnimatedRoute()
     // TODO: STOP watchPosition
   }
 
@@ -652,6 +682,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
     if (newMap !== undefined && routeId !== "") {
       newMap.colorPlaces([])
       newMap.destroyRouting({ routeId: routeId })
+      newMap.stopAnimatedRoute();
       setRouteId('')
     }
   }
@@ -1202,8 +1233,13 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
               <IonButtons slot='end'>
                 <IonButton
                   onClick={() => {
-                    startRoute(startPosition, finalPosition)
-                    setIsOpen(false)
+                    if (!animate) {
+                      startRoute(startPosition, finalPosition)
+                      setIsOpen(false)
+                    } else {
+                      startRouteAnimated(startPosition, finalPosition)
+                      setIsOpen(false)
+                    }
                   }}
                 >
                   Start <IonIcon icon={walk}></IonIcon>
@@ -1212,6 +1248,21 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
             </IonToolbar>
           </IonHeader>
           <IonContent className='ion-padding'>
+            <IonRow>
+              <IonCol>
+                <IonCardHeader>
+                  <IonCardTitle>Animate route</IonCardTitle>
+                </IonCardHeader>
+                <IonItem lines='none'>
+                  <IonCheckbox
+                    slot='end'
+                    checked={animate}
+                    onIonChange={(e) => setAnimate(e.detail.checked)}
+                  />
+                  <IonLabel>Use animation</IonLabel>
+                </IonItem>
+              </IonCol>
+            </IonRow>
             <IonRow>
               <IonCol>
                 <IonCardHeader>
