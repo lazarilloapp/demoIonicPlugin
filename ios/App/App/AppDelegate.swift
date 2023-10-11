@@ -11,23 +11,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        checkLocationPermission()
         return true
     }
     
-    private func checkLocationPermission() {
-        locationManager.delegate = self
-        switch CLLocationManager.authorizationStatus() {
-        case .notDetermined:
-            locationManager.requestAlwaysAuthorization()
-        case .restricted, .denied:
-            break
-        case .authorizedAlways, .authorizedWhenInUse:
-            break
-        @unknown default:
-            break
-        }
-    }
 
 
     func applicationWillResignActive(_ application: UIApplication) {
