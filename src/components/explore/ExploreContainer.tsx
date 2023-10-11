@@ -187,6 +187,9 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
         lng: parentPlaceRef.lng,
       },
       zoom: 17,
+      minZoom: 15,
+      showCompass: false,
+      boundRadius: 0,
       parentPlaceId: parentPlaceRef.id,
     }
     switch (locationIconOption) {
@@ -233,9 +236,15 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
           apiKey: apiKey,
           config: config,
         },
-        async () => {
-          console.log('Map loaded')
-          presentToast('top')
+        async (data: {mapId: string, error?: string}) => {
+          let error = data.error
+          if(error && error !== ""){
+            console.log('Error loading map: ' + error);
+            presentToast('top', "Cannot load map")
+          }else {
+            console.log('Map loaded')
+            presentToast('top', "Map Loaded")
+          }
         }
       )
     )
