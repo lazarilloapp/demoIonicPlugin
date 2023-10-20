@@ -9,11 +9,11 @@ import {
   IonSelectOption,
   useIonViewWillEnter,
 } from '@ionic/react'
-import { LazarilloUtils } from '@lzdevelopers/lazarillo-maps'
 import { useState } from 'react'
 import ExploreContainer from '../explore/ExploreContainer'
 
 import { Place } from '../places/Place'
+import { LazarilloMap } from '@lzdevelopers/lazarillo-maps'
 
 interface ContainerProps {}
 
@@ -39,10 +39,8 @@ const SelectParentPlaceContainer: React.FC<ContainerProps> = () => {
   }
 
   const getParentPlaces = async () => {
-    await LazarilloUtils.fetchParentPlaces(apiKey).then(async (response) => {
-      await response.json().then((data) => {
-        setParentPlacesList(data)
-      })
+    await LazarilloMap.getAvailablePlaces(apiKey).then(async (response: any[]) => {
+      setParentPlacesList(response)
     })
   }
 

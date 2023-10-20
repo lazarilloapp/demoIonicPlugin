@@ -32,7 +32,7 @@ import {
   isPlatform,
   useIonToast,
 } from '@ionic/react'
-import { LazarilloMap, LazarilloUtils } from '@lzdevelopers/lazarillo-maps'
+import { LazarilloMap } from '@lzdevelopers/lazarillo-maps'
 import {
   GetPositionCallbackData,
   GradientStyle,
@@ -161,12 +161,12 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
         parentPlaceRef.alias ? parentPlaceRef.alias : parentPlaceRef.id
       )
 
-      await getSubPlaces(parentPlaceRef.id)
-
       await LazarilloMap.initializeLazarilloPlugin({
         apiKey: apiKey,
         place: parentPlaceRef.id,
       })
+
+      await getSubPlaces(parentPlaceRef.id)
       setInitialized(true)
     }
   }
@@ -608,18 +608,16 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
    * @param placeId
    */
   async function getSubPlaces(placeId: string) {
-    LazarilloUtils.fetchSubplaces(apiKey, placeId).then((response) => {
-      // Load the places in the places variable
-      response.json().then((data) => {
-        const preparedPlaces: Place[] = []
-        data.sort((a: Place, b: Place) =>
-          a.title.default.toLowerCase() > b.title.default.toLowerCase() ? 1 : -1
-        )
-        data.forEach((place: Place) => {
-          preparedPlaces.push(place)
-        })
-        setPlaces(preparedPlaces)
+    await LazarilloMap.getSubPlaces(placeId).then((response: Place[]) => {
+      const preparedPlaces: Place[] = []
+      const data = response ?? []
+      data.sort((a: Place, b: Place) =>
+        a.title.default.toLowerCase() > b.title.default.toLowerCase() ? 1 : -1
+      )
+      data.forEach((place: Place) => {
+        preparedPlaces.push(place)
       })
+      setPlaces(preparedPlaces)
     })
   }
 
@@ -628,26 +626,19 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
    * @param alias
    */
   async function getParentPlace(alias: string) {
-    await LazarilloUtils.fetchPlaceInfo(apiKey, alias).then(
-      async (response) => {
-        // Load the place in the parentPlace variable
-        await response.json().then((data) => {
-          parentPlaceRef = data
+    let response  = await LazarilloMap.getPublicPlace(alias, apiKey)
+    parentPlaceRef = response
+    let innerFloors: InnerFloor[] = []
+    for (let [key, value] of Object.entries(
+      parentPlaceRef.innerFloors ?? {}
+    )) {
+      innerFloors.push({ ...value, key: key })
+    }
+    setInnerFloors(innerFloors)
 
-          let innerFloors: InnerFloor[] = []
-          for (let [key, value] of Object.entries(
-            parentPlaceRef.innerFloors ?? {}
-          )) {
-            innerFloors.push({ ...value, key: key })
-          }
-          setInnerFloors(innerFloors)
-
-          console.log(
-            'Inner floors :',
-            Object.values(parentPlaceRef.innerFloors ?? {})
-          )
-        })
-      }
+    console.log(
+      'Inner floors :',
+      Object.values(parentPlaceRef.innerFloors ?? {})
     )
   }
 
