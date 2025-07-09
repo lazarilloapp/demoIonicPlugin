@@ -22,9 +22,7 @@ const SelectParentPlaceContainer: React.FC<ContainerProps> = () => {
   const [parentPlacesList, setParentPlacesList] = useState<Place[]>([])
   const [parentPlaceSelected, setParentPlace] = useState<Place>()
 
-  const apiKey = process.env.REACT_APP_YOUR_API_KEY_HERE
-    ? process.env.REACT_APP_YOUR_API_KEY_HERE
-    : ''
+  const apiKey = "AiNFZyJdbr5qa2KHmj7e-dev"
 
   useIonViewWillEnter(() => {
     getParentPlaces()
@@ -39,6 +37,7 @@ const SelectParentPlaceContainer: React.FC<ContainerProps> = () => {
   }
 
   const getParentPlaces = async () => {
+    console.log("asdasdad ---" + apiKey)
     await LazarilloMap.getAvailablePlaces(apiKey).then(async (response: any[]) => {
       setParentPlacesList(response)
     })
@@ -55,6 +54,7 @@ const SelectParentPlaceContainer: React.FC<ContainerProps> = () => {
         <IonRow className='center-row'>
           <IonSelect
             placeholder='Select place'
+             interface="popover"
             onIonChange={showParentPlaceMap}
           >
             {parentPlacesList.map((place) => {

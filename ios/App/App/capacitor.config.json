@@ -1,5 +1,13 @@
 {
 	"appId": "com.LazarilloTecSpa.DemoLazarilloSDK",
 	"appName": "Demo Lazarillo SDK",
-	"webDir": "build"
+	"webDir": "build",
+	"packageClassList": [
+		"AppPlugin",
+		"DevicePlugin",
+		"HapticsPlugin",
+		"KeyboardPlugin",
+		"StatusBarPlugin",
+		"CapacitorLazarilloMaps"
+	]
 }

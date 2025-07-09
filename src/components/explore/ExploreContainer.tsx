@@ -153,7 +153,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
   const [markerId, setMarkerId] = useState<string>("")
   const [animate, setAnimate] = useState(true)
 
-  const apiKey = process.env.REACT_APP_YOUR_API_KEY_HERE ?? ''
+  const apiKey = 'AiNFZyJdbr5qa2KHmj7e-dev'
 
   async function initPlugin() {
     if (!initialized) {
