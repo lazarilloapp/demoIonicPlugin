@@ -1,5 +1,5 @@
-platform :ios, '13.0'
-DEPLOYMENT_TARGET_IOS = '13.0'
+platform :ios, '14.0'
+DEPLOYMENT_TARGET_IOS = '14.0'
 use_frameworks!
 
 # workaround to avoid Xcode caching of Pods that requires
@@ -15,12 +15,13 @@ def capacitor_pods
   pod 'CapacitorHaptics', :path => '../../node_modules/@capacitor/haptics'
   pod 'CapacitorKeyboard', :path => '../../node_modules/@capacitor/keyboard'
   pod 'CapacitorStatusBar', :path => '../../node_modules/@capacitor/status-bar'
-  pod 'LzdevelopersLazarilloMaps', :path => '../../node_modules/@lzdevelopers/lazarillo-maps'
+  pod 'LzdevelopersLazarilloMaps', :path => '../../..'
 end
 
 target 'Demo Lazarillo SDK' do
   capacitor_pods
   # Add your Pods here
+  pod 'Alamofire', '5.10.2'
 end
 
 post_install do |installer|
