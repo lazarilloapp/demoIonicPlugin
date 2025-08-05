@@ -31,6 +31,7 @@ import {
   IonToolbar,
   isPlatform,
   useIonToast,
+  IonInput,
 } from '@ionic/react'
 import { LazarilloMap } from '@lzdevelopers/lazarillo-maps'
 import {
@@ -109,6 +110,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
       default: 'Costanera',
       es: 'Costanera',
     },
+    innerFloors: {}, // Agregar innerFloors vacío por defecto
   }
 
   const [places, setPlaces] = useState<Place[]>([])
@@ -150,16 +152,21 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
   const [behindStyle, setBehindStyle] = useState<string>(behindStyleOptions[1])
   const [useIds, setUseIds] = useState(false)
   const [canTapPlaceOnMap, setTapPlaceOnMap] = useState(false);
-  const [markerId, setMarkerId] = useState<string>("")
   const [animate, setAnimate] = useState(true)
+  const [lastTappedPlaceId, setLastTappedPlaceId] = useState<string | null>(null)
+  
+  // Nuevos estados para múltiples marcadores
+  const [markers, setMarkers] = useState<Array<{id: string, placeId: string, iconType: string, placeName: string}>>([])
+  const [selectedPlaceForMarker, setSelectedPlaceForMarker] = useState<number>(-1)
+  const [selectedIconType, setSelectedIconType] = useState<string>("outlined_pin")
+  const [selectedIconTypeToRemove, setSelectedIconTypeToRemove] = useState<string>("")
+  const [placeSearchFilter, setPlaceSearchFilter] = useState<string>("")
 
   const apiKey = 'AiNFZyJdbr5qa2KHmj7e-dev'
 
   async function initPlugin() {
     if (!initialized) {
-      await getParentPlace(
-        parentPlaceRef.alias ? parentPlaceRef.alias : parentPlaceRef.id
-      )
+      // Ya no es necesario llamar a getParentPlace, el parentPlace viene como prop
 
       await LazarilloMap.initializeLazarilloPlugin({
         apiKey: apiKey,
@@ -475,43 +482,94 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
     }
   }, [currentFloorKey, currentBeaconIndex])
 
+  useEffect(() => {
+    // Cuando cambie el parentPlace (prop 'place'), inicializa los innerFloors
+    if (place && place.innerFloors) {
+      const floors: InnerFloor[] = [];
+      for (const [key, value] of Object.entries(place.innerFloors)) {
+        floors.push({ ...value, key });
+      }
+      setInnerFloors(floors);
+      // Si hay pisos, selecciona el primero por defecto
+      if (floors.length > 0) {
+        setCurrentFloorKey(floors[0].key);
+      }
+    }
+  }, [place]);
+
   async function changeFloor(e: CustomEvent) {
     setCurrentFloorKey(e.detail.value)
   }
 
+  // Filtrar lugares basado en la búsqueda
+  const filteredPlaces = places.filter(place => 
+    place.title.default.toLowerCase().includes(placeSearchFilter.toLowerCase()) ||
+    (place.inFloor && getFloorNameById(place.inFloor[0]).toLowerCase().includes(placeSearchFilter.toLowerCase()))
+  )
+
+  // Opciones de iconos disponibles
+  const iconOptions = [
+    "person_pin",
+    "outlined_pin", 
+    "outlined_person",
+    "double_arrow",
+    "play_arrow",
+    "you_are_here",
+    "you_are_here_accesible",
+    "route",
+    "ic_place_placeholder"
+  ]
+
   async function addMarker() {
-    removeMarker()
+    if (selectedPlaceForMarker === -1) {
+      presentToast('top', 'Please select a place first')
+      return
+    }
+
+    const selectedPlace = places[selectedPlaceForMarker]
     const id = await newMap?.addMarker({
       coordinate: {
-        lat: parentPlaceRef.lat,
-        lng: parentPlaceRef.lng,
+        lat: selectedPlace.lat,
+        lng: selectedPlace.lng,
       },
-      text: 'Estás aquí',
-      floorId: currentFloorKey,
-      icon: 'outlined_person'
+      text: selectedPlace.title.default,
+      floorId: selectedPlace.inFloor ? selectedPlace.inFloor[0] : currentFloorKey,
+      icon: selectedIconType
     })
+    
     if (id) {
-      setMarkerId(id);
-    }
-  }
-  async function removeMarker() {
-    if (markerId !== ""){
-      await newMap?.removeMarker(markerId);
+      const newMarker = {
+        id: id,
+        placeId: selectedPlace.id,
+        iconType: selectedIconType,
+        placeName: selectedPlace.title.default
+      }
+      setMarkers([...markers, newMarker])
+      presentToast('top', `Marker added: ${selectedPlace.title.default}`)
     }
   }
 
-  async function addOutdoorMarker() {
-    removeMarker()
-    const id = await newMap?.addMarker({
-      coordinate: {
-        lat: parentPlaceRef.lat,
-        lng: parentPlaceRef.lng,
-      },
-      icon: 'outlined_pin',
-    })
-    if (id) {
-      setMarkerId(id);
+  async function removeMarker(markerId: string) {
+    await newMap?.removeMarker(markerId)
+    setMarkers(markers.filter(marker => marker.id !== markerId))
+    presentToast('top', 'Marker removed')
+  }
+
+  async function removeMarkersByIconType(iconType: string) {
+    const markersToRemove = markers.filter(marker => marker.iconType === iconType)
+    for (const marker of markersToRemove) {
+      await newMap?.removeMarker(marker.id)
     }
+    setMarkers(markers.filter(marker => marker.iconType !== iconType))
+    presentToast('top', `Removed ${markersToRemove.length} markers with icon: ${iconType}`)
+  }
+
+  async function removeAllMarkers() {
+    for (const marker of markers) {
+      await newMap?.removeMarker(marker.id)
+    }
+    setMarkers([])
+    presentToast('top', 'All markers removed')
   }
 
   async function destroyMap() {
@@ -527,6 +585,8 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
     } else {
       let callback = (data: any) => {
         console.log(`Tap on map: PlaceId ${data.placeId}`)
+        setLastTappedPlaceId(data.placeId)
+        presentToast('top', `Place tapped: ${data.placeId}`)
       }
       newMap?.startUpdatingTappedPlace(callback)
     }
@@ -621,26 +681,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
     })
   }
 
-  /**
-   * This function will use the service fetchPlaceInfo to get the parent place
-   * @param alias
-   */
-  async function getParentPlace(alias: string) {
-    let response  = await LazarilloMap.getPublicPlace(alias, apiKey)
-    parentPlaceRef = response
-    let innerFloors: InnerFloor[] = []
-    for (let [key, value] of Object.entries(
-      parentPlaceRef.innerFloors ?? {}
-    )) {
-      innerFloors.push({ ...value, key: key })
-    }
-    setInnerFloors(innerFloors)
-
-    console.log(
-      'Inner floors :',
-      Object.values(parentPlaceRef.innerFloors ?? {})
-    )
-  }
+  // Eliminada la función getParentPlace, ya que el parentPlace se pasa como prop
 
   /**
    * Iterate over the list of beacons to simulate. If there is the last beacon, the counter come back to the first
@@ -673,9 +714,10 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
    * @param floorId
    */
   function getFloorNameById(floorId: string) {
-    const innerFloors = Object.values(parentPlaceRef.innerFloors ?? {}) ?? []
+    if (!parentPlaceRef?.innerFloors) return 'Outdoor'
+    const innerFloors = Object.values(parentPlaceRef.innerFloors) ?? []
     const floor = innerFloors.find((floor) => floor.key === floorId)
-    return floor?.title ?? ''
+    return floor?.title ?? 'Outdoor'
   }
 
   async function destroyRoute() {
@@ -1137,63 +1179,151 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
               </IonItem>
               <div className='ion-padding' slot='content'>
                 <div>
-                  <IonText>Add pin and change camera angle and zoom.</IonText>
+                  <IonText>Add multiple markers with different icons and change camera angle and zoom.</IonText>
                 </div>
+                
+                {/* Selector de lugar para marcador */}
                 <div>
-                  <IonButton onClick={addMarker}>
-                    <IonIcon icon={location}></IonIcon>
-                    <IonText>Indoor</IonText>
-                  </IonButton>
-                  <IonButton
-                    id='indoor-pin-button-information'
-                    fill='clear'
-                    className='information-button'
-                  >
-                    <IonIcon
-                      slot='icon-only'
-                      icon={informationCircle}
-                      color='warning'
-                      size='large'
+                  <IonItem>
+                    <IonLabel position="stacked">Select Place for Marker</IonLabel>
+                    <IonSelect
+                      value={selectedPlaceForMarker}
+                      onIonChange={(e) => setSelectedPlaceForMarker(e.detail.value)}
+                      placeholder="Choose a place"
+                      interface="popover"
+                    >
+                      <IonSelectOption value={-1}>Select a place...</IonSelectOption>
+                      {filteredPlaces.map((place, index) => {
+                        const originalIndex = places.findIndex(p => p.id === place.id)
+                        const floorName = place.inFloor ? getFloorNameById(place.inFloor[0]) : 'Outdoor'
+                        return (
+                          <IonSelectOption key={place.id} value={originalIndex}>
+                            {place.title.default} - Floor: {floorName}
+                          </IonSelectOption>
+                        )
+                      })}
+                    </IonSelect>
+                  </IonItem>
+                  
+                  {/* Buscador de lugares */}
+                  <IonItem>
+                    <IonLabel position="stacked">Search Places</IonLabel>
+                    <IonInput
+                      value={placeSearchFilter}
+                      onIonInput={(e) => setPlaceSearchFilter(e.detail.value || '')}
+                      placeholder="Type to search places..."
+                      clearInput={true}
+                      style={{
+                        '--background': 'white',
+                        '--color': 'black',
+                        '--placeholder-color': '#666'
+                      }}
                     />
-                  </IonButton>
-                  <IonPopover
-                    trigger='indoor-pin-button-information'
-                    triggerAction='click'
-                  >
-                    <IonContent class='ion-padding'>WIP</IonContent>
-                  </IonPopover>
+                  </IonItem>
+                   
+                  {/* Mostrar cantidad de resultados */}
+                  {placeSearchFilter && (
+                    <IonText color="medium" style={{ fontSize: '12px', marginLeft: '16px' }}>
+                      Found {filteredPlaces.length} places
+                    </IonText>
+                  )}
                 </div>
+
+                {/* Selector de tipo de icono */}
                 <div>
-                  <IonButton onClick={addOutdoorMarker}>
-                    <IonIcon icon={location}></IonIcon>
-                    <IonText> Outdoor</IonText>
-                  </IonButton>
-                  <IonButton
-                    id='outdoor-pin-button-information'
-                    fill='clear'
-                    className='information-button'
-                  >
-                    <IonIcon
-                      slot='icon-only'
-                      icon={informationCircle}
-                      color='warning'
-                      size='large'
-                    />
-                  </IonButton>
-                  <IonPopover
-                    trigger='outdoor-pin-button-information'
-                    triggerAction='click'
-                  >
-                    <IonContent class='ion-padding'>WIP</IonContent>
-                  </IonPopover>
+                  <IonItem>
+                    <IonLabel position="stacked">Select Icon Type</IonLabel>
+                    <IonSelect
+                      value={selectedIconType}
+                      onIonChange={(e) => setSelectedIconType(e.detail.value)}
+                    >
+                      {iconOptions.map((icon) => (
+                        <IonSelectOption key={icon} value={icon}>
+                          {icon}
+                        </IonSelectOption>
+                      ))}
+                    </IonSelect>
+                  </IonItem>
                 </div>
-                { markerId !== "" ? <IonButton onClick={removeMarker}>
+
+                {/* Botones para agregar y eliminar marcadores */}
+                <div>
+                  <IonButton onClick={addMarker} disabled={selectedPlaceForMarker === -1}>
                     <IonIcon icon={location}></IonIcon>
-                    <IonText>Remove marker</IonText>
-                  </IonButton> : null}
+                    <IonText>Add Marker</IonText>
+                  </IonButton>
+                  <IonButton color="danger" onClick={removeAllMarkers} disabled={markers.length === 0}>
+                    <IonIcon icon={trashBinOutline}></IonIcon>
+                    <IonText>Remove All Markers</IonText>
+                  </IonButton>
+                </div>
+
+                {/* Eliminar marcadores por tipo de icono */}
+                {markers.length > 0 && (
+                  <div>
+                    <IonItem>
+                      <IonLabel position="stacked">Remove Markers by Icon Type</IonLabel>
+                      <IonSelect
+                        value={selectedIconTypeToRemove}
+                        onIonChange={(e) => setSelectedIconTypeToRemove(e.detail.value)}
+                        placeholder="Select icon type to remove"
+                      >
+                        <IonSelectOption value="">Select icon type...</IonSelectOption>
+                        {iconOptions.map((icon) => {
+                          const count = markers.filter(m => m.iconType === icon).length
+                          if (count > 0) {
+                            return (
+                              <IonSelectOption key={icon} value={icon}>
+                                {icon} ({count} markers)
+                              </IonSelectOption>
+                            )
+                          }
+                          return null
+                        })}
+                      </IonSelect>
+                    </IonItem>
+                    {selectedIconTypeToRemove && (
+                      <IonButton 
+                        color="warning" 
+                        onClick={() => removeMarkersByIconType(selectedIconTypeToRemove)}
+                        disabled={!selectedIconTypeToRemove}
+                      >
+                        <IonIcon icon={trashBinOutline}></IonIcon>
+                        <IonText>Remove {markers.filter(m => m.iconType === selectedIconTypeToRemove).length} markers with "{selectedIconTypeToRemove}"</IonText>
+                      </IonButton>
+                    )}
+                  </div>
+                )}
+
+                {/* Lista de marcadores activos */}
+                {markers.length > 0 && (
+                  <div>
+                    <IonText color="medium">Active Markers:</IonText>
+                    <IonList>
+                      {markers.map((marker) => (
+                        <IonItem key={marker.id}>
+                          <IonLabel>
+                            <h3>{marker.placeName}</h3>
+                            <p>Icon: {marker.iconType}</p>
+                          </IonLabel>
+                          <IonButton 
+                            slot="end" 
+                            color="danger" 
+                            size="small"
+                            onClick={() => removeMarker(marker.id)}
+                          >
+                            Remove
+                          </IonButton>
+                        </IonItem>
+                      ))}
+                    </IonList>
+                  </div>
+                )}
+
                 <div>
                   <IonButton onClick={setCamera}>
                     <IonIcon icon={cameraOutline}></IonIcon>
+                    <IonText>Change Camera</IonText>
                   </IonButton>
                   <IonButton
                     id='camera-button-information'
@@ -1211,9 +1341,26 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
                     trigger='camera-button-information'
                     triggerAction='click'
                   >
-                    <IonContent class='ion-padding'>WIP</IonContent>
+                    <IonContent class='ion-padding'>Change camera angle and zoom randomly</IonContent>
                   </IonPopover>
                 </div>
+
+                {/* Ejemplo de anotación de lugar */}
+                {lastTappedPlaceId && (
+                  <div style={{marginTop: 16}}>
+                    <IonText color="primary">Último placeId tocado: {lastTappedPlaceId}</IonText>
+                    <div style={{display: 'flex', gap: 8, marginTop: 8}}>
+                      <IonButton color="success" onClick={async () => {
+                        await newMap?.addPlaceAnnotation(lastTappedPlaceId)
+                        presentToast('top', 'Anotación agregada')
+                      }}>Agregar anotación</IonButton>
+                      <IonButton color="danger" onClick={async () => {
+                        await newMap?.removePlaceAnnotation(lastTappedPlaceId)
+                        presentToast('top', 'Anotación eliminada')
+                      }}>Quitar anotación</IonButton>
+                    </div>
+                  </div>
+                )}
               </div>
             </IonAccordion>
           )}
@@ -1304,7 +1451,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
                           {place.title?.default} -{' '}
                           {place.inFloor
                             ? getFloorNameById(place.inFloor[0])
-                            : ''}
+                            : 'Outdoor'}
                         </IonLabel>
                         <IonItemDivider />
                       </IonSelectOption>
@@ -1338,7 +1485,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
                         {place.title?.default} -{' '}
                         {place.inFloor
                           ? getFloorNameById(place.inFloor[0])
-                          : ''}
+                          : 'Outdoor'}
                       </IonSelectOption>
                     ))}
                   </IonSelect>

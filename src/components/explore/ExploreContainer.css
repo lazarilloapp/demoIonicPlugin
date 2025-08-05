@@ -2,6 +2,10 @@ capacitor-lazarillo-map {
   display: inline-block;
   width: 100%;
   height: 300px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1;
 }
 
 ion-modal#example-modal {
@@ -12,8 +16,13 @@ ion-modal#example-modal {
 }
 
 .grid-2 {
-  height: 300px;
-  overflow: auto;
+  height: calc(100vh - 300px); /* Altura total menos la altura del mapa */
+  overflow-y: auto; /* Scroll vertical */
+  overflow-x: hidden; /* Ocultar scroll horizontal */
+  margin-top: 300px; /* Espacio para el mapa fijo */
+  position: relative;
+  z-index: 2;
+  background: white;
 }
 
 ion-popover {
