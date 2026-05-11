@@ -1,6 +1,37 @@
 /* Ionic Variables and Theming. For more info, please see:
 http://ionicframework.com/docs/theming/ */
 
+/*
+ * Overlays must stay opaque even though `--ion-background-color` is kept
+ * transparent on `body` so the native map view (rendered behind the
+ * Ionic web view) can show through `.grid-2`. Without these overrides,
+ * IonAlert / IonPopover / IonModal / IonActionSheet inherit the
+ * transparent body background and become unreadable in dark mode.
+ */
+ion-alert,
+ion-action-sheet,
+ion-popover,
+ion-modal,
+ion-toast,
+ion-loading,
+ion-picker {
+  --background: #ffffff;
+  --ion-background-color: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+  ion-alert,
+  ion-action-sheet,
+  ion-popover,
+  ion-modal,
+  ion-toast,
+  ion-loading,
+  ion-picker {
+    --background: #1e1e1e;
+    --ion-background-color: #1e1e1e;
+  }
+}
+
 /** Ionic CSS Variables **/
 :root {
 

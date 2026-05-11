@@ -31,7 +31,6 @@ import {
   IonToolbar,
   isPlatform,
   useIonToast,
-  IonInput,
 } from '@ionic/react'
 import { LazarilloMap } from '@lzdevelopers/lazarillo-maps'
 import {
@@ -48,6 +47,9 @@ import {
   bluetooth,
   cameraOutline,
   caretForward,
+  closeCircleOutline,
+  handLeft,
+  handLeftOutline,
   informationCircle,
   locateOutline,
   location,
@@ -59,6 +61,7 @@ import {
 import { useEffect, useRef, useState } from 'react'
 import { InnerFloor } from '../places/InnerFloor'
 import { Place } from '../places/Place'
+import PlaceSelect, { USER_POSITION_VALUE } from '../places/PlaceSelect'
 import RouteInstruction from '../routeInstructions/RouteInstructions'
 import './ExploreContainer.css'
 
@@ -116,8 +119,8 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
   const [places, setPlaces] = useState<Place[]>([])
 
   const [present] = useIonToast()
-  const [startPosition, setStartPosition] = useState(-1)
-  const [finalPosition, setFinalPosition] = useState(0)
+  const [startPlaceId, setStartPlaceId] = useState<string | undefined>(USER_POSITION_VALUE)
+  const [finalPlaceId, setFinalPlaceId] = useState<string | undefined>()
   const mapRef = useRef<HTMLElement>()
   const [showToast1, setShowToast1] = useState(false)
   const [steps, setSteps] = useState<SdkStepRoute[]>([])
@@ -157,10 +160,9 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
   
   // Nuevos estados para múltiples marcadores
   const [markers, setMarkers] = useState<Array<{id: string, placeId: string, iconType: string, placeName: string}>>([])
-  const [selectedPlaceForMarker, setSelectedPlaceForMarker] = useState<number>(-1)
+  const [selectedPlaceIdForMarker, setSelectedPlaceIdForMarker] = useState<string | undefined>()
   const [selectedIconType, setSelectedIconType] = useState<string>("outlined_pin")
   const [selectedIconTypeToRemove, setSelectedIconTypeToRemove] = useState<string>("")
-  const [placeSearchFilter, setPlaceSearchFilter] = useState<string>("")
 
   const apiKey = 'AiNFZyJdbr5qa2KHmj7e-dev'
 
@@ -256,31 +258,26 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
       )
     )
   }
-  async function getRouteArgs(startLocationIndex: number, targetPlaceKey: number){
-    const targetPlace = places[targetPlaceKey]
+  async function getRouteArgs(startId: string | undefined, finalId: string | undefined){
+    if (!newMap) return {placeIds: [], routeArgs: undefined}
+    if (!finalId || finalId === USER_POSITION_VALUE) {
+      presentToast('top', 'Select a destination place')
+      return {placeIds: [], routeArgs: undefined}
+    }
+    const targetPlace = places.find((p) => p.id === finalId)
+    if (!targetPlace) return {placeIds: [], routeArgs: undefined}
 
-    if (!newMap) return {placeIds: [], undefined}
     let initialPos: LocationRoutePlace | IdRoutePlace
     let placeIds: string[] = [];
     // Using user location as initial position
-    if (startLocationIndex === -1) {
+    if (!startId || startId === USER_POSITION_VALUE) {
       await getCurrentPosition()
-      console.log(
-        `STARTING ROUTE Current position ${JSON.stringify(
-          currentPositionRef.current
-        ).toString()}`
-      )
       if (
         currentPositionRef.current?.location?.building &&
         currentPositionRef.current?.location?.floor &&
         currentPositionRef.current?.location?.latitude &&
         currentPositionRef.current?.location?.longitude
       ) {
-        console.log(
-          `STARTING ROUTE Using current user position ${JSON.stringify(
-            currentPositionRef.current
-          ).toString()}`
-        )
         initialPos = {
           type: 'LOCATION',
           building: currentPositionRef.current.location.building,
@@ -291,20 +288,21 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
         }
       } else {
         console.error('LZ Something failed when getting location')
-        return {placeIds: [], undefined}
+        presentToast('top', 'Could not get current position')
+        return {placeIds: [], routeArgs: undefined}
       }
     } else {
-      console.log('LZRouting Start not user location')
-      let initialPlace = places[startLocationIndex]
+      const initialPlace = places.find((p) => p.id === startId)
+      if (!initialPlace) return {placeIds: [], routeArgs: undefined}
       if (useIds) {
-        let initialLocation: IdRoutePlace = {
+        const initialLocation: IdRoutePlace = {
           type: 'ID',
           id: initialPlace.alias ?? initialPlace.id,
         }
         placeIds.push(initialLocation.id)
         initialPos = initialLocation
       } else {
-        let initialLocation: LocationRoutePlace = {
+        const initialLocation: LocationRoutePlace = {
           type: 'LOCATION',
           building: parentPlaceRef.id,
           floor: initialPlace.inFloor ? initialPlace.inFloor[0] : undefined,
@@ -317,14 +315,14 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
     }
     let finalPos: LocationRoutePlace | IdRoutePlace
     if (useIds) {
-      let location: IdRoutePlace = {
+      const location: IdRoutePlace = {
         type: 'ID',
         id: targetPlace.alias ?? targetPlace.id,
       }
       placeIds.push(location.id)
       finalPos = location
     } else {
-      let location: LocationRoutePlace = {
+      const location: LocationRoutePlace = {
         building: parentPlaceRef.id,
         floor: targetPlace.inFloor ? targetPlace.inFloor[0] : undefined,
         polygons: undefined,
@@ -364,19 +362,14 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
     return {placeIds, routeArgs};
   }
 
-  //if you only want to show the route on the map
-  //if startLocationIndex is -1, it starts from user location
-  async function startRoute(
-    startLocationIndex: number,
-    targetPlaceKey: number
-  ) {
-    const {placeIds, routeArgs} = await getRouteArgs(startLocationIndex, targetPlaceKey)!;
+  // Show the route on the map. If startId is undefined or USER_POSITION_VALUE,
+  // the route starts from the current user position.
+  async function startRoute(startId: string | undefined, finalId: string | undefined) {
+    const {placeIds, routeArgs} = await getRouteArgs(startId, finalId)
     if (routeArgs === undefined) return
-    newMap!.addRoute(routeArgs!)
+    newMap!.addRoute(routeArgs)
       .then((routeResponse: RouteReadyCallbackData) => {
-        console.log('Route added', routeResponse)
-        let routeData = routeResponse.data
-        let steps = routeData.legs[0].steps
+        const steps = routeResponse.data.legs[0].steps
         setRouteId(routeResponse.routeId)
         setSteps(steps)
         newMap?.colorPlaces(placeIds)
@@ -385,17 +378,12 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
       .catch((e) => console.error('LZ addRoute failed ', e))
   }
 
-  async function startRouteAnimated(
-    startLocationIndex: number,
-    targetPlaceKey: number) {
-
-    const {placeIds, routeArgs} = await getRouteArgs(startLocationIndex, targetPlaceKey)!;
+  async function startRouteAnimated(startId: string | undefined, finalId: string | undefined) {
+    const {placeIds, routeArgs} = await getRouteArgs(startId, finalId)
     if (routeArgs === undefined) return
-    newMap!.getRoute(routeArgs!)
+    newMap!.getRoute(routeArgs)
       .then((routeResponse: RouteReadyCallbackData) => {
-        console.log('Route added', routeResponse)
-        let routeData = routeResponse.data
-        let steps = routeData.legs[0].steps
+        const steps = routeResponse.data.legs[0].steps
         setRouteId(routeResponse.routeId)
         setSteps(steps)
         newMap?.colorPlaces(placeIds)
@@ -501,12 +489,6 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
     setCurrentFloorKey(e.detail.value)
   }
 
-  // Filtrar lugares basado en la búsqueda
-  const filteredPlaces = places.filter(place => 
-    place.title.default.toLowerCase().includes(placeSearchFilter.toLowerCase()) ||
-    (place.inFloor && getFloorNameById(place.inFloor[0]).toLowerCase().includes(placeSearchFilter.toLowerCase()))
-  )
-
   // Opciones de iconos disponibles
   const iconOptions = [
     "person_pin",
@@ -521,12 +503,13 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
   ]
 
   async function addMarker() {
-    if (selectedPlaceForMarker === -1) {
+    if (!selectedPlaceIdForMarker) {
       presentToast('top', 'Please select a place first')
       return
     }
+    const selectedPlace = places.find((p) => p.id === selectedPlaceIdForMarker)
+    if (!selectedPlace) return
 
-    const selectedPlace = places[selectedPlaceForMarker]
     const id = await newMap?.addMarker({
       coordinate: {
         lat: selectedPlace.lat,
@@ -536,7 +519,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
       floorId: selectedPlace.inFloor ? selectedPlace.inFloor[0] : currentFloorKey,
       icon: selectedIconType
     })
-    
+
     if (id) {
       const newMarker = {
         id: id,
@@ -578,6 +561,12 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
     setCurrentFloorKey('')
     setSteps([])
   }
+
+  useEffect(() => {
+    return () => {
+      newMap?.destroy()
+    }
+  }, [newMap])
 
   async function placeTap() {    
     if (canTapPlaceOnMap) {
@@ -759,18 +748,20 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
                   </IonSelect>
                 </IonCardTitle>
                 <IonCardContent>
-                  <IonButton onClick={destroyMap}>
-                    <IonIcon icon={trashBinOutline}></IonIcon>
+                  <IonButton color='danger' onClick={destroyMap}>
+                    <IonIcon slot='start' icon={trashBinOutline}></IonIcon>
                     <IonText>Destroy Map</IonText>
                   </IonButton>
-                  <IonButton onClick={placeTap}>
-                    <IonIcon icon={trashBinOutline}></IonIcon>
-                    <IonText>Enable Place tap on map</IonText>
+                  <IonButton fill='outline' onClick={placeTap}>
+                    <IonIcon slot='start' icon={canTapPlaceOnMap ? handLeft : handLeftOutline}></IonIcon>
+                    <IonText>{canTapPlaceOnMap ? 'Disable place tap' : 'Enable place tap'}</IonText>
                   </IonButton>
-                  {canTapPlaceOnMap ? <IonButton onClick={clearTappedPlace}>
-                    <IonIcon icon={trashBinOutline}></IonIcon>
-                    <IonText>Clear selected place on map</IonText>
-                  </IonButton> : null}
+                  {canTapPlaceOnMap && (
+                    <IonButton fill='outline' color='medium' onClick={clearTappedPlace}>
+                      <IonIcon slot='start' icon={closeCircleOutline}></IonIcon>
+                      <IonText>Clear selected place</IonText>
+                    </IonButton>
+                  )}
                 </IonCardContent>
               </IonCard>
             ) : (
@@ -1125,52 +1116,54 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
             </IonAccordion>
           )}
 
-          <IonAccordion value='beacons-simulation'>
-            <IonItem slot='header' color='light' key='beaconsSimulation'>
-              <IonLabel>Beacons simulation</IonLabel>
-            </IonItem>
-            <div className='ion-padding' slot='content'>
-              <div>
-                <IonText>
-                  Change the beacon to simulate, also show the current beacon
-                  simulated. The list of beacons to simulate is hardcoded on the
-                  app.
-                </IonText>
+          {newMap && (
+            <IonAccordion value='beacons-simulation'>
+              <IonItem slot='header' color='light' key='beaconsSimulation'>
+                <IonLabel>Beacons simulation</IonLabel>
+              </IonItem>
+              <div className='ion-padding' slot='content'>
+                <div>
+                  <IonText>
+                    Change the beacon to simulate, also show the current beacon
+                    simulated. The list of beacons to simulate is hardcoded on the
+                    app.
+                  </IonText>
+                </div>
+                <div>
+                  <IonButton
+                    onClick={() => setCurrentBeaconIndex(currentBeaconIndex + 1)}
+                  >
+                    <IonIcon slot='start' icon={caretForward}></IonIcon>
+                    <IonLabel>Simulate Next Beacon</IonLabel>
+                  </IonButton>
+                  <IonButton
+                    id='simulate-beacon-button-information'
+                    fill='clear'
+                    className='information-button'
+                  >
+                    <IonIcon
+                      slot='icon-only'
+                      icon={informationCircle}
+                      color='warning'
+                      size='large'
+                    />
+                  </IonButton>
+                  <IonPopover
+                    trigger='simulate-beacon-button-information'
+                    triggerAction='click'
+                  >
+                    <IonContent class='ion-padding'>
+                      Change to next beacon to simulate. If has not simulated,
+                      start to simulate the first beacon.
+                    </IonContent>
+                  </IonPopover>
+                </div>
+                <div>
+                  <IonText>Current beacon {currentSimulatedBeacon}</IonText>
+                </div>
               </div>
-              <div>
-                <IonButton
-                  onClick={() => setCurrentBeaconIndex(currentBeaconIndex + 1)}
-                >
-                  <IonIcon icon={caretForward}></IonIcon>
-                  <IonLabel>Simulate Next Beacon</IonLabel>
-                </IonButton>
-                <IonButton
-                  id='simulate-beacon-button-information'
-                  fill='clear'
-                  className='information-button'
-                >
-                  <IonIcon
-                    slot='icon-only'
-                    icon={informationCircle}
-                    color='warning'
-                    size='large'
-                  />
-                </IonButton>
-                <IonPopover
-                  trigger='simulate-beacon-button-information'
-                  triggerAction='click'
-                >
-                  <IonContent class='ion-padding'>
-                    Change to next beacon to simulate. If has not simulated,
-                    start to simulate the first beacon.
-                  </IonContent>
-                </IonPopover>
-              </div>
-              <div>
-                <IonText>Current beacon {currentSimulatedBeacon}</IonText>
-              </div>
-            </div>
-          </IonAccordion>
+            </IonAccordion>
+          )}
 
           {newMap && (
             <IonAccordion value='pin-and-camera'>
@@ -1182,57 +1175,17 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
                   <IonText>Add multiple markers with different icons and change camera angle and zoom.</IonText>
                 </div>
                 
-                {/* Selector de lugar para marcador */}
-                <div>
+                <IonList lines='full'>
+                  <PlaceSelect
+                    label='Place for marker'
+                    placeholder='Select a place'
+                    places={places}
+                    value={selectedPlaceIdForMarker}
+                    onChange={setSelectedPlaceIdForMarker}
+                    getFloorName={getFloorNameById}
+                  />
                   <IonItem>
-                    <IonLabel position="stacked">Select Place for Marker</IonLabel>
-                    <IonSelect
-                      value={selectedPlaceForMarker}
-                      onIonChange={(e) => setSelectedPlaceForMarker(e.detail.value)}
-                      placeholder="Choose a place"
-                      interface="popover"
-                    >
-                      <IonSelectOption value={-1}>Select a place...</IonSelectOption>
-                      {filteredPlaces.map((place, index) => {
-                        const originalIndex = places.findIndex(p => p.id === place.id)
-                        const floorName = place.inFloor ? getFloorNameById(place.inFloor[0]) : 'Outdoor'
-                        return (
-                          <IonSelectOption key={place.id} value={originalIndex}>
-                            {place.title.default} - Floor: {floorName}
-                          </IonSelectOption>
-                        )
-                      })}
-                    </IonSelect>
-                  </IonItem>
-                  
-                  {/* Buscador de lugares */}
-                  <IonItem>
-                    <IonLabel position="stacked">Search Places</IonLabel>
-                    <IonInput
-                      value={placeSearchFilter}
-                      onIonInput={(e) => setPlaceSearchFilter(e.detail.value || '')}
-                      placeholder="Type to search places..."
-                      clearInput={true}
-                      style={{
-                        '--background': 'white',
-                        '--color': 'black',
-                        '--placeholder-color': '#666'
-                      }}
-                    />
-                  </IonItem>
-                   
-                  {/* Mostrar cantidad de resultados */}
-                  {placeSearchFilter && (
-                    <IonText color="medium" style={{ fontSize: '12px', marginLeft: '16px' }}>
-                      Found {filteredPlaces.length} places
-                    </IonText>
-                  )}
-                </div>
-
-                {/* Selector de tipo de icono */}
-                <div>
-                  <IonItem>
-                    <IonLabel position="stacked">Select Icon Type</IonLabel>
+                    <IonLabel position='stacked'>Marker icon</IonLabel>
                     <IonSelect
                       value={selectedIconType}
                       onIonChange={(e) => setSelectedIconType(e.detail.value)}
@@ -1244,16 +1197,15 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
                       ))}
                     </IonSelect>
                   </IonItem>
-                </div>
+                </IonList>
 
-                {/* Botones para agregar y eliminar marcadores */}
-                <div>
-                  <IonButton onClick={addMarker} disabled={selectedPlaceForMarker === -1}>
-                    <IonIcon icon={location}></IonIcon>
+                <div className='ion-padding-top'>
+                  <IonButton onClick={addMarker} disabled={!selectedPlaceIdForMarker}>
+                    <IonIcon slot='start' icon={location}></IonIcon>
                     <IonText>Add Marker</IonText>
                   </IonButton>
-                  <IonButton color="danger" onClick={removeAllMarkers} disabled={markers.length === 0}>
-                    <IonIcon icon={trashBinOutline}></IonIcon>
+                  <IonButton color='danger' onClick={removeAllMarkers} disabled={markers.length === 0}>
+                    <IonIcon slot='start' icon={trashBinOutline}></IonIcon>
                     <IonText>Remove All Markers</IonText>
                   </IonButton>
                 </div>
@@ -1369,289 +1321,197 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
         <IonModal
           id='example-modal'
           isOpen={isOpen}
-          className='ion-padding modal-demo'
+          onDidDismiss={() => setIsOpen(false)}
         >
           <IonHeader>
             <IonToolbar>
               <IonButtons slot='start'>
                 <IonButton onClick={() => setIsOpen(false)}>Close</IonButton>
               </IonButtons>
-              <IonTitle>Route Options: </IonTitle>
+              <IonTitle>Route Options</IonTitle>
               <IonButtons slot='end'>
                 <IonButton
+                  strong
+                  disabled={!finalPlaceId || finalPlaceId === USER_POSITION_VALUE}
                   onClick={() => {
-                    if (!animate) {
-                      startRoute(startPosition, finalPosition)
-                      setIsOpen(false)
+                    if (animate) {
+                      startRouteAnimated(startPlaceId, finalPlaceId)
                     } else {
-                      startRouteAnimated(startPosition, finalPosition)
-                      setIsOpen(false)
+                      startRoute(startPlaceId, finalPlaceId)
                     }
+                    setIsOpen(false)
                   }}
                 >
-                  Start <IonIcon icon={walk}></IonIcon>
+                  Start <IonIcon slot='end' icon={walk}></IonIcon>
                 </IonButton>
               </IonButtons>
             </IonToolbar>
           </IonHeader>
-          <IonContent className='ion-padding'>
-            <IonRow>
-              <IonCol>
-                <IonCardHeader>
-                  <IonCardTitle>Animate route</IonCardTitle>
-                </IonCardHeader>
-                <IonItem lines='none'>
-                  <IonCheckbox
-                    slot='end'
-                    checked={animate}
-                    onIonChange={(e) => setAnimate(e.detail.checked)}
-                  />
-                  <IonLabel>Use animation</IonLabel>
+          <IonContent>
+            <IonList lines='full'>
+              <IonItemDivider>
+                <IonLabel>Origin and destination</IonLabel>
+              </IonItemDivider>
+              <PlaceSelect
+                label='From'
+                placeholder='My current position'
+                places={places}
+                value={startPlaceId}
+                onChange={setStartPlaceId}
+                allowUserPosition
+                getFloorName={getFloorNameById}
+              />
+              <PlaceSelect
+                label='To'
+                placeholder='Select destination'
+                places={places}
+                value={finalPlaceId}
+                onChange={setFinalPlaceId}
+                getFloorName={getFloorNameById}
+              />
+
+              <IonItemDivider>
+                <IonLabel>Route options</IonLabel>
+              </IonItemDivider>
+              <IonItem>
+                <IonCheckbox
+                  slot='start'
+                  checked={animate}
+                  onIonChange={(e) => setAnimate(e.detail.checked)}
+                />
+                <IonLabel>Animate route</IonLabel>
+              </IonItem>
+              <IonItem>
+                <IonCheckbox
+                  slot='start'
+                  checked={useIds}
+                  onIonChange={(e) => setUseIds(e.detail.checked)}
+                />
+                <IonLabel>Use IDs for places</IonLabel>
+              </IonItem>
+
+              <IonItemDivider>
+                <IonLabel>Accessibility</IonLabel>
+              </IonItemDivider>
+              <IonRadioGroup
+                id='accessibility'
+                value={withMobility ? '1' : '0'}
+                onIonChange={(event) => setWithMobility(event.detail.value !== '0')}
+              >
+                <IonItem>
+                  <IonLabel>Walking</IonLabel>
+                  <IonRadio slot='end' value='0' />
                 </IonItem>
-              </IonCol>
-            </IonRow>
-            <IonRow>
-              <IonCol>
-                <IonCardHeader>
-                  <IonCardTitle>Locations Mode</IonCardTitle>
-                </IonCardHeader>
-                <IonItem lines='none'>
-                  <IonCheckbox
-                    slot='end'
-                    checked={useIds}
-                    onIonChange={(e) => setUseIds(e.detail.checked)}
-                  />
-                  <IonLabel>Use IDs for Places</IonLabel>
+                <IonItem>
+                  <IonLabel>Accessible</IonLabel>
+                  <IonRadio slot='end' value='1' />
                 </IonItem>
-              </IonCol>
-            </IonRow>
-            <IonRow>
-              <IonCol>
-                <IonCardHeader>
-                  {' '}
-                  <IonCardTitle> From: </IonCardTitle>
-                </IonCardHeader>
-                <IonList>
-                  <IonSelect
-                    id='start_point'
-                    value={startPosition}
-                    onIonChange={(event) => {
-                      if (event.detail.value === undefined) return
-                      setStartPosition(event.detail.value)
-                    }}
-                    interfaceOptions={{
-                      translucent: false,
-                      cssClass: 'actionSheet',
-                    }}
-                  >
-                    <IonSelectOption value={-1}>User Position</IonSelectOption>
-                    {places.map((place, i) => (
-                      <IonSelectOption value={i} key={place.id}>
-                        <IonLabel class='ion-text-wrap'>
-                          {place.title?.default} -{' '}
-                          {place.inFloor
-                            ? getFloorNameById(place.inFloor[0])
-                            : 'Outdoor'}
-                        </IonLabel>
-                        <IonItemDivider />
-                      </IonSelectOption>
-                    ))}
-                  </IonSelect>
-                </IonList>
-              </IonCol>
-            </IonRow>
+              </IonRadioGroup>
 
-            <IonRow>
-              <IonCol>
-                <IonCardHeader>
-                  {' '}
-                  <IonCardTitle> To: </IonCardTitle>
-                </IonCardHeader>
-                <IonList>
-                  <IonSelect
-                    id='final_point'
-                    value={finalPosition}
-                    onIonChange={(event) => {
-                      if (event.detail.value === undefined) return
-                      setFinalPosition(event.detail.value)
-                    }}
-                    interfaceOptions={{
-                      translucent: false,
-                      cssClass: 'actionSheet',
-                    }}
-                  >
-                    {places.map((place, i) => (
-                      <IonSelectOption value={i} key={place.id}>
-                        {place.title?.default} -{' '}
-                        {place.inFloor
-                          ? getFloorNameById(place.inFloor[0])
-                          : 'Outdoor'}
-                      </IonSelectOption>
-                    ))}
-                  </IonSelect>
-                </IonList>
-              </IonCol>
-            </IonRow>
+              <IonItemDivider>
+                <IonLabel>Announce format</IonLabel>
+              </IonItemDivider>
+              <IonRadioGroup
+                id='announce-format'
+                value={announceFormat}
+                onIonChange={(event) => {
+                  if (event.detail.value === undefined) return
+                  setAnnounceFormat(event.detail.value)
+                }}
+              >
+                <IonItem>
+                  <IonLabel>Relative</IonLabel>
+                  <IonRadio slot='end' value='RELATIVE' />
+                </IonItem>
+                <IonItem>
+                  <IonLabel>Cardinal</IonLabel>
+                  <IonRadio slot='end' value='CARDINAL' />
+                </IonItem>
+                <IonItem>
+                  <IonLabel>Clock</IonLabel>
+                  <IonRadio slot='end' value='CLOCK' />
+                </IonItem>
+              </IonRadioGroup>
 
-            <IonRow>
-              <IonCol>
-                <IonCardHeader>
-                  {' '}
-                  <IonCardTitle> Route Accessibility</IonCardTitle>
-                </IonCardHeader>
-                <IonList>
-                  <IonRadioGroup
-                    id='accessibility'
-                    value={withMobility ? '1' : '0'}
-                    onIonChange={(event) => {
-                      console.log('pre cambio de variable', withMobility)
-                      setWithMobility(event.detail.value !== '0')
-                    }}
-                  >
-                    <IonItem>
-                      <IonLabel>Walking</IonLabel>
-                      <IonRadio slot='end' value='0'></IonRadio>
-                    </IonItem>
-                    <IonItem key='accessible'>
-                      <IonLabel>Accessible</IonLabel>
-                      <IonRadio slot='end' value='1'></IonRadio>
-                    </IonItem>
-                  </IonRadioGroup>
-                </IonList>
-              </IonCol>
+              <IonItemDivider>
+                <IonLabel>Unit system</IonLabel>
+              </IonItemDivider>
+              <IonRadioGroup
+                id='unit-metric'
+                value={unitSystem}
+                onIonChange={(event) => {
+                  if (event.detail.value === undefined) return
+                  setUnitSystem(event.detail.value)
+                }}
+              >
+                <IonItem>
+                  <IonLabel>Metric</IonLabel>
+                  <IonRadio slot='end' value='METRIC' />
+                </IonItem>
+                <IonItem>
+                  <IonLabel>Imperial</IonLabel>
+                  <IonRadio slot='end' value='IMPERIAL' />
+                </IonItem>
+                <IonItem>
+                  <IonLabel>Steps</IonLabel>
+                  <IonRadio slot='end' value='STEPS' />
+                </IonItem>
+              </IonRadioGroup>
 
-              <IonCol>
-                <IonCardHeader>
-                  {' '}
-                  <IonCardTitle>Announce Format</IonCardTitle>
-                </IonCardHeader>
+              <IonItemDivider>
+                <IonLabel>Language</IonLabel>
+              </IonItemDivider>
+              <IonRadioGroup
+                id='language'
+                value={instructionsLanguage}
+                onIonChange={(event) => setInstructionsLanguage(event.detail.value)}
+              >
+                <IonItem>
+                  <IonLabel>System</IonLabel>
+                  <IonRadio slot='end' value='system' />
+                </IonItem>
+                <IonItem>
+                  <IonLabel>Spanish</IonLabel>
+                  <IonRadio slot='end' value='es' />
+                </IonItem>
+                <IonItem>
+                  <IonLabel>English</IonLabel>
+                  <IonRadio slot='end' value='en' />
+                </IonItem>
+              </IonRadioGroup>
 
-                <IonList>
-                  <IonRadioGroup
-                    id='announce-format'
-                    value={announceFormat}
-                    onIonChange={(event) => {
-                      if (event.detail.value === undefined) return
-                      if (isOpen) {
-                        setAnnounceFormat(event.detail.value.toString())
-                      }
-                    }}
-                  >
-                    <IonItem>
-                      <IonLabel>RELATIVE</IonLabel>
-                      <IonRadio slot='end' value='RELATIVE'></IonRadio>
-                    </IonItem>
+              <IonItemDivider>
+                <IonLabel>Behind style</IonLabel>
+              </IonItemDivider>
+              <IonRadioGroup
+                id='behind-color'
+                value={behindStyle}
+                onIonChange={(e) => setBehindStyle(e.detail.value)}
+              >
+                {behindStyleOptions.map((option) => (
+                  <IonItem key={'behind-' + option}>
+                    <IonLabel>{option}</IonLabel>
+                    <IonRadio slot='end' value={option} />
+                  </IonItem>
+                ))}
+              </IonRadioGroup>
 
-                    <IonItem key='cardinal'>
-                      <IonLabel>CARDINAL</IonLabel>
-                      <IonRadio slot='end' value='CARDINAL'></IonRadio>
-                    </IonItem>
-
-                    <IonItem key='clock'>
-                      <IonLabel>CLOCK</IonLabel>
-                      <IonRadio slot='end' value='CLOCK'></IonRadio>
-                    </IonItem>
-                  </IonRadioGroup>
-                </IonList>
-              </IonCol>
-              <IonCol>
-                <IonCardHeader>
-                  {' '}
-                  <IonCardTitle> Announce Unit System</IonCardTitle>
-                </IonCardHeader>
-                <IonList>
-                  <IonRadioGroup
-                    id='unit-metric'
-                    value={unitSystem}
-                    onIonChange={(event) => {
-                      if (event.detail.value === undefined) return
-                      if (isOpen) {
-                        setUnitSystem(event.detail.value.toString())
-                      }
-                    }}
-                  >
-                    <IonItem key='metric'>
-                      <IonLabel>METRIC</IonLabel>
-                      <IonRadio slot='end' value='METRIC'></IonRadio>
-                    </IonItem>
-
-                    <IonItem key='imperial'>
-                      <IonLabel>IMPERIAL</IonLabel>
-                      <IonRadio slot='end' value='IMPERIAL'></IonRadio>
-                    </IonItem>
-
-                    <IonItem key='steps'>
-                      <IonLabel>STEPS</IonLabel>
-                      <IonRadio slot='end' value='STEPS'></IonRadio>
-                    </IonItem>
-                  </IonRadioGroup>
-                </IonList>
-              </IonCol>
-              <IonCol>
-                <IonCardHeader>
-                  {' '}
-                  <IonCardTitle> Language</IonCardTitle>
-                </IonCardHeader>
-                <IonList>
-                  <IonRadioGroup
-                    id='language'
-                    value={instructionsLanguage}
-                    onIonChange={(event) => {
-                      setInstructionsLanguage(event.detail.value.toString())
-                    }}
-                  >
-                    <IonItem key='langDefault'>
-                      <IonLabel>SYSTEM</IonLabel>
-                      <IonRadio slot='end' value='system' />
-                    </IonItem>
-
-                    <IonItem key='langES'>
-                      <IonLabel>SPANISH</IonLabel>
-                      <IonRadio slot='end' value='es' />
-                    </IonItem>
-
-                    <IonItem key='langEN'>
-                      <IonLabel>ENGLISH</IonLabel>
-                      <IonRadio slot='end' value='en' />
-                    </IonItem>
-                  </IonRadioGroup>
-                </IonList>
-              </IonCol>
-              <IonCol>
-                <IonCardHeader>
-                  <IonCardTitle>Behind Style</IonCardTitle>
-                </IonCardHeader>
-                <IonRadioGroup
-                  id='behind-color'
-                  value={behindStyle}
-                  onIonChange={(e) => setBehindStyle(e.detail.value)}
-                >
-                  {behindStyleOptions.map((option) => (
-                    <IonItem key={'behind-' + option}>
-                      <IonLabel>{option}</IonLabel>
-                      <IonRadio slot='end' value={option}></IonRadio>
-                    </IonItem>
-                  ))}
-                </IonRadioGroup>
-              </IonCol>
-              <IonCol>
-                <IonCardHeader>
-                  <IonCardTitle>Ahead Color</IonCardTitle>
-                </IonCardHeader>
-                <IonRadioGroup
-                  id='ahead-color'
-                  value={aheadStyle}
-                  onIonChange={(e) => setAheadStyle(e.detail.value)}
-                >
-                  {aheadStyleOptions.map((option) => (
-                    <IonItem key={'ahead-' + option}>
-                      <IonLabel>{option}</IonLabel>
-                      <IonRadio slot='end' value={option}></IonRadio>
-                    </IonItem>
-                  ))}
-                </IonRadioGroup>
-              </IonCol>
-            </IonRow>
+              <IonItemDivider>
+                <IonLabel>Ahead style</IonLabel>
+              </IonItemDivider>
+              <IonRadioGroup
+                id='ahead-color'
+                value={aheadStyle}
+                onIonChange={(e) => setAheadStyle(e.detail.value)}
+              >
+                {aheadStyleOptions.map((option) => (
+                  <IonItem key={'ahead-' + option}>
+                    <IonLabel>{option}</IonLabel>
+                    <IonRadio slot='end' value={option} />
+                  </IonItem>
+                ))}
+              </IonRadioGroup>
+            </IonList>
           </IonContent>
         </IonModal>
         <IonRow>
