@@ -22,12 +22,32 @@ android {
             signingConfig signingConfigs.debug
         }
     }
+    // 16 KB page size support (required for Android 15+); mirrors the customer app.
+    packaging {
+        jniLibs {
+            useLegacyPackaging = false
+        }
+    }
     namespace "com.LazarilloTecSpa.DemoLazarilloSDK"
 }
 
 repositories {
     flatDir{
         dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+    }
+}
+
+// Avoid duplicate-class crash from androidsvg + androidsvg-aar both being
+// pulled transitively (e.g. mlkit / qr / sdk paths). The customer app uses
+// the same exclusion; this is necessary before R8 can even run.
+configurations.all {
+    exclude group: 'com.caverock', module: 'androidsvg-aar'
+
+    // Pin androidx.browser to 1.8.0 to stay on compileSdk 35 (mirrors the
+    // customer app). Newer Capacitor plugins started pulling 1.9.0, which
+    // would force compileSdk 36.
+    resolutionStrategy {
+        force "androidx.browser:browser:$androidxBrowserVersion"
     }
 }
 

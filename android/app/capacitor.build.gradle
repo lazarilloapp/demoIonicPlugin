@@ -9,12 +9,32 @@ android {
 
 apply from: "../capacitor-cordova-android-plugins/cordova.variables.gradle"
 dependencies {
+    implementation project(':capacitor-community-device-security-detect')
+    implementation project(':capacitor-community-fcm')
+    implementation project(':capacitor-community-firebase-analytics')
+    implementation project(':capacitor-community-in-app-review')
+    implementation project(':capacitor-community-native-market')
+    implementation project(':capacitor-firebase-crashlytics')
+    implementation project(':capacitor-mlkit-barcode-scanning')
     implementation project(':capacitor-app')
+    implementation project(':capacitor-browser')
+    implementation project(':capacitor-camera')
+    implementation project(':capacitor-clipboard')
     implementation project(':capacitor-device')
+    implementation project(':capacitor-geolocation')
     implementation project(':capacitor-haptics')
     implementation project(':capacitor-keyboard')
+    implementation project(':capacitor-preferences')
+    implementation project(':capacitor-push-notifications')
     implementation project(':capacitor-status-bar')
+    implementation project(':capawesome-capacitor-app-update')
+    implementation project(':capgo-capacitor-social-login')
+    implementation project(':capgo-capacitor-updater')
+    implementation project(':capgo-inappbrowser')
     implementation project(':lzdevelopers-lazarillo-maps')
+    implementation project(':capacitor-native-settings')
+    implementation project(':capacitor-plugin-safe-area')
+    implementation project(':capacitor-swipe-back-plugin')
 
 }
 
