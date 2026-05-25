@@ -63,6 +63,7 @@ import { InnerFloor } from '../places/InnerFloor'
 import { Place } from '../places/Place'
 import PlaceSelect, { USER_POSITION_VALUE } from '../places/PlaceSelect'
 import RouteInstruction from '../routeInstructions/RouteInstructions'
+import { API_KEY } from '../../config'
 import './ExploreContainer.css'
 
 interface ContainerProps {
@@ -164,7 +165,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({ place }) => {
   const [selectedIconType, setSelectedIconType] = useState<string>("outlined_pin")
   const [selectedIconTypeToRemove, setSelectedIconTypeToRemove] = useState<string>("")
 
-  const apiKey = 'AiNFZyJdbr5qa2KHmj7e-dev'
+  const apiKey = API_KEY
 
   async function initPlugin() {
     if (!initialized) {

@@ -12,18 +12,26 @@ import { useEffect, useState } from 'react'
 
 import { Place } from '../places/Place'
 import { LazarilloMap } from '@lzdevelopers/lazarillo-maps'
+import { API_KEY } from '../../config'
 
 interface ContainerProps {
   onSelected: (place: Place) => void
+  /**
+   * Optional perf hook: invoked once the parent-places fetch completes,
+   * with the round-trip duration in ms. Used by the Cache & Preload Lab
+   * menu to surface live timing — /home ignores it.
+   */
+  onMetric?: (name: string, durationMs: number) => void
 }
 
-const SelectParentPlaceContainer: React.FC<ContainerProps> = ({ onSelected }) => {
+const SelectParentPlaceContainer: React.FC<ContainerProps> = ({ onSelected, onMetric }) => {
   const [parentPlacesList, setParentPlacesList] = useState<Place[]>([])
 
-  const apiKey = 'AiNFZyJdbr5qa2KHmj7e-dev'
+  const apiKey = API_KEY
 
   useEffect(() => {
     getParentPlaces()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const onSelectParentPlace = (e: CustomEvent) => {
@@ -35,8 +43,10 @@ const SelectParentPlaceContainer: React.FC<ContainerProps> = ({ onSelected }) =>
   }
 
   const getParentPlaces = async () => {
+    const startedAt = performance.now()
     await LazarilloMap.getAvailablePlaces(apiKey).then(async (response: any[]) => {
       setParentPlacesList(response)
+      onMetric?.('available_places', performance.now() - startedAt)
     })
   }
 
