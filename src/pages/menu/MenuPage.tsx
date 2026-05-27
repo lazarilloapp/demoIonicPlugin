@@ -184,6 +184,28 @@ const MenuPage: React.FC = () => {
             routerLink='/scenario/map'
             disabled={!parentPlace}
           />
+          <ScenarioCard
+            icon={locationOutline}
+            subtitle='Scenario 4'
+            title='Map + place'
+            description='Opens the map and drops a marker for one sub-place — the deep-linked store flow. Measures create + addMarker together.'
+            metricName='map_with_place_total'
+            metricLabel='Visible total'
+            metricThreshold={1500}
+            routerLink='/scenario/map-with-place'
+            disabled={!parentPlace}
+          />
+          <ScenarioCard
+            icon={list}
+            subtitle='Scenario 5'
+            title='Map + list'
+            description='Opens the map and drops markers for every sub-place. Stresses slim getSubPlaces + addMarkers batch IPC.'
+            metricName='map_with_list_total'
+            metricLabel='Visible total'
+            metricThreshold={2500}
+            routerLink='/scenario/map-with-list'
+            disabled={!parentPlace}
+          />
         </div>
 
         <IonItem

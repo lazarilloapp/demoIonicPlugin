@@ -8,8 +8,11 @@ import MenuPage from './pages/menu/MenuPage';
 import SubplacesListPage from './pages/scenarios/SubplacesListPage';
 import PlaceProfilePage from './pages/scenarios/PlaceProfilePage';
 import MapDirectPage from './pages/scenarios/MapDirectPage';
+import MapWithPlacePage from './pages/scenarios/MapWithPlacePage';
+import MapWithListPage from './pages/scenarios/MapWithListPage';
 import { ParentPlaceProvider } from './contexts/ParentPlaceContext';
 import { PerfMetricsProvider } from './contexts/PerfMetricsContext';
+import BenchAutoDrive from './contexts/BenchAutoDrive';
 import { API_KEY } from './config';
 
 /* Core CSS required for Ionic components to work properly */
@@ -87,6 +90,7 @@ const App: React.FC = () => {
         <ParentPlaceProvider>
           <IonReactRouter>
             <FirstMountRedirect />
+            <BenchAutoDrive />
             <IonRouterOutlet>
               {/* IonRouterOutlet picks the FIRST matching child route. Putting the
                   root redirect ahead of the explicit `/home` route is what makes
@@ -106,6 +110,12 @@ const App: React.FC = () => {
               </Route>
               <Route exact path="/scenario/map">
                 <MapDirectPage />
+              </Route>
+              <Route exact path="/scenario/map-with-place">
+                <MapWithPlacePage />
+              </Route>
+              <Route exact path="/scenario/map-with-list">
+                <MapWithListPage />
               </Route>
               <Route exact path="/home">
                 <Home />
