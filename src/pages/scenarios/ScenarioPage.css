@@ -56,7 +56,11 @@
   width: 100%;
   height: 60vh;
   min-height: 360px;
-  background: #d8d8d8;
+  /* Transparent so the native MapLibre view (rendered behind the WebView)
+     is visible. Setting an opaque background here hides the map and only
+     leaves the tiles peeking around the container edges — the issue that
+     prompted this fix. */
+  background: transparent;
 }
 
 .scenario-page__map-overlay {

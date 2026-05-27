@@ -78,7 +78,11 @@ const MapWithListPage: React.FC = () => {
       await LazarilloMap.initializeLazarilloPlugin({ apiKey: API_KEY, place: parentPlace.id })
       const fetchStart = performance.now()
       places = ((await LazarilloMap.getSubPlaces(parentPlace.id, {
-        fields: ['id', 'title', 'lat', 'lng', 'floorId'],
+        // `inFloor` is the SDK's actual field name (array of floor IDs the
+        // place sits on); the marker layer expects `floorId` per place so
+        // we pick inFloor[0] below. Requesting `floorId` here would yield
+        // undefined and disable floor filtering on every marker.
+        fields: ['id', 'title', 'lat', 'lng', 'inFloor'],
       })) as Place[]) ?? []
       record('list_fetch', performance.now() - fetchStart)
       setMarkerCount(places.length)
@@ -126,7 +130,12 @@ const MapWithListPage: React.FC = () => {
             const markers: Marker[] = places.map((p) => ({
               coordinate: { lat: p.lat, lng: p.lng },
               title: p.title?.default ?? p.id,
-              floorId: (p as any).floorId,
+              // `inFloor` is the SDK's per-place floor list (a place can sit
+              // on more than one floor in a multi-level store). The Marker
+              // API takes a single `floorId`; we pick the first floor so the
+              // SDK hides the marker when the user is on a different floor.
+              // Places without an inFloor stay outdoor (no filtering).
+              floorId: p.inFloor?.[0],
             }))
             if (markers.length > 0) {
               await mapRef.current?.addMarkers(markers)

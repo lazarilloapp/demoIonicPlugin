@@ -135,7 +135,10 @@ const MapWithPlacePage: React.FC = () => {
             await mapRef.current?.addMarker({
               coordinate: { lat: target.lat, lng: target.lng },
               title: target.title?.default ?? target.id,
-              floorId: (target as any).floorId,
+              // SDK exposes the place's floors as `inFloor` (array). Marker
+              // takes a single `floorId` so we pick the first; matches
+              // MapWithListPage's pattern.
+              floorId: target.inFloor?.[0],
             })
             record('place_with_place_marker', performance.now() - markerStart)
             record('map_with_place_total', performance.now() - totalStart)
