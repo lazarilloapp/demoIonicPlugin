@@ -1,0 +1,29 @@
+.perf-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.perf-badge ion-icon {
+  font-size: 1rem;
+}
+
+.perf-history {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.perf-history__chip {
+  background: rgba(var(--ion-color-primary-rgb, 56, 128, 255), 0.12);
+  color: var(--ion-color-primary, #3880ff);
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-variant-numeric: tabular-nums;
+}

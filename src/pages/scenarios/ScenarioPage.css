@@ -1,0 +1,91 @@
+.scenario-page {
+  --background: var(--ion-background-color, #fff);
+}
+
+.scenario-page__header {
+  padding: 12px 16px 6px;
+}
+
+.scenario-page__subtitle {
+  margin: 0 0 4px;
+  font-size: 0.95rem;
+}
+
+.scenario-page__perf {
+  margin-top: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.scenario-page__loading,
+.scenario-page__empty,
+.scenario-page__error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 24px 16px;
+  text-align: center;
+}
+
+.scenario-page__avatar {
+  background: rgba(var(--ion-color-primary-rgb, 56, 128, 255), 0.12);
+  color: var(--ion-color-primary, #3880ff);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  font-size: 1.2rem;
+}
+
+.scenario-page__hint {
+  margin: 0 16px 12px;
+  font-size: 0.85rem;
+  color: var(--ion-color-medium, #92949c);
+}
+
+.scenario-page__picker {
+  margin: 0 12px 16px;
+}
+
+.scenario-page__map-container {
+  position: relative;
+  width: 100%;
+  height: 60vh;
+  min-height: 360px;
+  /* Transparent so the native MapLibre view (rendered behind the WebView)
+     is visible. Setting an opaque background here hides the map and only
+     leaves the tiles peeking around the container edges — the issue that
+     prompted this fix. */
+  background: transparent;
+}
+
+.scenario-page__map-overlay {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  right: 12px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  font-size: 0.8rem;
+}
+
+.scenario-page__map-overlay-error {
+  color: #ff8a80;
+}
+
+.scenario-page__map-container capacitor-lazarillo-map,
+.scenario-page__map-element {
+  display: block;
+  width: 100%;
+  height: 100%;
+}

@@ -3,12 +3,30 @@
 	"appName": "Demo Lazarillo SDK",
 	"webDir": "build",
 	"packageClassList": [
+		"DeviceSecurityDetectPlugin",
+		"InAppReviewPlugin",
+		"NativeMarket",
+		"BarcodeScannerPlugin",
 		"AppPlugin",
+		"CAPBrowserPlugin",
+		"CAPCameraPlugin",
+		"ClipboardPlugin",
 		"DevicePlugin",
+		"GeolocationPlugin",
 		"HapticsPlugin",
 		"KeyboardPlugin",
+		"PreferencesPlugin",
+		"PushNotificationsPlugin",
 		"StatusBarPlugin",
+		"AppUpdatePlugin",
+		"SocialLoginPlugin",
+		"CapacitorUpdaterPlugin",
+		"InAppBrowserPlugin",
 		"KFSessionDelegate",
-		"CapacitorLazarilloMaps"
+		"CapacitorLazarilloMaps",
+		"NativeSettingsPlugin",
+		"AppTrackingTransparencyPlugin",
+		"SafeAreaPlugin",
+		"CapacitorSwipeBackPlugin"
 	]
 }

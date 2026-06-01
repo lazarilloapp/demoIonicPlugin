@@ -20,6 +20,16 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <!-- Bench harness deep link. Lets `adb shell am start -W -a
+                 android.intent.action.VIEW -d "lzbench://drive?bench=..."`
+                 drive the demo without DOM tap automation. Picked up by
+                 Capacitor's App plugin → BenchAutoDrive. -->
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="lzbench" />
+            </intent-filter>
         </activity>
 
         <provider

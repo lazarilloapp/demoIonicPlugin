@@ -1,0 +1,104 @@
+capacitor-lazarillo-map.demo-map {
+  display: inline-block;
+  width: 100%;
+  height: 300px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+capacitor-lazarillo-map.demo-map--full {
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+}
+
+.demo-controls {
+  height: calc(100vh - 300px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin-top: 300px;
+  position: relative;
+  z-index: 2;
+  background: #ffffff;
+  color: #000000;
+}
+
+.demo-controls__hint {
+  position: fixed;
+  top: 64px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.65);
+  color: #ffffff;
+  font-size: 13px;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+@media (prefers-color-scheme: dark) {
+  .demo-controls {
+    background: #121212;
+    color: #ffffff;
+  }
+}
+
+.place-profile__hero img {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  display: block;
+}
+
+.place-profile__header h2 {
+  margin: 0 0 4px 0;
+  font-size: 22px;
+}
+
+.place-profile__alias {
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+}
+
+.place-profile__description {
+  margin: 12px 0 0 0;
+  line-height: 1.4;
+}
+
+.place-profile__tags {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.place-profile__raw {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
+}
+
+.demo-tile {
+  cursor: pointer;
+}
+
+.demo-tile ion-card-title {
+  font-size: 18px;
+}
+
+.demo-tile ion-icon {
+  font-size: 32px;
+}

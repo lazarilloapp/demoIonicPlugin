@@ -1,0 +1,79 @@
+.menu-page {
+  --background: var(--ion-background-color, #f4f5f8);
+}
+
+.menu-title__icon {
+  vertical-align: middle;
+  margin-right: 6px;
+  color: var(--ion-color-warning, #ffc409);
+}
+
+.menu-page__heading {
+  margin: 18px 16px 4px;
+  font-size: 1.35rem;
+}
+
+.menu-page__hint {
+  margin: 0 16px 16px;
+  color: var(--ion-color-medium, #92949c);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.menu-page__parent-card {
+  margin: 12px;
+}
+
+.menu-page__parent-current ion-icon {
+  color: var(--ion-color-primary, #3880ff);
+}
+
+.menu-page__cards {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0 8px 16px;
+}
+
+.scenario-card {
+  margin: 8px;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.scenario-card:hover:not([disabled]) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.18);
+}
+
+.scenario-card__heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.scenario-card__icon {
+  font-size: 2.2rem;
+  color: var(--ion-color-primary, #3880ff);
+  flex-shrink: 0;
+}
+
+.scenario-card__metrics {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.menu-page__legacy-link {
+  margin: 12px;
+  border-radius: 8px;
+  --background: var(--ion-color-light, #f4f5f8);
+}
+
+.menu-page__footer-note {
+  display: block;
+  text-align: center;
+  font-size: 0.72rem;
+  padding: 4px 0;
+}

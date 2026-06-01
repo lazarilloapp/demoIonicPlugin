@@ -1,11 +1,55 @@
 [
 	{
+		"pkg": "@capacitor-community/device-security-detect",
+		"classpath": "com.mukha.andrei.plugins.device.secutiry.detect.DeviceSecurityDetectPlugin"
+	},
+	{
+		"pkg": "@capacitor-community/fcm",
+		"classpath": "com.getcapacitor.community.fcm.FCMPlugin"
+	},
+	{
+		"pkg": "@capacitor-community/firebase-analytics",
+		"classpath": "com.getcapacitor.community.firebaseanalytics.FirebaseAnalytics"
+	},
+	{
+		"pkg": "@capacitor-community/in-app-review",
+		"classpath": "com.getcapacitor.community.inappreview.InAppReviewPlugin"
+	},
+	{
+		"pkg": "@capacitor-community/native-market",
+		"classpath": "com.getcapacitor.community.nativemarket.NativeMarket"
+	},
+	{
+		"pkg": "@capacitor-firebase/crashlytics",
+		"classpath": "io.capawesome.capacitorjs.plugins.firebase.crashlytics.FirebaseCrashlyticsPlugin"
+	},
+	{
+		"pkg": "@capacitor-mlkit/barcode-scanning",
+		"classpath": "io.capawesome.capacitorjs.plugins.mlkit.barcodescanning.BarcodeScannerPlugin"
+	},
+	{
 		"pkg": "@capacitor/app",
 		"classpath": "com.capacitorjs.plugins.app.AppPlugin"
 	},
 	{
+		"pkg": "@capacitor/browser",
+		"classpath": "com.capacitorjs.plugins.browser.BrowserPlugin"
+	},
+	{
+		"pkg": "@capacitor/camera",
+		"classpath": "com.capacitorjs.plugins.camera.CameraPlugin"
+	},
+	{
+		"pkg": "@capacitor/clipboard",
+		"classpath": "com.capacitorjs.plugins.clipboard.ClipboardPlugin"
+	},
+	{
 		"pkg": "@capacitor/device",
 		"classpath": "com.capacitorjs.plugins.device.DevicePlugin"
+	},
+	{
+		"pkg": "@capacitor/geolocation",
+		"classpath": "com.capacitorjs.plugins.geolocation.GeolocationPlugin"
 	},
 	{
 		"pkg": "@capacitor/haptics",
@@ -16,11 +60,47 @@
 		"classpath": "com.capacitorjs.plugins.keyboard.KeyboardPlugin"
 	},
 	{
+		"pkg": "@capacitor/preferences",
+		"classpath": "com.capacitorjs.plugins.preferences.PreferencesPlugin"
+	},
+	{
+		"pkg": "@capacitor/push-notifications",
+		"classpath": "com.capacitorjs.plugins.pushnotifications.PushNotificationsPlugin"
+	},
+	{
 		"pkg": "@capacitor/status-bar",
 		"classpath": "com.capacitorjs.plugins.statusbar.StatusBarPlugin"
 	},
 	{
+		"pkg": "@capawesome/capacitor-app-update",
+		"classpath": "io.capawesome.capacitorjs.plugins.appupdate.AppUpdatePlugin"
+	},
+	{
+		"pkg": "@capgo/capacitor-social-login",
+		"classpath": "ee.forgr.capacitor.social.login.SocialLoginPlugin"
+	},
+	{
+		"pkg": "@capgo/capacitor-updater",
+		"classpath": "ee.forgr.capacitor_updater.CapacitorUpdaterPlugin"
+	},
+	{
+		"pkg": "@capgo/inappbrowser",
+		"classpath": "ee.forgr.capacitor_inappbrowser.InAppBrowserPlugin"
+	},
+	{
 		"pkg": "@lzdevelopers/lazarillo-maps",
 		"classpath": "com.capacitorlazarillo.sdk.plugin.CapacitorLazarilloMapsPlugin"
+	},
+	{
+		"pkg": "capacitor-native-settings",
+		"classpath": "nl.raphael.settings.NativeSettingsPlugin"
+	},
+	{
+		"pkg": "capacitor-plugin-safe-area",
+		"classpath": "com.capacitor.safearea.SafeAreaPlugin"
+	},
+	{
+		"pkg": "capacitor-swipe-back-plugin",
+		"classpath": "com.swipeback.CapacitorSwipeBackPlugin"
 	}
 ]

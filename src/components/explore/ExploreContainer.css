@@ -8,12 +8,6 @@ capacitor-lazarillo-map {
   z-index: 1;
 }
 
-ion-modal#example-modal {
-  --box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1),
-    0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --backdrop-opacity: 0;
-  --ion-background-color: #ffffff;
-}
 
 .grid-2 {
   height: calc(100vh - 300px); /* Altura total menos la altura del mapa */
@@ -22,19 +16,21 @@ ion-modal#example-modal {
   margin-top: 300px; /* Espacio para el mapa fijo */
   position: relative;
   z-index: 2;
-  background: white;
+  background: #ffffff;
+  color: #000000;
+}
+
+@media (prefers-color-scheme: dark) {
+  .grid-2 {
+    background: #121212;
+    color: #ffffff;
+  }
 }
 
 ion-popover {
-  --background: white;
   --backdrop-opacity: 0.6;
   --box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.6);
-  --color: white;
   justify-content: center;
-}
-
-ion-popover ion-content {
-  --background: rgb(255, 255, 255);
 }
 
 ion-button.information-button {

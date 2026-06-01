@@ -6,6 +6,21 @@
 		<array>
 			<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 		</array>
+		<key>CFBundleURLTypes</key>
+		<array>
+			<dict>
+				<key>CFBundleURLName</key>
+				<string>$(PRODUCT_BUNDLE_IDENTIFIER).bench</string>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<!-- Bench harness deep link. xcrun simctl openurl booted
+					     "lzbench://drive?bench=map_direct&parent=COSTANERA"
+					     fires Capacitor App plugin's appUrlOpen event, picked
+					     up by BenchAutoDrive. Debug-only feature. -->
+					<string>lzbench</string>
+				</array>
+			</dict>
+		</array>
 		<key>CFBundleDevelopmentRegion</key>
 		<string>en</string>
 		<key>CFBundleDisplayName</key>
