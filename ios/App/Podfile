@@ -1,5 +1,5 @@
-platform :ios, '14.0'
-DEPLOYMENT_TARGET_IOS = '14.0'
+platform :ios, '16.0'
+DEPLOYMENT_TARGET_IOS = '16.0'
 use_frameworks!
 
 # workaround to avoid Xcode caching of Pods that requires
@@ -10,12 +10,33 @@ install! 'cocoapods', :disable_input_output_paths => true
 def capacitor_pods
   pod 'Capacitor', :path => '../../node_modules/@capacitor/ios'
   pod 'CapacitorCordova', :path => '../../node_modules/@capacitor/ios'
+  pod 'CapacitorCommunityDeviceSecurityDetect', :path => '../../node_modules/@capacitor-community/device-security-detect'
+  pod 'CapacitorCommunityFcm', :path => '../../node_modules/@capacitor-community/fcm'
+  pod 'CapacitorCommunityFirebaseAnalytics', :path => '../../node_modules/@capacitor-community/firebase-analytics'
+  pod 'CapacitorCommunityInAppReview', :path => '../../node_modules/@capacitor-community/in-app-review'
+  pod 'CapacitorCommunityNativeMarket', :path => '../../node_modules/@capacitor-community/native-market'
+  pod 'CapacitorFirebaseCrashlytics', :path => '../../node_modules/@capacitor-firebase/crashlytics'
+  pod 'CapacitorMlkitBarcodeScanning', :path => '../../node_modules/@capacitor-mlkit/barcode-scanning'
   pod 'CapacitorApp', :path => '../../node_modules/@capacitor/app'
+  pod 'CapacitorBrowser', :path => '../../node_modules/@capacitor/browser'
+  pod 'CapacitorCamera', :path => '../../node_modules/@capacitor/camera'
+  pod 'CapacitorClipboard', :path => '../../node_modules/@capacitor/clipboard'
   pod 'CapacitorDevice', :path => '../../node_modules/@capacitor/device'
+  pod 'CapacitorGeolocation', :path => '../../node_modules/@capacitor/geolocation'
   pod 'CapacitorHaptics', :path => '../../node_modules/@capacitor/haptics'
   pod 'CapacitorKeyboard', :path => '../../node_modules/@capacitor/keyboard'
+  pod 'CapacitorPreferences', :path => '../../node_modules/@capacitor/preferences'
+  pod 'CapacitorPushNotifications', :path => '../../node_modules/@capacitor/push-notifications'
   pod 'CapacitorStatusBar', :path => '../../node_modules/@capacitor/status-bar'
+  pod 'CapawesomeCapacitorAppUpdate', :path => '../../node_modules/@capawesome/capacitor-app-update'
+  pod 'CapgoCapacitorSocialLogin', :path => '../../node_modules/@capgo/capacitor-social-login'
+  pod 'CapgoCapacitorUpdater', :path => '../../node_modules/@capgo/capacitor-updater'
+  pod 'CapgoInappbrowser', :path => '../../node_modules/@capgo/inappbrowser'
   pod 'LzdevelopersLazarilloMaps', :path => '../../..'
+  pod 'CapacitorNativeSettings', :path => '../../node_modules/capacitor-native-settings'
+  pod 'CapacitorPluginAppTrackingTransparency', :path => '../../node_modules/capacitor-plugin-app-tracking-transparency'
+  pod 'CapacitorPluginSafeArea', :path => '../../node_modules/capacitor-plugin-safe-area'
+  pod 'CapacitorSwipeBackPlugin', :path => '../../node_modules/capacitor-swipe-back-plugin'
 end
 
 target 'Demo Lazarillo SDK' do

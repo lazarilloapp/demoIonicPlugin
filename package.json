@@ -70,7 +70,11 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --transformIgnorePatterns 'node_modules/(?!(@ionic/react|@ionic/react-router|@ionic/core|@stencil/core|ionicons)/)'",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "disable-firebase": "node scripts/disable-firebase-ios.mjs",
+    "cap:sync": "cap sync && node scripts/disable-firebase-ios.mjs",
+    "cap:sync:ios": "cap sync ios && node scripts/disable-firebase-ios.mjs",
+    "cap:copy:ios": "cap copy ios && node scripts/disable-firebase-ios.mjs"
   },
   "eslintConfig": {
     "extends": [
